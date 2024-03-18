@@ -1,20 +1,49 @@
 <script lang="ts">
-	import { spring } from 'svelte/motion';
+	import { onMount } from 'svelte'
+	import { spring } from 'svelte/motion'
 
-	let count = 0;
+	let count = 0
 
-	const displayed_count = spring();
-	$: displayed_count.set(count);
-	$: offset = modulo($displayed_count, 1);
+	let ws: WebSocket
+	onMount(async () => {
+		const fetchCount = async () => {
+			const res = await fetch('http://localhost:8787/count')
+			const data: any = await res.json()
+			count = data.count
+		}
+
+		await fetchCount()
+
+		// establish ws connection
+		ws = new WebSocket(`ws://localhost:8787/ws`)
+		ws.onmessage = (event) => {
+			const data = JSON.parse(event.data.toString())
+			count = data.count
+		}
+	})
+
+	const dec = () => {
+		count--
+		ws.send('dec')
+	}
+
+	const inc = () => {
+		count++
+		ws.send('inc')
+	}
+
+	const displayed_count = spring()
+	$: displayed_count.set(count)
+	$: offset = modulo($displayed_count, 1)
 
 	function modulo(n: number, m: number) {
 		// handle negative numbers
-		return ((n % m) + m) % m;
+		return ((n % m) + m) % m
 	}
 </script>
 
 <div class="counter">
-	<button on:click={() => (count -= 1)} aria-label="Decrease the counter by one">
+	<button on:click={dec} aria-label="Decrease the counter by one">
 		<svg aria-hidden="true" viewBox="0 0 1 1">
 			<path d="M0,0.5 L1,0.5" />
 		</svg>
@@ -27,7 +56,7 @@
 		</div>
 	</div>
 
-	<button on:click={() => (count += 1)} aria-label="Increase the counter by one">
+	<button on:click={inc} aria-label="Increase the counter by one">
 		<svg aria-hidden="true" viewBox="0 0 1 1">
 			<path d="M0,0.5 L1,0.5 M0.5,0 L0.5,1" />
 		</svg>
