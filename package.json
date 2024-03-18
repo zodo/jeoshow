@@ -1,0 +1,13 @@
+{
+	"name": "jeoshow",
+	"version": "1.0.0",
+	"scripts": {
+		"check": "cd engine && yarn run check && cd ../frontend && yarn run check",
+		"format": "prettier --write ."
+	},
+	"devDependencies": {
+		"prettier": "^3.2.5",
+		"prettier-plugin-svelte": "^3.1.2",
+		"svelte": "^4.2.7"
+	}
+}
