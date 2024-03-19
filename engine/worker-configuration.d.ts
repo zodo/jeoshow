@@ -2,5 +2,5 @@
 // by running `wrangler types --env-interface CfEnv`
 
 interface CfEnv {
-	JEOSHOW_GAME_STATE: DurableObjectNamespace;
+	JEOSHOW_GAME_STATE: DurableObjectNamespace
 }

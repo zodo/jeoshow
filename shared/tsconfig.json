@@ -1,8 +1,8 @@
 {
 	"compilerOptions": {
-		"target": "es6", // Set the JavaScript version for emitted JavaScript and included lib.
-		"module": "esnext", // Use ES modules, helpful for tree-shaking in bundlers.
-		"lib": ["esnext"], // Include library files for the target JS version and DOM manipulation.
+		"target": "es2021", // Set the JavaScript version for emitted JavaScript and included lib.
+		"module": "es2022", // Use ES modules, helpful for tree-shaking in bundlers.
+		"lib": ["es2021"], // Include library files for the target JS version and DOM manipulation.
 		"declaration": true, // Generate corresponding '.d.ts' file for the shared types.
 		"outDir": "./dist", // Output directory for compiled files.
 		"rootDir": "./src", // Root directory of source files.

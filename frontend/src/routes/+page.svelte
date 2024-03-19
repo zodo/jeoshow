@@ -1,5 +1,10 @@
 <script lang="ts">
-	import Counter from './Counter.svelte';
+	import UploadFile from '$lib/UploadFile.svelte'
+	import Username from '$lib/Username.svelte'
+
+	const onFileUploadFinished = (packId: string) => {
+		console.log('File uploaded with id:', packId)
+	}
 </script>
 
 <svelte:head>
@@ -8,7 +13,8 @@
 </svelte:head>
 
 <section>
-	<Counter />
+	<Username />
+	<UploadFile onFinished={onFileUploadFinished} />
 </section>
 
 <style>

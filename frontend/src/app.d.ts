@@ -3,7 +3,9 @@
 declare global {
 	namespace App {
 		interface Platform {
-			env: Env
+			env: {
+				JEOSHOW_PACKS: R2Bucket
+			}
 			cf: CfProperties
 			ctx: ExecutionContext
 		}
