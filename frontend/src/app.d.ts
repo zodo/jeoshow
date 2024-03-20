@@ -5,6 +5,7 @@ declare global {
 		interface Platform {
 			env: {
 				JEOSHOW_PACKS: R2Bucket
+				PUBLIC_ENGINE_URL: string
 			}
 			cf: CfProperties
 			ctx: ExecutionContext

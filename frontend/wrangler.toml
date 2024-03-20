@@ -16,3 +16,6 @@ bucket_name = "jeoshow-packs"
 # [[services]]
 # binding = "MY_SERVICE"
 # service = "my-service"
+
+[vars]
+PUBLIC_ENGINE_URL = "http://localhost:8787"

@@ -9,7 +9,11 @@ let platform: App.Platform
 
 if (dev) {
 	const { getPlatformProxy } = await import('wrangler')
-	platform = await getPlatformProxy()
+	platform = await getPlatformProxy({
+		persist: {
+			path: '../.wrangler/v3/',
+		},
+	})
 }
 
 export const handle = async ({ event, resolve }: { event: any; resolve: any }) => {

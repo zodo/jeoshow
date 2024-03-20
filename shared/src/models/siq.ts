@@ -4,22 +4,20 @@ export namespace PackModel {
 	}
 
 	export interface Round {
-		id: string
 		name: string
 		themes: Theme[]
-		typ: RoundType
+		type: RoundType
 	}
 
 	export type RoundType = 'Standard' | 'Final'
 
 	export interface Theme {
-		id: string
 		name: string
 		questions: Question[]
 	}
 
 	export interface Question {
-		id: string
+		id: number
 		fragments: Fragment[]
 		answers: Answers
 		price: number

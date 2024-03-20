@@ -1,32 +1,36 @@
+import { XMLParser } from 'fast-xml-parser'
 import { PackModel } from 'shared/models/pack/siq'
-import { parseStringPromise } from 'xml2js'
 
 export class SiqXmlContentParser {
-	public static async convert(xmlString: string): Promise<PackModel.Pack> {
-		const xml = await parseStringPromise(xmlString, { explicitArray: false })
-		const rounds = xml.rounds.round.map((r: any) => this.convertRound(r))
+	public static convert(xmlString: string): PackModel.Pack {
+		const parser = new XMLParser({
+			ignoreAttributes: false,
+			attributesGroupName: '$',
+			attributeNamePrefix: '',
+			isArray: (name: string) => ['round', 'theme', 'question', 'answer'].includes(name),
+		})
+		const xml = parser.parse(xmlString)
+		const rounds = xml.package.rounds.round.map(this.convertRound)
 		return { rounds }
 	}
 
 	private static convertRound(r: any): PackModel.Round {
 		return {
-			id: r.$.name, // Assuming XML structure allows access to attributes this way
 			name: r.$.name,
-			themes: r.themes.theme.map((t: any) => this.convertTheme(t, r.$.name)),
-			typ: r.$.type === 'final' ? 'Final' : 'Standard',
+			themes: r.themes.theme.map((t: any) => SiqXmlContentParser.convertTheme(t)),
+			type: r.$.type === 'final' ? 'Final' : 'Standard',
 		}
 	}
 
-	private static convertTheme(t: any, roundName: string): PackModel.Theme {
+	private static convertTheme(t: any): PackModel.Theme {
 		return {
-			id: t.$.name,
 			name: t.$.name,
 			questions: t.questions.question.map((q: any) => this.mapQuestion(t.$.name, q)),
 		}
 	}
 
 	private static mapQuestion(themeName: string, q: any): PackModel.Question {
-		const atoms = q.scenario.atom
+		const atoms = q.scenario?.atom ?? []
 		const markerIndex = atoms.findIndex((a: any) => a.$.type === 'marker')
 		let questions: PackModel.Fragment[] = []
 		let mediaAnswers: PackModel.Fragment[] = []
@@ -39,11 +43,10 @@ export class SiqXmlContentParser {
 		}
 
 		return {
-			id: `${themeName}-${q.$.price}`,
 			fragments: questions,
 			answers: {
-				correct: q.right.answer.map((a: any) => a._),
-				incorrect: q.wrong.answer.map((a: any) => a._),
+				correct: q.right.answer,
+				incorrect: q.wrong?.answer,
 				additional: mediaAnswers,
 			},
 			price: parseInt(q.$.price, 10),
