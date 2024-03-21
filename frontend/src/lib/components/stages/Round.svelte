@@ -16,19 +16,45 @@
 
 	<h2>{round.name}</h2>
 
-	{#each round.themes as theme}
-		<h3>{theme.name}</h3>
-
-		<ul>
-			{#each theme.questions as question}
-				<li>
-					<button on:click={() => selectQuestion(question.id)}>
-						{question.price}
-					</button>
-				</li>
+	<table>
+		<tbody>
+			{#each round.themes as { name, questions }}
+				<tr>
+					<td>{name}</td>
+					{#each questions as { id, price, available }}
+						<td
+							class={available ? 'available' : 'unavailable'}
+							on:click={() => selectQuestion(id)}
+						>
+							{price}
+						</td>
+					{/each}
+				</tr>
 			{/each}
-		</ul>
-	{/each}
+		</tbody>
+	</table>
 
 	<p>Active player: {round.activePlayerId}</p>
 </section>
+
+<style>
+	table {
+		width: 100%;
+		border-collapse: collapse;
+	}
+
+	td {
+		border: 1px solid #ddd;
+		padding: 8px;
+		text-align: center;
+	}
+
+	.available {
+		background-color: #90ee90; /* Light green to indicate availability */
+		cursor: pointer;
+	}
+
+	.unavailable {
+		background-color: #ffcccb; /* Light red to indicate unavailability */
+	}
+</style>

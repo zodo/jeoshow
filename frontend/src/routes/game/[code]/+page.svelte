@@ -39,6 +39,7 @@
 	<h1>Game {gameCode}</h1>
 
 	<button on:click={() => gameClient.sendMessage({ type: 'HitButton' })}>Hit</button>
+	<button on:click={() => gameClient.sendMessage({ type: 'StartGame' })}>Reset</button>
 
 	<PlayerList />
 

@@ -3,7 +3,7 @@ import { SiqXmlContentParser } from './xml-parser'
 
 test('converts XML to pack model', () => {
 	const pack = SiqXmlContentParser.convert(xml)
-	console.log('Pack:', JSON.stringify(pack, null, 2))
+	console.log(JSON.stringify(pack, null, 2))
 })
 
 const xml = `<?xml version="1.0" encoding="utf-8"?>
