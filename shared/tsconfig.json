@@ -1,16 +1,16 @@
 {
 	"compilerOptions": {
-		"target": "es2021", // Set the JavaScript version for emitted JavaScript and included lib.
-		"module": "es2022", // Use ES modules, helpful for tree-shaking in bundlers.
-		"lib": ["es2021"], // Include library files for the target JS version and DOM manipulation.
-		"declaration": true, // Generate corresponding '.d.ts' file for the shared types.
-		"outDir": "./dist", // Output directory for compiled files.
-		"rootDir": "./src", // Root directory of source files.
-		"composite": true, // Enable project compilation.
-		"strict": true, // Enable all strict type-checking options.
-		"esModuleInterop": true, // Enables emit interoperability between CommonJS and ES Modules.
-		"skipLibCheck": true, // Skip type checking of declaration files.
-		"forceConsistentCasingInFileNames": true // Disallow inconsistently-cased references to the same file.
+		"target": "ESNext",
+		"module": "ESNext",
+		"declaration": true,
+		"outDir": "./dist",
+		"rootDir": "./src",
+		"composite": true,
+		"strict": true,
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"forceConsistentCasingInFileNames": true,
+		"verbatimModuleSyntax": true
 	},
 	"include": ["src/**/*"],
 	"exclude": ["node_modules", "dist"]

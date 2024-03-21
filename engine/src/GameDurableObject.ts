@@ -1,7 +1,12 @@
-import { ClientAction } from 'shared/models/commands'
+import type { ClientAction } from 'shared/models/commands'
+import type { GameState } from './game/state/models'
+import type {
+	ClientCommand,
+	GameCommand,
+	ServerCommandOfType,
+} from './game/state/state-machine-models'
+import { updateState } from './game/state/state-machine'
 import { initGame } from './game/create'
-import { ClientCommand, GameCommand, ServerCommand, updateState } from './game/state-machine'
-import { GameState } from './game/models/state'
 
 export class GameDurableObject {
 	state: DurableObjectState
@@ -29,10 +34,10 @@ export class GameDurableObject {
 
 	async webSocketMessage(ws: WebSocket, message: ArrayBuffer | string) {
 		console.log('Received message:', message)
-		const command: ClientCommand = {
+		const command: ClientCommand<ClientAction> = {
 			type: 'client',
 			playerId: this.state.getTags(ws)[0],
-			action: JSON.parse(message as string) as ClientAction,
+			action: JSON.parse(message as string),
 		}
 		await this.modifyState(command, ws)
 	}
@@ -41,7 +46,7 @@ export class GameDurableObject {
 		ws.close(code, 'Durable Object is closing WebSocket')
 		const userId = this.state.getTags(ws)[0]
 		console.log('User disconnected:', userId)
-		const command: ServerCommand = {
+		const command: ServerCommandOfType<'disconnect'> = {
 			type: 'server',
 			action: { type: 'disconnect', playerId: userId },
 		}

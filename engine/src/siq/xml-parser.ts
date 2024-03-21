@@ -1,5 +1,5 @@
 import { XMLParser } from 'fast-xml-parser'
-import { PackModel } from 'shared/models/pack/siq'
+import type { PackModel } from 'shared/models/siq'
 
 export class SiqXmlContentParser {
 	public static convert(xmlString: string): PackModel.Pack {
@@ -25,11 +25,14 @@ export class SiqXmlContentParser {
 	private static convertTheme(t: any): PackModel.Theme {
 		return {
 			name: t.$.name,
-			questions: t.questions.question.map((q: any) => this.mapQuestion(t.$.name, q)),
+			questions: t.questions.question.map((q: any, idx: number) => {
+				const id = `${this.djb2Hash(t.$.name)}-${idx}`
+				return this.mapQuestion(q, id)
+			}),
 		}
 	}
 
-	private static mapQuestion(themeName: string, q: any): PackModel.Question {
+	private static mapQuestion(q: any, id: string): PackModel.Question {
 		const atoms = q.scenario?.atom ?? []
 		const markerIndex = atoms.findIndex((a: any) => a.$.type === 'marker')
 		let questions: PackModel.Fragment[] = []
@@ -43,6 +46,7 @@ export class SiqXmlContentParser {
 		}
 
 		return {
+			id: id,
 			fragments: questions,
 			answers: {
 				correct: q.right.answer,
@@ -50,7 +54,6 @@ export class SiqXmlContentParser {
 				additional: mediaAnswers,
 			},
 			price: parseInt(q.$.price, 10),
-			theme: themeName,
 		}
 	}
 
@@ -73,5 +76,16 @@ export class SiqXmlContentParser {
 			default:
 				throw new Error(`Unknown atom type: ${type}`)
 		}
+	}
+
+	private static djb2Hash(str: string): string {
+		let hash = 5381 // Initial seed
+		for (let i = 0; i < str.length; i++) {
+			// Bit-shift hash to the left and add the current character code
+			hash = (hash * 33) ^ str.charCodeAt(i)
+		}
+		// Ensure the hash is within the 32-bit integer range and return it
+		const numHash = hash >>> 0
+		return numHash.toString(16)
 	}
 }

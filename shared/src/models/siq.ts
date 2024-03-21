@@ -17,11 +17,10 @@ export namespace PackModel {
 	}
 
 	export interface Question {
-		id: number
+		id: string
 		fragments: Fragment[]
 		answers: Answers
 		price: number
-		theme: string
 	}
 
 	export interface Answers {

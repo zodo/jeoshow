@@ -1,5 +1,5 @@
-import { PackModel } from 'shared/models/siq'
-import { QuestionSubstate, StageSnapshot } from 'shared/models/events'
+import type { PackModel } from 'shared/models/siq'
+import type { GameEvents } from 'shared/models/events'
 
 type PlayerId = string
 
@@ -25,25 +25,25 @@ export interface Countdown {
 export type Stage = { type: 'BeforeStart' } | (RoundStageType & RoundStageBase)
 
 export interface RoundStageBase {
-	model: PackModel.Round
-	takenQuestions: number[]
+	roundModel: PackModel.Round
+	takenQuestions: string[]
 	activePlayer: string
 	previousAnswers: AnswersSummary
 }
 
 type RoundStageType =
 	| { type: 'Round' }
-	| { type: 'Question'; model: PackModel.Question }
-	| { type: 'ReadyForHit'; model: PackModel.Question }
+	| { type: 'Question'; questionModel: PackModel.Question }
+	| { type: 'ReadyForHit'; questionModel: PackModel.Question }
 	| {
 			type: 'AwaitingAnswer'
-			model: PackModel.Question
+			questionModel: PackModel.Question
 			answeringPlayer: string
 	  }
-	| { type: 'Answer'; model: PackModel.Answers }
+	| { type: 'Answer'; answerModel: PackModel.Answers }
 	| {
 			type: 'Appeal'
-			model: PackModel.Question
+			questionModel: PackModel.Question
 			answer: string
 			playerId: PlayerId
 			resolutions: Record<PlayerId, boolean>
@@ -63,16 +63,16 @@ export interface PlayerAnswer {
 	scoreDiff: number
 }
 
-export const toSnapshot = (stage: Stage): StageSnapshot => {
+export const toSnapshot = (stage: Stage): GameEvents.StageSnapshot => {
 	switch (stage.type) {
 		case 'BeforeStart':
 			return { type: 'BeforeStart' }
 		case 'Round':
 			return {
 				type: 'Round',
-				name: stage.model.name,
+				name: stage.roundModel.name,
 				themes: [
-					...stage.model.themes.map((t) => ({
+					...stage.roundModel.themes.map((t) => ({
 						name: t.name,
 						questions: t.questions.map((q) => ({
 							id: q.id,
@@ -86,7 +86,7 @@ export const toSnapshot = (stage: Stage): StageSnapshot => {
 		case 'Question':
 		case 'ReadyForHit':
 		case 'AwaitingAnswer':
-			let substate: QuestionSubstate
+			let substate: GameEvents.QuestionState
 			switch (stage.type) {
 				case 'Question':
 					substate = { type: 'Idle' }
@@ -101,20 +101,22 @@ export const toSnapshot = (stage: Stage): StageSnapshot => {
 
 			return {
 				type: 'Question',
-				fragments: stage.model.fragments,
-				price: stage.model.price,
-				theme: stage.model.theme,
+				fragments: stage.questionModel.fragments,
+				price: stage.questionModel.price,
+				theme: stage.roundModel.themes.find((t) =>
+					t.questions.some((q) => q.id === stage.questionModel.id)
+				)!.name,
 				substate: substate,
 			}
 		case 'Answer':
 			return {
 				type: 'Answer',
-				model: stage.model,
+				model: stage.answerModel,
 			}
 		case 'Appeal':
 			return {
 				type: 'Appeal',
-				model: stage.model,
+				model: stage.questionModel,
 				answer: stage.answer,
 				playerId: stage.playerId,
 				resolutions: stage.resolutions,

@@ -1,63 +1,46 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
-	import { PUBLIC_ENGINE_URL } from '$env/static/public'
-	import type { GameEvent } from 'shared/models/events'
+	import type { GameEvents } from 'shared/models/events'
+	import { handleGameEvent } from '$lib/store'
+	import PlayerList from '$lib/components/PlayerList.svelte'
+	import Stage from '$lib/components/Stage.svelte'
+	import { WebSocketGameClient } from '$lib/ws-client'
 	import type { ClientAction } from 'shared/models/commands'
 
 	const gameCode = $page.data.gameCode
 	const userId = $page.data.userId
 
-	let ws: WebSocket
-
-	let eventLog: any[] = []
-
-	const sendAction = (action: ClientAction) => {
-		ws.send(JSON.stringify(action))
-		eventLog = [{ type: 'out', data: action }, ...eventLog]
-	}
+	let gameClient: WebSocketGameClient
 
 	onMount(() => {
-		ws = new WebSocket(`ws://${PUBLIC_ENGINE_URL}/ws?gameCode=${gameCode}&userId=${userId}`)
-		ws.onmessage = (event) => {
-			if (event.data !== 'pong') {
-				console.log('Received message:', event.data)
-				const gameEvent = JSON.parse(event.data) as GameEvent
-				eventLog = [{ type: 'in', data: gameEvent }, ...eventLog]
-			}
-		}
+		gameClient = new WebSocketGameClient(gameCode, userId)
 
-		ws.onopen = () => {
-			sendAction({
-				type: 'Introduce',
-				name: 'Test name',
-			})
-		}
+		gameClient.onConnect(() => {
+			console.log('Connected to WS')
+			gameClient.sendMessage({ type: 'Introduce', name: 'Player' })
+		})
 
-		const pinger = setInterval(() => {
-			ws.send('ping')
-		}, 5000)
+		gameClient.onMessage((message: GameEvents.GameEvent) => {
+			handleGameEvent(message)
+		})
 
 		return () => {
-			clearInterval(pinger)
-			ws.close()
+			gameClient.close()
 		}
 	})
+
+	const handleStageEvent = (event: CustomEvent<ClientAction>) => {
+		gameClient.sendMessage(event.detail)
+	}
 </script>
 
 <section>
 	<h1>Game {gameCode}</h1>
-	<p>Game page</p>
 
-	<button on:click={() => sendAction({ type: 'HitButton' })}>Hit</button>
-	<button on:click={() => sendAction({ type: 'StartGame' })}>Start</button>
+	<button on:click={() => gameClient.sendMessage({ type: 'HitButton' })}>Hit</button>
 
-	<ul>
-		{#each eventLog as event}
-			<li>
-				{event.type === 'in' ? 'Received' : 'Sent'}:
-				<pre>{JSON.stringify(event.data, null, 2)}</pre>
-			</li>
-		{/each}
-	</ul>
+	<PlayerList />
+
+	<Stage on:action={handleStageEvent} />
 </section>

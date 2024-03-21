@@ -1,5 +1,5 @@
 import { SiqXmlContentParser } from 'src/siq/xml-parser'
-import { GameState } from './models/state'
+import type { GameState } from './state/models'
 
 export interface ExecutionContext {
 	state: DurableObjectState

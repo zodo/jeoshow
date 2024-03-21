@@ -2,10 +2,9 @@
 	import UploadFile from '$lib/UploadFile.svelte'
 	import Username from '$lib/Username.svelte'
 	import { PUBLIC_ENGINE_URL } from '$env/static/public'
+	import { goto } from '$app/navigation'
 
 	let uploadedPackId: string | null = '20a7156dbaa92f87d88e94ad2345330297257502'
-
-	let gameCode: string | null = null
 
 	const onFileUploadFinished = (packId: string) => {
 		console.log('File uploaded with id:', packId)
@@ -23,7 +22,7 @@
 			}),
 		})
 		const data = (await res.json()) as any
-		gameCode = data.gameCode
+		goto(`/game/${data.gameCode}`)
 	}
 </script>
 
@@ -41,10 +40,6 @@
 	{:else}
 		<Username />
 		<UploadFile onFinished={onFileUploadFinished} />
-	{/if}
-
-	{#if gameCode}
-		<p>Game code: {gameCode}</p>
 	{/if}
 </section>
 
