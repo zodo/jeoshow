@@ -36,7 +36,7 @@ export namespace GameEvents {
 		  }
 		| {
 				type: 'Question'
-				fragments: PackModel.Fragment[]
+				fragments: PackModel.FragmentGroup[]
 				price: number
 				theme: string
 				substate: QuestionState

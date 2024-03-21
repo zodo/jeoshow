@@ -7,33 +7,44 @@
 	export let question: Extract<GameEvents.StageSnapshot, { type: 'Question' }>
 
 	const dispatch = createEventDispatcher<SvelteCustomEvent>()
+
+	const modifyUrl = (url: string) => {
+		if (url.startsWith('http')) {
+			return url
+		}
+		return `/resources/${url}`
+	}
 </script>
 
 <div class="question-container">
 	<div class="theme">Theme: {question.theme}</div>
 	<div class="price">Price: ${question.price}</div>
-	{#each question.fragments as fragment}
-		<div class="fragment">
-			{#if fragment.type === 'Text'}
-				<div class="text-fragment">{fragment.value}</div>
-			{:else if fragment.type === 'Image'}
-				<div class="image-fragment">
-					<img src={fragment.url} alt="fragment" />
+	{#each question.fragments as fragmentGroup}
+		<div>
+			{#each fragmentGroup as fragment}
+				<div class="fragment">
+					{#if fragment.type === 'Text'}
+						<div class="text-fragment">{fragment.value}</div>
+					{:else if fragment.type === 'Image'}
+						<div class="image-fragment">
+							<img src={modifyUrl(fragment.url)} alt="fragment" />
+						</div>
+					{:else if fragment.type === 'Audio'}
+						<div class="audio-fragment">
+							<audio controls src={modifyUrl(fragment.url)}
+								>Your browser does not support the audio element.</audio
+							>
+						</div>
+					{:else if fragment.type === 'Video'}
+						<div class="video-fragment">
+							<video controls src={modifyUrl(fragment.url)}>
+								<track kind="captions" />
+								Your browser does not support the video tag.
+							</video>
+						</div>
+					{/if}
 				</div>
-			{:else if fragment.type === 'Audio'}
-				<div class="audio-fragment">
-					<audio controls src={fragment.url}
-						>Your browser does not support the audio element.</audio
-					>
-				</div>
-			{:else if fragment.type === 'Video'}
-				<div class="video-fragment">
-					<video controls src={fragment.url}>
-						<track kind="captions" />
-						Your browser does not support the video tag.
-					</video>
-				</div>
-			{/if}
+			{/each}
 		</div>
 	{/each}
 </div>

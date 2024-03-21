@@ -1,8 +1,11 @@
-import { expect, test } from 'vitest'
+import { test } from 'vitest'
 import { SiqXmlContentParser } from './xml-parser'
 
 test('converts XML to pack model', () => {
-	const pack = SiqXmlContentParser.convert(xml)
+	const converter = new SiqXmlContentParser(xml, {
+		'photo_2024-03-07_21-45-26_1.jpg': 'another link',
+	})
+	const pack = converter.convert()
 	console.log(JSON.stringify(pack, null, 2))
 })
 
@@ -53,10 +56,10 @@ const xml = `<?xml version="1.0" encoding="utf-8"?>
                     <questions>
                         <question price="100" type="noRisk">
                             <params>
-                                <param name="question" type="content">
-                                    <item>Является ли отдельный гражданин субъектом экологического
-                                        права?</item>
-                                </param>
+								<param name="question" type="content">
+								<item>назовите игру из игротеки по картинке</item>
+								<item type="image" isRef="True">photo_2024-03-07_21-45-26_1.jpg</item>
+							</param>
                             </params>
                             <right>
                                 <answer>да</answer>

@@ -18,7 +18,7 @@ export namespace PackModel {
 
 	export interface Question {
 		id: string
-		fragments: Fragment[]
+		fragments: FragmentGroup[]
 		answers: Answers
 		price: number
 	}
@@ -26,8 +26,10 @@ export namespace PackModel {
 	export interface Answers {
 		correct: string[]
 		incorrect: string[]
-		additional: Fragment[]
+		content: FragmentGroup[]
 	}
+
+	export type FragmentGroup = Fragment[]
 
 	export type Fragment = Text | Image | Audio | Video
 
