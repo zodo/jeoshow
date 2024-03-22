@@ -3,6 +3,7 @@ import type { GameState } from './game/state/models'
 import type {
 	ClientCommand,
 	GameCommand,
+	ScheduledCommand,
 	ServerCommandOfType,
 } from './game/state/state-machine-models'
 import { updateState } from './game/state/state-machine'
@@ -54,8 +55,20 @@ export class GameDurableObject {
 	}
 
 	async alarm() {
-		console.log('Alarm, inc')
-		this.storage.setAlarm(Date.now() + 1000)
+		const now = Date.now()
+		console.log('Alarm triggered, now', now)
+		const scheduledCommands = (await this.storage.get('scheduledCommands')) as string
+		const commands: ScheduledCommand[] = scheduledCommands ? JSON.parse(scheduledCommands) : []
+		const commandsToExecute = commands.filter((c) => c.time <= now)
+		for (const { command } of commandsToExecute) {
+			await this.modifyState(command)
+		}
+		const remainingCommands = commands.filter((c) => c.time > now)
+		if (remainingCommands.length > 0) {
+			const closestTime = Math.min(...remainingCommands.map((c) => c.time))
+			await this.storage.setAlarm(closestTime)
+		}
+		await this.storage.put('scheduledCommands', JSON.stringify(remainingCommands))
 	}
 
 	private async initiateWebSocket(request: Request): Promise<Response> {
@@ -111,6 +124,7 @@ export class GameDurableObject {
 	}
 
 	private async modifyState(command: GameCommand, ws?: WebSocket) {
+		console.log('Modifying state:', command)
 		const currentStateJson = (await this.storage.get('state')) as string
 		const currentState = JSON.parse(currentStateJson) as GameState
 
@@ -124,6 +138,17 @@ export class GameDurableObject {
 				this.broadcast(JSON.stringify(event.event))
 			} else if (event.type === 'reply' && ws) {
 				ws.send(JSON.stringify(event.event))
+			} else if (event.type === 'schedule') {
+				const scheduledCommands = (await this.storage.get('scheduledCommands')) as string
+				const commands: ScheduledCommand[] = scheduledCommands
+					? JSON.parse(scheduledCommands)
+					: []
+				const now = Date.now()
+				commands.push({ command: event.command, time: now + event.delaySeconds * 1000 })
+				const closestTime = Math.min(...commands.map((c) => c.time).filter((t) => t > now))
+				console.log('Set alarm for:', closestTime)
+				await this.storage.setAlarm(closestTime)
+				await this.storage.put('scheduledCommands', JSON.stringify(commands))
 			}
 		}
 	}

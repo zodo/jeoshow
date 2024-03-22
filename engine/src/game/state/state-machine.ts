@@ -10,6 +10,7 @@ import handleClientStartGame from './handlers/client-startgame'
 import handleClientHitButton from './handlers/client-hitbutton'
 import handleServerDisconnect from './handlers/server-disconnect'
 import handleClientSelectQuestion from './handlers/client-selectquestion'
+import handleServerReadyForHit from './handlers/server-readyforhit'
 
 export const updateState = (state: GameState, command: GameCommand): UpdateResult => {
 	switch (command.type) {
@@ -36,6 +37,11 @@ export const updateState = (state: GameState, command: GameCommand): UpdateResul
 					return handleServerDisconnect(
 						state,
 						command as ServerCommandOfType<'disconnect'>
+					)
+				case 'ready-for-hit':
+					return handleServerReadyForHit(
+						state,
+						command as ServerCommandOfType<'ready-for-hit'>
 					)
 				default:
 					console.error('Unknown server action', command)

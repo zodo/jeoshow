@@ -1,10 +1,20 @@
+<script lang="ts">
+	import { wsConnectionStatusStore } from '$lib/store'
+</script>
+
 <div class="app">
 	<main>
 		<slot />
 	</main>
 
 	<footer>
-		<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
+		<p>
+			{#if $wsConnectionStatusStore === 'connected'}
+				Connected
+			{:else}
+				Disconnected
+			{/if}
+		</p>
 	</footer>
 </div>
 

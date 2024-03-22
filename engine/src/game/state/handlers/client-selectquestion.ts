@@ -36,6 +36,17 @@ const handleClientSelectQuestion = (
 				type: 'broadcast',
 				event: { type: 'StageUpdated', stage: toSnapshot(newStage) },
 			},
+			{
+				type: 'schedule',
+				command: {
+					type: 'server',
+					action: {
+						type: 'ready-for-hit',
+						questionId: question.id,
+					},
+				},
+				delaySeconds: 10,
+			},
 		],
 	}
 }

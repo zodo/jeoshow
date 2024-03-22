@@ -21,6 +21,8 @@ export const activePlayerIdStore = derived(gameStageStore, ($gameStageStore) => 
 	return null
 })
 
+export const wsConnectionStatusStore = writable<'connected' | 'disconnected'>('connected')
+
 export const handleGameEvent = (event: GameEvents.GameEvent) => {
 	switch (event.type) {
 		case 'PlayersUpdated':

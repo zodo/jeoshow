@@ -1,6 +1,8 @@
 import { PUBLIC_ENGINE_URL } from '$env/static/public'
+import { WebSocket } from 'partysocket'
 import type { ClientAction } from 'shared/models/commands'
 import type { GameEvents } from 'shared/models/events'
+import { wsConnectionStatusStore } from './store'
 
 export class WebSocketGameClient {
 	ws: WebSocket
@@ -11,6 +13,7 @@ export class WebSocketGameClient {
 			`ws://${PUBLIC_ENGINE_URL}/ws?gameCode=${gameCode}&userId=${userId}`
 		)
 		this.ws.onclose = () => {
+			wsConnectionStatusStore.set('disconnected')
 			console.log('Connection closed')
 		}
 
@@ -22,7 +25,10 @@ export class WebSocketGameClient {
 	}
 
 	onConnect(callback: () => void) {
-		this.ws.onopen = callback
+		this.ws.onopen = () => {
+			wsConnectionStatusStore.set('connected')
+			callback()
+		}
 	}
 
 	onMessage(callback: (event: GameEvents.GameEvent) => void) {
@@ -42,5 +48,6 @@ export class WebSocketGameClient {
 	close() {
 		clearInterval(this.pingInterval)
 		this.ws.close()
+		wsConnectionStatusStore.set('connected')
 	}
 }

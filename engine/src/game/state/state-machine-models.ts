@@ -2,7 +2,9 @@ import type { ClientAction } from 'shared/models/commands'
 import type { GameEvents } from 'shared/models/events'
 import type { GameState } from './models'
 
-export type ServerAction = { type: 'disconnect'; playerId: string }
+export type ServerAction =
+	| { type: 'disconnect'; playerId: string }
+	| { type: 'ready-for-hit'; questionId: string }
 
 export type ServerCommand<A> = {
 	type: 'server'
@@ -30,8 +32,14 @@ export type ServerCommandOfType<T extends ServerAction['type']> = ServerCommand<
 export type UpdateEvent =
 	| { type: 'broadcast'; event: GameEvents.GameEvent }
 	| { type: 'reply'; event: GameEvents.GameEvent }
+	| { type: 'schedule'; command: GameCommand; delaySeconds: number }
 
 export interface UpdateResult {
 	state: GameState
 	events: UpdateEvent[]
+}
+
+export interface ScheduledCommand {
+	command: GameCommand
+	time: number
 }

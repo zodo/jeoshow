@@ -16,7 +16,7 @@
 	}
 </script>
 
-<div class="question-container">
+<div class="question-container" class:ready-for-hit={question.substate.type === 'ReadyForHit'}>
 	<div class="theme">Theme: {question.theme}</div>
 	{#each question.fragments as fragmentGroup}
 		<div>
@@ -54,6 +54,10 @@
 		padding: 20px;
 		border: 1px solid #ddd;
 		border-radius: 8px;
+	}
+	.ready-for-hit {
+		background-color: #f0f0f0;
+		border-color: #666;
 	}
 	.fragment {
 		margin-bottom: 10px;

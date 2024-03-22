@@ -28,6 +28,7 @@
 	"type": "module",
 	"license": "WTFPL",
 	"dependencies": {
-		"jszip": "^3.10.1"
+		"jszip": "^3.10.1",
+		"partysocket": "^1.0.1"
 	}
 }
