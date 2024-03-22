@@ -3,29 +3,34 @@
 
 	export let player: GameEvents.Player
 	export let pressedButton: boolean
+	export let active: boolean
 </script>
 
-<section class:disconnected={player.disconnected} class:pressed={pressedButton}>
-	<h1 title={player.id}>{player.name}</h1>
+<section class:disconnected={player.disconnected} class:pressed={pressedButton} class:active>
+	<h4 title={player.id}>{player.name}</h4>
 	<p>Score: {player.score}</p>
 </section>
 
 <style>
 	section {
 		border: 1px solid black;
-		padding: 1rem;
+		padding: 0 1rem;
 		margin: 1rem;
-		transition: background-color 3.5s;
-
-		width: 5rem;
+		transition: background-color 1s;
+		width: 7rem;
+		box-sizing: border-box;
 	}
 
-	section.disconnected {
+	.disconnected {
 		border-color: red;
 	}
 
-	section.pressed {
+	.pressed {
 		background-color: lightgreen;
 		transition: none;
+	}
+
+	.active {
+		border: 2px solid red;
 	}
 </style>

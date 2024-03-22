@@ -9,7 +9,7 @@ const handleClientStartGame = (
 	const randomActivePlayer = alivePlayers[Math.floor(Math.random() * alivePlayers.length)]
 	const newStage: Stage = {
 		type: 'Round',
-		roundModel: state.pack.rounds[0],
+		roundModel: state.pack.rounds[Math.floor(Math.random() * state.pack.rounds.length)],
 		takenQuestions: [],
 		activePlayer: randomActivePlayer.id,
 		previousAnswers: { answers: [], triedToAppeal: [] },

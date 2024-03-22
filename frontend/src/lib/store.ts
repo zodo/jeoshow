@@ -1,11 +1,25 @@
 import type { GameEvents } from 'shared/models/events'
-import { writable } from 'svelte/store'
+import { derived, writable } from 'svelte/store'
 
 export const playersStore = writable<GameEvents.Player[]>([])
 
 export const gameStageStore = writable<GameEvents.StageSnapshot | null>(null)
 
 export const hitButtonStore = writable<string[]>([])
+
+export const activePlayerIdStore = derived(gameStageStore, ($gameStageStore) => {
+	if ($gameStageStore?.type === 'Round') {
+		return $gameStageStore.activePlayerId
+	} else if (
+		$gameStageStore?.type === 'Question' &&
+		$gameStageStore.substate.type === 'AwaitingAnswer'
+	) {
+		return $gameStageStore.substate.activePlayerId
+	} else if ($gameStageStore?.type === 'Appeal') {
+		return $gameStageStore.playerId
+	}
+	return null
+})
 
 export const handleGameEvent = (event: GameEvents.GameEvent) => {
 	switch (event.type) {

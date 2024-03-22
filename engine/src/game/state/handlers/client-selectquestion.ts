@@ -26,6 +26,7 @@ const handleClientSelectQuestion = (
 		type: 'Question',
 		questionModel: question,
 		previousAnswers: { triedToAppeal: [], answers: [] },
+		takenQuestions: [...stage.takenQuestions, command.action.questionId],
 	}
 
 	return {

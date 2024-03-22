@@ -33,8 +33,6 @@
 			{/each}
 		</tbody>
 	</table>
-
-	<p>Active player: {round.activePlayerId}</p>
 </section>
 
 <style>

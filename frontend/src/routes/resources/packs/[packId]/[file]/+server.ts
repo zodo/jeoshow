@@ -1,9 +1,8 @@
 import type { RequestEvent } from '@sveltejs/kit'
 
-export const GET = async ({ request, platform }: RequestEvent) => {
-	const url = new URL(request.url)
-	const packId = url.pathname.split('/')[3]
-	const filename = url.pathname.split('/').pop()
+export const GET = async ({ params, platform }: RequestEvent) => {
+	const packId = params.packId
+	const filename = params.file
 
 	const bucket: R2Bucket | undefined = platform?.env.JEOSHOW_PACKS
 	if (!bucket) {

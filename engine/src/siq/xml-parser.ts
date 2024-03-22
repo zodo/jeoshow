@@ -22,36 +22,58 @@ export class SiqXmlContentParser {
 	convert(): PackModel.Pack {
 		const xml = this.parser.parse(this.xml)
 		// console.log(JSON.stringify(xml, null, 2))
-		const rounds = xml.package.rounds.round.map((round: any) => this.convertRound(round))
+		const rounds = xml.package.rounds.round
+			.map((round: any) => this.convertRound(round))
+			.filter((r: any) => r !== undefined)
 		return { rounds }
 	}
 
-	private convertRound(r: any): PackModel.Round {
+	private convertRound(r: any): PackModel.Round | undefined {
+		const themes: PackModel.Theme[] | undefined = r.themes?.theme
+			?.map((t: any) => this.convertTheme(t))
+			?.filter((t: any) => t !== undefined)
+
+		if (!themes || themes.length === 0) {
+			return undefined
+		}
+
 		return {
-			name: r.$.name,
-			themes: r.themes.theme.map((t: any) => this.convertTheme(t)),
-			type: r.$.type === 'final' ? 'Final' : 'Standard',
+			name: r.$?.name ?? '?',
+			themes: themes,
+			type: r.$?.type === 'final' ? 'Final' : 'Standard',
 		}
 	}
 
-	private convertTheme(t: any): PackModel.Theme {
-		return {
-			name: t.$.name,
-			questions: t.questions.question.map((q: any, idx: number) => {
+	private convertTheme(t: any): PackModel.Theme | undefined {
+		const questions = t.questions?.question
+			?.map((q: any, idx: number) => {
 				const id = `${this.djb2Hash(t.$.name)}-${idx}`
 				return this.mapQuestion(q, id)
-			}),
+			})
+			?.filter((q: any) => q)
+
+		if (!questions || questions.length === 0) {
+			return undefined
+		}
+
+		return {
+			name: t.$?.name ?? '?',
+			questions: questions,
 		}
 	}
 
-	private mapQuestion(q: any, id: string): PackModel.Question {
+	private mapQuestion(q: any, id: string): PackModel.Question | undefined {
+		if (!q.right?.answer || q.right.answer.length === 0) {
+			return undefined
+		}
+
 		return this.getLegacyQuestion(q, id) ?? this.getNewQuestion(q, id)
 	}
 
-	private getLegacyQuestion(q: any, id: string): PackModel.Question | null {
+	private getLegacyQuestion(q: any, id: string): PackModel.Question | undefined {
 		const atoms = q.scenario?.atom ?? []
 		if (atoms.length === 0) {
-			return null
+			return undefined
 		}
 		const markerIndex = atoms.findIndex((a: any) => a.$.type === 'marker')
 		let questions: PackModel.Fragment[] = []
@@ -68,7 +90,7 @@ export class SiqXmlContentParser {
 			id: id,
 			fragments: questions.map((f: PackModel.Fragment) => [f]),
 			answers: {
-				correct: q.right.answer,
+				correct: q.right?.answer,
 				incorrect: q.wrong?.answer,
 				content: mediaAnswers.map((f: PackModel.Fragment) => [f]),
 			},
@@ -116,6 +138,7 @@ export class SiqXmlContentParser {
 			case 'image':
 				return { type: 'Image', url: this.mapMediaUrl(content, 'Images/') }
 			case 'voice':
+			case 'audio':
 				return { type: 'Audio', url: this.mapMediaUrl(content, 'Audio/'), time }
 			case 'video':
 				return { type: 'Video', url: this.mapMediaUrl(content, 'Video/'), time }
@@ -154,6 +177,7 @@ export class SiqXmlContentParser {
 			case 'image':
 				return { type: 'Image', url: this.mapMediaUrl(content, 'Images/') }
 			case 'voice':
+			case 'audio':
 				return {
 					type: 'Audio',
 					url: this.mapMediaUrl(content, 'Audio/'),
@@ -171,7 +195,14 @@ export class SiqXmlContentParser {
 	}
 
 	private mapMediaUrl(url: string, prefix: string): string {
-		return this.mediaMapping[prefix + url] ?? this.mediaMapping[url] ?? url
+		const urlEncoded = encodeURI(url)
+		return (
+			this.mediaMapping[prefix + url] ??
+			this.mediaMapping[url] ??
+			this.mediaMapping[prefix + urlEncoded] ??
+			this.mediaMapping[urlEncoded] ??
+			url
+		)
 	}
 
 	private djb2Hash(str: string): string {

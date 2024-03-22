@@ -18,7 +18,6 @@
 
 <div class="question-container">
 	<div class="theme">Theme: {question.theme}</div>
-	<div class="price">Price: ${question.price}</div>
 	{#each question.fragments as fragmentGroup}
 		<div>
 			{#each fragmentGroup as fragment}
