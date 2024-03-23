@@ -1,6 +1,6 @@
 import { toSnapshot, type GameState, type Stage } from '../models'
 import type { ServerCommandOfType, UpdateResult } from '../state-machine-models'
-import { Timeouts } from '../timeouts'
+import { Timeouts, getFragmentsTime } from '../timeouts'
 
 const handleServerAnswerShow = (
 	state: GameState,
@@ -23,6 +23,8 @@ const handleServerAnswerShow = (
 		type: 'answer',
 	}
 
+	const answerShowTime = getFragmentsTime(stage.questionModel.answers.content)
+
 	return {
 		state: { ...state, stage },
 		events: [
@@ -38,7 +40,7 @@ const handleServerAnswerShow = (
 						type: 'round-return',
 					},
 				},
-				delaySeconds: Timeouts.answerShowTime,
+				delaySeconds: answerShowTime,
 			},
 		],
 	}

@@ -4,7 +4,7 @@ import type { GameState } from './models'
 
 export type ServerAction =
 	| { type: 'player-disconnect'; playerId: string }
-	| { type: 'button-ready'; callbackId: string }
+	| { type: 'button-ready'; callbackId?: string }
 	| { type: 'button-hit-timeout'; callbackId: string }
 	| { type: 'answer-show'; questionId?: string }
 	| { type: 'answer-timeout'; callbackId: string }

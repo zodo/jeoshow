@@ -8,8 +8,6 @@
 
 	$: stage = $gameStageStore
 	export let userId: string
-
-	let timeoutSeconds = stage?.type
 </script>
 
 <section>
@@ -32,3 +30,6 @@
 		{/if}
 	{/if}
 </section>
+
+<pre>{JSON.stringify(stage, null, 2)}</pre>
+<p>Current userId: {userId}</p>

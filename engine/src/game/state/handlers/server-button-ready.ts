@@ -10,7 +10,7 @@ const handleServerButtonReady = (
 		return { state, events: [] }
 	}
 
-	if (state.stage.callbackId !== command.action.callbackId) {
+	if (command.action.callbackId && state.stage.callbackId !== command.action.callbackId) {
 		return { state, events: [] }
 	}
 

@@ -26,10 +26,11 @@ export const POST = async ({ request, platform }: RequestEvent) => {
 
 	const prefix = `packs/${hash}/`
 
+	const lowercaseFilename = fileName.toLowerCase()
 	if (
-		fileName.startsWith('audio') ||
-		fileName.startsWith('Images') ||
-		fileName.startsWith('video')
+		lowercaseFilename.startsWith('audio') ||
+		lowercaseFilename.startsWith('images') ||
+		lowercaseFilename.startsWith('video')
 	) {
 		const extension = fileName.split('.').pop()
 		const newName = `${Math.random().toString(36).substring(7)}.${extension}`

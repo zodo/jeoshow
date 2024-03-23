@@ -21,7 +21,7 @@ export class SiqXmlContentParser {
 			},
 			parseAttributeValue: false,
 			isArray: (name: string) =>
-				['round', 'theme', 'question', 'answer', 'param'].includes(name),
+				['round', 'theme', 'question', 'answer', 'param', 'atom'].includes(name),
 		})
 	}
 
@@ -64,6 +64,7 @@ export class SiqXmlContentParser {
 
 		return {
 			name: t.$?.name ?? '?',
+			comments: t.info?.comments ?? '',
 			questions: questions,
 		}
 	}
@@ -81,15 +82,20 @@ export class SiqXmlContentParser {
 		if (atoms.length === 0) {
 			return undefined
 		}
-		const markerIndex = atoms.findIndex((a: any) => a.$.type === 'marker')
+		const markerIndex = atoms.findIndex((a: any) => a.$?.type === 'marker')
 		let questions: PackModel.Fragment[] = []
 		let mediaAnswers: PackModel.Fragment[] = []
 
 		if (markerIndex > 0) {
-			questions = atoms.slice(0, markerIndex).map(this.mapAtom)
-			mediaAnswers = atoms.slice(markerIndex + 1).map(this.mapAtom)
+			questions = atoms.slice(0, markerIndex).map((a: any) => this.mapAtom(a))
+			mediaAnswers = atoms.slice(markerIndex + 1).map((a: any) => this.mapAtom(a))
 		} else {
-			questions = atoms.map(this.mapAtom)
+			questions = atoms.map((a: any) => this.mapAtom(a))
+		}
+
+		if (mediaAnswers.length === 0) {
+			const text: string = q.right.answer[0]
+			mediaAnswers = [{ type: 'text', value: text }]
 		}
 
 		return {
@@ -136,9 +142,12 @@ export class SiqXmlContentParser {
 	}
 
 	private mapAtom(a: any): PackModel.Fragment {
-		const type = a.$.type
+		const type = a.$?.type ?? ''
 		const content = a._
-		const time = parseInt(a.$.time, 10)
+		let time: number | undefined
+		if (a.$?.time) {
+			time = parseInt(a.$.time, 10)
+		}
 
 		switch (type) {
 			case 'say':
@@ -174,7 +183,7 @@ export class SiqXmlContentParser {
 		const type = item.$?.type ?? 'text'
 		const content = item._
 		const duration = item.$?.duration
-		let durationSeconds: number = 10
+		let durationSeconds: number | undefined
 		if (duration) {
 			const [hours, minutes, seconds] = duration.split(':').map((x: any) => parseInt(x, 10))
 			durationSeconds = hours * 3600 + minutes * 60 + seconds
@@ -205,6 +214,12 @@ export class SiqXmlContentParser {
 	}
 
 	private mapMediaUrl(url: string, prefix: string): string {
+		if (!url) {
+			return ''
+		}
+		if (url.startsWith('@')) {
+			url = url.slice(1)
+		}
 		const urlEncoded = encodeURI(url)
 		return (
 			this.mediaMapping[prefix + url] ??

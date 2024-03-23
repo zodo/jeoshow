@@ -41,6 +41,7 @@ export namespace GameEvents {
 				fragments: PackModel.FragmentGroup[]
 				price: number
 				theme: string
+				themeComment?: string
 				substate: QuestionState
 		  }
 		| {

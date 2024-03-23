@@ -6,6 +6,7 @@ import type {
 	ServerCommandOfType,
 	UpdateResult,
 } from './state-machine-models'
+import type { ClientAction } from 'shared/models/commands'
 import handleClientIntroduce from './handlers/client-introduce'
 import handleClientGameStart from './handlers/client-game-start'
 import handleClientButtonHit from './handlers/client-button-hit'
@@ -18,7 +19,7 @@ import handleServerRoundReturn from './handlers/server-round-return'
 import handleServerButtonHitTimeout from './handlers/server-button-hit-timeout'
 import handleClientGiveAnswer from './handlers/client-answer-give'
 import handleServerAnswerTimeout from './handlers/server-answer-timeout'
-import type { ClientAction } from 'shared/models/commands'
+import handleClientMediaFinished from './handlers/client-media-finished'
 
 const clientCommandHandlers: {
 	[K in ClientAction['type']]: (state: GameState, command: ClientCommandOfType<K>) => UpdateResult
@@ -28,7 +29,7 @@ const clientCommandHandlers: {
 	'button-hit': handleClientButtonHit,
 	'question-select': handleClientQuestionSelect,
 	'answer-give': handleClientGiveAnswer,
-	'media-finished': () => ({}),
+	'media-finished': handleClientMediaFinished,
 	'start-appeal': () => ({}),
 	'resolve-appeal': () => ({}),
 }

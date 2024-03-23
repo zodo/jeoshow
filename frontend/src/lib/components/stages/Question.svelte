@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { SvelteCustomEvent } from '$lib/models'
 	import type { GameEvents } from 'shared/models/events'
-	import type { PackModel } from 'shared/models/siq'
 	import { createEventDispatcher } from 'svelte'
 	import Progress from '../Progress.svelte'
 
@@ -22,6 +21,9 @@
 
 <div class="question-container" class:ready-for-hit={question.substate.type === 'ready-for-hit'}>
 	<div class="theme">Theme: {question.theme}</div>
+	{#if question.themeComment}
+		<div class="theme-comment">{question.themeComment}</div>
+	{/if}
 	{#if question.substate.type === 'ready-for-hit' && question.substate.timeoutSeconds}
 		<Progress seconds={question.substate.timeoutSeconds} />
 	{/if}
@@ -70,9 +72,6 @@
 	</div>
 {/if}
 
-<pre>{JSON.stringify(question, null, 2)}</pre>
-<p>Current userId: {userId}</p>
-
 <style>
 	.question-container {
 		margin: 20px;
@@ -103,5 +102,9 @@
 	.theme {
 		font-weight: bold;
 		margin-bottom: 10px;
+	}
+	.theme-comment {
+		margin-top: 10px;
+		font-style: italic;
 	}
 </style>

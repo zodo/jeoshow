@@ -14,7 +14,7 @@ export const initGame = async (ctx: ExecutionContext, packId: string) => {
 	const contentXml = await contentObject.text()
 
 	const mediaMapping = await ctx.env.JEOSHOW_PACKS.get('packs/' + packId + '/mapping.json')
-	const mediaMappingJson = (await mediaMapping?.json()) as Record<string, string>
+	const mediaMappingJson = ((await mediaMapping?.json()) as Record<string, string>) ?? {}
 	const parser = new SiqXmlContentParser(contentXml, mediaMappingJson)
 	const packModel = parser.convert()
 

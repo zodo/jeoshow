@@ -61,13 +61,15 @@ export const handleGameEvent = (event: GameEvents.GameEvent) => {
 			}, 100)
 			break
 		case 'player-texted':
-			playerMessagesStore.update((answers) => [
-				...answers,
+			playerMessagesStore.update((messages) => [
+				...messages,
 				{ playerId: event.playerId, text: event.text },
 			])
 			setTimeout(() => {
-				playerMessagesStore.update((answers) =>
-					answers.filter((a) => a.playerId !== event.playerId && a.text !== event.text)
+				playerMessagesStore.update((messages) =>
+					messages.filter(
+						(m) => !(m.playerId === event.playerId && m.text === event.text)
+					)
 				)
 			}, event.text.length * 700)
 			break

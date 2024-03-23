@@ -1,6 +1,7 @@
+import type { PackModel } from 'shared/models/siq'
 import { toSnapshot, type GameState, type Stage } from '../models'
 import type { ClientCommandOfType, UpdateResult } from '../state-machine-models'
-import { Timeouts } from '../timeouts'
+import { getFragmentsTime } from '../timeouts'
 
 const handleClientQuestionSelect = (
 	state: GameState,
@@ -8,18 +9,22 @@ const handleClientQuestionSelect = (
 ): UpdateResult => {
 	const stage = state.stage
 	if (stage.type !== 'round') {
-		return { state, events: [] }
+		return {}
 	}
 
 	const question = stage.roundModel.themes
 		.flatMap((t) => t.questions)
 		.find((q) => q.id === command.action.questionId)
+	if (!question) {
+		console.error('Question not found', command.action.questionId)
+		return {}
+	}
 	if (
 		stage.takenQuestions.includes(command.action.questionId) ||
 		stage.activePlayer !== command.playerId ||
 		!question
 	) {
-		return { state, events: [] }
+		return {}
 	}
 
 	const callbackId: string = Math.random().toString(36).substring(7)
@@ -35,6 +40,9 @@ const handleClientQuestionSelect = (
 		callbackId,
 	}
 
+	const fragmentsTime = getFragmentsTime(question.fragments)
+	const questionReadTime = Math.floor(fragmentsTime / 2 + Math.random() * 3)
+
 	return {
 		state: { ...state, stage: newStage },
 		events: [
@@ -48,7 +56,7 @@ const handleClientQuestionSelect = (
 					type: 'server',
 					action: { type: 'button-ready', callbackId },
 				},
-				delaySeconds: Timeouts.readQuestionLimit,
+				delaySeconds: questionReadTime,
 			},
 		],
 	}

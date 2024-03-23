@@ -10,8 +10,6 @@ import type {
 } from './game/state/state-machine-models'
 import { updateState } from './game/state/state-machine'
 import { initGame } from './game/create'
-import type { GameEvents } from 'shared/models/events'
-import { a } from 'vitest/dist/suite-a18diDsI'
 
 export class GameDurableObject {
 	state: DurableObjectState
@@ -133,7 +131,7 @@ export class GameDurableObject {
 		const { state, events } = this.recursivelyUpdateState(currentState, command)
 
 		if (state && state !== currentState) {
-			this.storage.put('state', JSON.stringify(state))
+			await this.storage.put('state', JSON.stringify(state))
 		}
 
 		for (const event of events ?? []) {

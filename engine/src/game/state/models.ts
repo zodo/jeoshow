@@ -131,6 +131,9 @@ export const toSnapshot = (stage: Stage): GameEvents.StageSnapshot => {
 				theme: stage.roundModel.themes.find((t) =>
 					t.questions.some((q) => q.id === stage.questionModel.id)
 				)!.name,
+				themeComment: stage.roundModel.themes.find((t) =>
+					t.questions.some((q) => q.id === stage.questionModel.id)
+				)!.comments,
 				substate: substate,
 			}
 		case 'answer':

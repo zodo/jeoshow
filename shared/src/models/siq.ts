@@ -14,6 +14,7 @@ export namespace PackModel {
 
 	export interface Theme {
 		name: string
+		comments?: string
 		questions: Question[]
 	}
 
@@ -47,12 +48,12 @@ export namespace PackModel {
 	export interface Audio {
 		type: 'audio'
 		url: string
-		time: number
+		time?: number
 	}
 
 	export interface Video {
 		type: 'video'
 		url: string
-		time: number
+		time?: number
 	}
 }
