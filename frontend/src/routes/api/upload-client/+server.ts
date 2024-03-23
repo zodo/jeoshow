@@ -27,9 +27,9 @@ export const POST = async ({ request, platform }: RequestEvent) => {
 	const prefix = `packs/${hash}/`
 
 	if (
-		fileName.startsWith('Audio') ||
+		fileName.startsWith('audio') ||
 		fileName.startsWith('Images') ||
-		fileName.startsWith('Video')
+		fileName.startsWith('video')
 	) {
 		const extension = fileName.split('.').pop()
 		const newName = `${Math.random().toString(36).substring(7)}.${extension}`

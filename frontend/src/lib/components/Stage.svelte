@@ -3,20 +3,29 @@
 	import BeforeStart from '$lib/components/stages/BeforeStart.svelte'
 	import Round from '$lib/components/stages/Round.svelte'
 	import Question from './stages/Question.svelte'
+	import AfterFinish from './stages/AfterFinish.svelte'
+	import Answer from './stages/Answer.svelte'
 
 	$: stage = $gameStageStore
+	export let userId: string
+
+	let timeoutSeconds = stage?.type
 </script>
 
 <section>
 	<h1>Stage</h1>
 
 	{#if stage}
-		{#if stage.type === 'BeforeStart'}
+		{#if stage.type === 'before-start'}
 			<BeforeStart on:action />
-		{:else if stage.type === 'Round'}
+		{:else if stage.type === 'round'}
 			<Round round={stage} on:action />
-		{:else if stage.type === 'Question'}
-			<Question question={stage} on:action />
+		{:else if stage.type === 'question'}
+			<Question question={stage} {userId} on:action />
+		{:else if stage.type === 'answer'}
+			<Answer answer={stage} on:action />
+		{:else if stage.type === 'after-finish'}
+			<AfterFinish />
 		{:else}
 			<p>Unknown stage</p>
 			<pre>{JSON.stringify(stage, null, 2)}</pre>

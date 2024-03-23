@@ -2,13 +2,20 @@
 	import type { GameEvents } from 'shared/models/events'
 
 	export let player: GameEvents.Player
-	export let pressedButton: boolean
+	export let pressedButton: 'ok' | 'false' | undefined
 	export let active: boolean
+	export let answers: string[]
 </script>
 
-<section class:disconnected={player.disconnected} class:pressed={pressedButton} class:active>
+<section
+	class:disconnected={player.disconnected}
+	class:pressed={pressedButton == 'ok'}
+	class:false-start={pressedButton == 'false'}
+	class:active
+>
 	<h4 title={player.id}>{player.name}</h4>
 	<p>Score: {player.score}</p>
+	<p>Answer: {answers}</p>
 </section>
 
 <style>
@@ -27,6 +34,11 @@
 
 	.pressed {
 		background-color: lightgreen;
+		transition: none;
+	}
+
+	.false-start {
+		background-color: lightcoral;
 		transition: none;
 	}
 

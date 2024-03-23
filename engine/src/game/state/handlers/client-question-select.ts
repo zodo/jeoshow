@@ -1,12 +1,13 @@
 import { toSnapshot, type GameState, type Stage } from '../models'
 import type { ClientCommandOfType, UpdateResult } from '../state-machine-models'
+import { Timeouts } from '../timeouts'
 
-const handleClientSelectQuestion = (
+const handleClientQuestionSelect = (
 	state: GameState,
-	command: ClientCommandOfType<'SelectQuestion'>
+	command: ClientCommandOfType<'question-select'>
 ): UpdateResult => {
 	const stage = state.stage
-	if (stage.type !== 'Round') {
+	if (stage.type !== 'round') {
 		return { state, events: [] }
 	}
 
@@ -21,34 +22,36 @@ const handleClientSelectQuestion = (
 		return { state, events: [] }
 	}
 
-	const newStage: Extract<Stage, { type: 'Question' }> = {
-		...stage,
-		type: 'Question',
+	const callbackId: string = Math.random().toString(36).substring(7)
+
+	const newStage: Extract<Stage, { type: 'question' }> = {
+		type: 'question',
+		roundModel: stage.roundModel,
+		activePlayer: command.playerId,
 		questionModel: question,
-		previousAnswers: { triedToAppeal: [], answers: [] },
+		previousAnswers: { model: question, answers: [] },
 		takenQuestions: [...stage.takenQuestions, command.action.questionId],
+		falseStartPlayers: [],
+		callbackId,
 	}
 
 	return {
 		state: { ...state, stage: newStage },
 		events: [
 			{
-				type: 'broadcast',
-				event: { type: 'StageUpdated', stage: toSnapshot(newStage) },
+				type: 'client-broadcast',
+				event: { type: 'stage-updated', stage: toSnapshot(newStage) },
 			},
 			{
 				type: 'schedule',
 				command: {
 					type: 'server',
-					action: {
-						type: 'ready-for-hit',
-						questionId: question.id,
-					},
+					action: { type: 'button-ready', callbackId },
 				},
-				delaySeconds: 10,
+				delaySeconds: Timeouts.readQuestionLimit,
 			},
 		],
 	}
 }
 
-export default handleClientSelectQuestion
+export default handleClientQuestionSelect

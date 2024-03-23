@@ -1,5 +1,10 @@
 <script lang="ts">
-	import { activePlayerIdStore, hitButtonStore, playersStore } from '$lib/store'
+	import {
+		activePlayerIdStore,
+		hitButtonStore,
+		playersStore,
+		playerMessagesStore,
+	} from '$lib/store'
 	import Player from './Player.svelte'
 </script>
 
@@ -9,8 +14,11 @@
 		{#each $playersStore as player}
 			<Player
 				{player}
-				pressedButton={$hitButtonStore.includes(player.id)}
+				pressedButton={$hitButtonStore.find((b) => b.playerId === player.id)?.type}
 				active={$activePlayerIdStore === player.id}
+				answers={$playerMessagesStore
+					.filter((m) => m.playerId === player.id)
+					.map((m) => m.text)}
 			/>
 		{/each}
 	</div>

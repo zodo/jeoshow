@@ -8,5 +8,5 @@
 <section>
 	<h1>Game will start soon</h1>
 
-	<button on:click={() => dispatch('action', { type: 'StartGame' })}>Start</button>
+	<button on:click={() => dispatch('action', { type: 'game-start' })}>Start</button>
 </section>

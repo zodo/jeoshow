@@ -2,12 +2,13 @@
 	import type { SvelteCustomEvent } from '$lib/models'
 	import type { GameEvents } from 'shared/models/events'
 	import { createEventDispatcher } from 'svelte'
+	import Progress from '../Progress.svelte'
 
-	export let round: Extract<GameEvents.StageSnapshot, { type: 'Round' }>
+	export let round: Extract<GameEvents.StageSnapshot, { type: 'round' }>
 
 	const dispatch = createEventDispatcher<SvelteCustomEvent>()
 	const selectQuestion = (questionId: string) => {
-		dispatch('action', { type: 'SelectQuestion', questionId })
+		dispatch('action', { type: 'question-select', questionId })
 	}
 </script>
 
@@ -33,6 +34,9 @@
 			{/each}
 		</tbody>
 	</table>
+	{#if round.timeoutSeconds}
+		<Progress seconds={round.timeoutSeconds} />
+	{/if}
 </section>
 
 <style>

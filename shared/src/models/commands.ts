@@ -1,9 +1,9 @@
 export type ClientAction =
-	| { type: 'Introduce'; name: string }
-	| { type: 'StartGame' }
-	| { type: 'SelectQuestion'; questionId: string }
-	| { type: 'HitButton' }
-	| { type: 'GiveAnswer'; value: string }
-	| { type: 'MediaFinished'; questionId: string }
-	| { type: 'StartAppeal' }
-	| { type: 'ResolveAppeal'; resolution: boolean }
+	| { type: 'introduce'; name: string }
+	| { type: 'game-start' }
+	| { type: 'question-select'; questionId: string }
+	| { type: 'button-hit' }
+	| { type: 'answer-give'; value: string }
+	| { type: 'media-finished'; questionId: string }
+	| { type: 'start-appeal' }
+	| { type: 'resolve-appeal'; resolution: boolean }

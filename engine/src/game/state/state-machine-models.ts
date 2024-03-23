@@ -3,8 +3,13 @@ import type { GameEvents } from 'shared/models/events'
 import type { GameState } from './models'
 
 export type ServerAction =
-	| { type: 'disconnect'; playerId: string }
-	| { type: 'ready-for-hit'; questionId: string }
+	| { type: 'player-disconnect'; playerId: string }
+	| { type: 'button-ready'; callbackId: string }
+	| { type: 'button-hit-timeout'; callbackId: string }
+	| { type: 'answer-show'; questionId?: string }
+	| { type: 'answer-timeout'; callbackId: string }
+	| { type: 'round-return' }
+	| { type: 'question-random'; callbackId: string }
 
 export type ServerCommand<A> = {
 	type: 'server'
@@ -30,13 +35,14 @@ export type ServerCommandOfType<T extends ServerAction['type']> = ServerCommand<
 >
 
 export type UpdateEvent =
-	| { type: 'broadcast'; event: GameEvents.GameEvent }
-	| { type: 'reply'; event: GameEvents.GameEvent }
+	| { type: 'client-broadcast'; event: GameEvents.GameEvent }
+	| { type: 'client-reply'; event: GameEvents.GameEvent }
 	| { type: 'schedule'; command: GameCommand; delaySeconds: number }
+	| { type: 'trigger'; command: GameCommand }
 
 export interface UpdateResult {
-	state: GameState
-	events: UpdateEvent[]
+	state?: GameState
+	events?: UpdateEvent[]
 }
 
 export interface ScheduledCommand {

@@ -15,7 +15,6 @@ export const initGame = async (ctx: ExecutionContext, packId: string) => {
 
 	const mediaMapping = await ctx.env.JEOSHOW_PACKS.get('packs/' + packId + '/mapping.json')
 	const mediaMappingJson = (await mediaMapping?.json()) as Record<string, string>
-	console.log(mediaMappingJson)
 	const parser = new SiqXmlContentParser(contentXml, mediaMappingJson)
 	const packModel = parser.convert()
 
@@ -23,7 +22,8 @@ export const initGame = async (ctx: ExecutionContext, packId: string) => {
 		pack: packModel,
 		mediaMapping: mediaMappingJson || {},
 		players: [],
-		stage: { type: 'BeforeStart' },
+		stage: { type: 'before-start' },
+		scheduledCommands: [],
 	}
 
 	ctx.state.storage.put('state', JSON.stringify(state))

@@ -8,17 +8,18 @@
 	import { WebSocketGameClient } from '$lib/ws-client'
 	import type { ClientAction } from 'shared/models/commands'
 
-	const gameCode = $page.data.gameCode
-	const userId = $page.data.userId
+	const gameCode: string = $page.data.gameCode
+	const userId: string = $page.data.userId
 
 	let gameClient: WebSocketGameClient
 
 	onMount(() => {
+		console.log(userId)
 		gameClient = new WebSocketGameClient(gameCode, userId)
 
 		gameClient.onConnect(() => {
 			console.log('Connected to WS')
-			gameClient.sendMessage({ type: 'Introduce', name: 'Player' })
+			gameClient.sendMessage({ type: 'introduce', name: 'Player' })
 		})
 
 		gameClient.onMessage((message: GameEvents.GameEvent) => {
@@ -38,10 +39,10 @@
 <section>
 	<h1>Game {gameCode}</h1>
 
-	<button on:click={() => gameClient.sendMessage({ type: 'HitButton' })}>Hit</button>
-	<button on:click={() => gameClient.sendMessage({ type: 'StartGame' })}>Reset</button>
+	<button on:click={() => gameClient.sendMessage({ type: 'button-hit' })}>Hit</button>
+	<button on:click={() => gameClient.sendMessage({ type: 'game-start' })}>Reset</button>
 
 	<PlayerList />
 
-	<Stage on:action={handleStageEvent} />
+	<Stage on:action={handleStageEvent} {userId} />
 </section>

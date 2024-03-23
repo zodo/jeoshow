@@ -4,7 +4,7 @@ import type { GameEvents } from 'shared/models/events'
 
 const handleClientIntroduce = (
 	state: GameState,
-	command: ClientCommandOfType<'Introduce'>
+	command: ClientCommandOfType<'introduce'>
 ): UpdateResult => {
 	const existingPlayer = state.players.find((p) => p.id === command.playerId)
 	const player: GameEvents.Player = {
@@ -19,12 +19,12 @@ const handleClientIntroduce = (
 		state: { ...state, players: newPlayers },
 		events: [
 			{
-				type: 'broadcast',
-				event: { type: 'PlayersUpdated', players: newPlayers },
+				type: 'client-broadcast',
+				event: { type: 'players-updated', players: newPlayers },
 			},
 			{
-				type: 'reply',
-				event: { type: 'StageUpdated', stage: toSnapshot(state.stage) },
+				type: 'client-reply',
+				event: { type: 'stage-updated', stage: toSnapshot(state.stage) },
 			},
 		],
 	}

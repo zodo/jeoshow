@@ -1,5 +1,6 @@
 import type { PackModel } from 'shared/models/siq'
 import type { GameEvents } from 'shared/models/events'
+import type { ScheduledCommand } from './state-machine-models'
 
 type PlayerId = string
 
@@ -8,6 +9,7 @@ export interface GameState {
 	mediaMapping: Record<string, string>
 	players: Player[]
 	stage: Stage
+	scheduledCommands: ScheduledCommand[]
 }
 
 export interface Player {
@@ -22,38 +24,56 @@ export interface Countdown {
 	finishesAt: number
 }
 
-export type Stage = { type: 'BeforeStart' } | (RoundStageType & RoundStageBase)
+export type Stage =
+	| { type: 'before-start' }
+	| (RoundStageType & RoundStageBase)
+	| { type: 'after-finish' }
 
 export interface RoundStageBase {
 	roundModel: PackModel.Round
 	takenQuestions: string[]
 	activePlayer: string
 	previousAnswers: AnswersSummary
+	callbackId?: string
+	callbackTimeout?: number
 }
 
 type RoundStageType =
-	| { type: 'Round' }
-	| { type: 'Question'; questionModel: PackModel.Question }
-	| { type: 'ReadyForHit'; questionModel: PackModel.Question }
 	| {
-			type: 'AwaitingAnswer'
+			type: 'round'
+	  }
+	| {
+			type: 'question'
+			questionModel: PackModel.Question
+			falseStartPlayers: PlayerId[]
+	  }
+	| {
+			type: 'ready-for-hit'
+			questionModel: PackModel.Question
+			falseStartPlayers: PlayerId[]
+	  }
+	| {
+			type: 'awaiting-answer'
 			questionModel: PackModel.Question
 			answeringPlayer: string
+			falseStartPlayers: PlayerId[]
 	  }
-	| { type: 'Answer'; answerModel: PackModel.Answers }
 	| {
-			type: 'Appeal'
+			type: 'answer'
+			questionModel: PackModel.Question
+	  }
+	| {
+			type: 'appeal'
 			questionModel: PackModel.Question
 			answer: string
 			playerId: PlayerId
 			resolutions: Record<PlayerId, boolean>
 	  }
-	| { type: 'AppealResult'; resolution: boolean }
+	| { type: 'appeal-result'; resolution: boolean }
 
 export interface AnswersSummary {
 	model?: PackModel.Question
 	answers: PlayerAnswer[]
-	triedToAppeal: PlayerId[]
 }
 
 export interface PlayerAnswer {
@@ -65,11 +85,11 @@ export interface PlayerAnswer {
 
 export const toSnapshot = (stage: Stage): GameEvents.StageSnapshot => {
 	switch (stage.type) {
-		case 'BeforeStart':
-			return { type: 'BeforeStart' }
-		case 'Round':
+		case 'before-start':
+			return { type: 'before-start' }
+		case 'round':
 			return {
-				type: 'Round',
+				type: 'round',
 				name: stage.roundModel.name,
 				themes: [
 					...stage.roundModel.themes.map((t) => ({
@@ -82,25 +102,30 @@ export const toSnapshot = (stage: Stage): GameEvents.StageSnapshot => {
 					})),
 				],
 				activePlayerId: stage.activePlayer,
+				timeoutSeconds: stage.callbackTimeout ?? 0,
 			}
-		case 'Question':
-		case 'ReadyForHit':
-		case 'AwaitingAnswer':
+		case 'question':
+		case 'ready-for-hit':
+		case 'awaiting-answer':
 			let substate: GameEvents.QuestionState
 			switch (stage.type) {
-				case 'Question':
-					substate = { type: 'Idle' }
+				case 'question':
+					substate = { type: 'idle' }
 					break
-				case 'ReadyForHit':
-					substate = { type: 'ReadyForHit' }
+				case 'ready-for-hit':
+					substate = { type: 'ready-for-hit', timeoutSeconds: stage.callbackTimeout ?? 0 }
 					break
-				case 'AwaitingAnswer':
-					substate = { type: 'AwaitingAnswer', activePlayerId: stage.answeringPlayer }
+				case 'awaiting-answer':
+					substate = {
+						type: 'awaiting-answer',
+						activePlayerId: stage.answeringPlayer,
+						timeoutSeconds: stage.callbackTimeout ?? 0,
+					}
 					break
 			}
 
 			return {
-				type: 'Question',
+				type: 'question',
 				fragments: stage.questionModel.fragments,
 				price: stage.questionModel.price,
 				theme: stage.roundModel.themes.find((t) =>
@@ -108,23 +133,28 @@ export const toSnapshot = (stage: Stage): GameEvents.StageSnapshot => {
 				)!.name,
 				substate: substate,
 			}
-		case 'Answer':
+		case 'answer':
 			return {
-				type: 'Answer',
-				model: stage.answerModel,
+				type: 'answer',
+				theme: stage.roundModel.themes.find((t) =>
+					t.questions.some((q) => q.id === stage.questionModel.id)
+				)!.name,
+				model: stage.questionModel.answers,
 			}
-		case 'Appeal':
+		case 'appeal':
 			return {
-				type: 'Appeal',
+				type: 'appeal',
 				model: stage.questionModel,
 				answer: stage.answer,
 				playerId: stage.playerId,
 				resolutions: stage.resolutions,
 			}
-		case 'AppealResult':
+		case 'appeal-result':
 			return {
-				type: 'AppealResult',
+				type: 'appeal-result',
 				resolution: stage.resolution,
 			}
+		case 'after-finish':
+			return { type: 'after-finish' }
 	}
 }

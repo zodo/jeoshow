@@ -2,10 +2,11 @@ import type { PackModel } from './siq'
 
 export namespace GameEvents {
 	export type GameEvent =
-		| { type: 'PlayersUpdated'; players: Player[] }
-		| { type: 'PlayerHitTheButton'; playerId: string }
-		| { type: 'StageUpdated'; stage: StageSnapshot }
-		| { type: 'PlayerGaveAnswer'; playerId: string; answer: string; isCorrect: boolean }
+		| { type: 'player-hit-the-button'; playerId: string }
+		| { type: 'player-false-start'; playerId: string }
+		| { type: 'player-texted'; playerId: string; text: string }
+		| { type: 'players-updated'; players: Player[] }
+		| { type: 'stage-updated'; stage: StageSnapshot }
 
 	export interface Player {
 		id: string
@@ -15,14 +16,14 @@ export namespace GameEvents {
 	}
 
 	export type QuestionState =
-		| { type: 'Idle' }
-		| { type: 'ReadyForHit' }
-		| { type: 'AwaitingAnswer'; activePlayerId: string }
+		| { type: 'idle' }
+		| { type: 'ready-for-hit'; timeoutSeconds: number }
+		| { type: 'awaiting-answer'; activePlayerId: string; timeoutSeconds: number }
 
 	export type StageSnapshot =
-		| { type: 'BeforeStart' }
+		| { type: 'before-start' }
 		| {
-				type: 'Round'
+				type: 'round'
 				name: string
 				themes: {
 					name: string
@@ -33,24 +34,27 @@ export namespace GameEvents {
 					}[]
 				}[]
 				activePlayerId: string
+				timeoutSeconds: number
 		  }
 		| {
-				type: 'Question'
+				type: 'question'
 				fragments: PackModel.FragmentGroup[]
 				price: number
 				theme: string
 				substate: QuestionState
 		  }
 		| {
-				type: 'Answer'
+				type: 'answer'
+				theme: string
 				model: PackModel.Answers
 		  }
 		| {
-				type: 'Appeal'
+				type: 'appeal'
 				model: PackModel.Question
 				answer: string
 				playerId: string
 				resolutions: Record<string, boolean>
 		  }
-		| { type: 'AppealResult'; resolution: boolean }
+		| { type: 'appeal-result'; resolution: boolean }
+		| { type: 'after-finish' }
 }

@@ -1,14 +1,9 @@
 <script lang="ts">
 	import type { SvelteCustomEvent } from '$lib/models'
 	import type { GameEvents } from 'shared/models/events'
-	import type { PackModel } from 'shared/models/siq'
 	import { createEventDispatcher } from 'svelte'
-	import Progress from '../Progress.svelte'
 
-	export let question: Extract<GameEvents.StageSnapshot, { type: 'question' }>
-	export let userId: string
-
-	const dispatch = createEventDispatcher<SvelteCustomEvent>()
+	export let answer: Extract<GameEvents.StageSnapshot, { type: 'answer' }>
 
 	const modifyUrl = (url: string) => {
 		if (url.startsWith('http')) {
@@ -16,16 +11,11 @@
 		}
 		return `/resources/${url}`
 	}
-
-	let answer: string
 </script>
 
-<div class="question-container" class:ready-for-hit={question.substate.type === 'ready-for-hit'}>
-	<div class="theme">Theme: {question.theme}</div>
-	{#if question.substate.type === 'ready-for-hit' && question.substate.timeoutSeconds}
-		<Progress seconds={question.substate.timeoutSeconds} />
-	{/if}
-	{#each question.fragments as fragmentGroup}
+<div class="answer-container">
+	<div class="theme">Theme: {answer.theme}</div>
+	{#each answer.model.content as fragmentGroup}
 		<div>
 			{#each fragmentGroup as fragment}
 				<div class="fragment">
@@ -55,34 +45,12 @@
 	{/each}
 </div>
 
-{#if question.substate.type === 'awaiting-answer' && question.substate.activePlayerId === userId}
-	{#if question.substate.timeoutSeconds}
-		<Progress seconds={question.substate.timeoutSeconds} />
-	{/if}
-	<div class="question-container">
-		<input type="text" placeholder="Your answer" bind:value={answer} />
-		<button
-			on:click={() => dispatch('action', { type: 'answer-give', value: answer })}
-			disabled={!answer}
-		>
-			Give answer
-		</button>
-	</div>
-{/if}
-
-<pre>{JSON.stringify(question, null, 2)}</pre>
-<p>Current userId: {userId}</p>
-
 <style>
-	.question-container {
+	.answer-container {
 		margin: 20px;
 		padding: 20px;
 		border: 1px solid #ddd;
 		border-radius: 8px;
-	}
-	.ready-for-hit {
-		background-color: #f0f0f0;
-		border-color: #666;
 	}
 	.fragment {
 		margin-bottom: 10px;

@@ -4,6 +4,7 @@ export namespace PackModel {
 	}
 
 	export interface Round {
+		idx: number
 		name: string
 		themes: Theme[]
 		type: RoundType
@@ -34,23 +35,23 @@ export namespace PackModel {
 	export type Fragment = Text | Image | Audio | Video
 
 	export interface Text {
-		type: 'Text'
+		type: 'text'
 		value: string
 	}
 
 	export interface Image {
-		type: 'Image'
+		type: 'image'
 		url: string
 	}
 
 	export interface Audio {
-		type: 'Audio'
+		type: 'audio'
 		url: string
 		time: number
 	}
 
 	export interface Video {
-		type: 'Video'
+		type: 'video'
 		url: string
 		time: number
 	}

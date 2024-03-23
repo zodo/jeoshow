@@ -14,6 +14,12 @@ export class SiqXmlContentParser {
 			attributesGroupName: '$',
 			attributeNamePrefix: '',
 			textNodeName: '_',
+			numberParseOptions: {
+				hex: false,
+				leadingZeros: false,
+				skipLike: /.*/,
+			},
+			parseAttributeValue: false,
 			isArray: (name: string) =>
 				['round', 'theme', 'question', 'answer', 'param'].includes(name),
 		})
@@ -21,14 +27,14 @@ export class SiqXmlContentParser {
 
 	convert(): PackModel.Pack {
 		const xml = this.parser.parse(this.xml)
-		// console.log(JSON.stringify(xml, null, 2))
-		const rounds = xml.package.rounds.round
+		const rounds = (xml.package.rounds.round as any[])
 			.map((round: any) => this.convertRound(round))
-			.filter((r: any) => r !== undefined)
+			.filter((r) => r !== undefined)
+			.map((r, idx) => ({ ...r!!, idx }))
 		return { rounds }
 	}
 
-	private convertRound(r: any): PackModel.Round | undefined {
+	private convertRound(r: any): Omit<PackModel.Round, 'idx'> | undefined {
 		const themes: PackModel.Theme[] | undefined = r.themes?.theme
 			?.map((t: any) => this.convertTheme(t))
 			?.filter((t: any) => t !== undefined)
@@ -107,11 +113,15 @@ export class SiqXmlContentParser {
 				return this.mapQuestionParam(p.item)
 			})
 
-		const answerMedia = params
+		let answerMedia: PackModel.FragmentGroup[] = params
 			.filter((p: any) => p.$.name === 'answer')
 			.map((p: any) => {
 				return this.mapQuestionParam(p.item)
 			})
+		if (answerMedia.length === 0) {
+			const text: string = q.right.answer[0]
+			answerMedia = [[{ type: 'text', value: text }]]
+		}
 
 		return {
 			id: id,
@@ -134,14 +144,14 @@ export class SiqXmlContentParser {
 			case 'say':
 			case 'text':
 			case '':
-				return { type: 'Text', value: content }
+				return { type: 'text', value: content }
 			case 'image':
-				return { type: 'Image', url: this.mapMediaUrl(content, 'Images/') }
+				return { type: 'image', url: this.mapMediaUrl(content, 'Images/') }
 			case 'voice':
 			case 'audio':
-				return { type: 'Audio', url: this.mapMediaUrl(content, 'Audio/'), time }
+				return { type: 'audio', url: this.mapMediaUrl(content, 'Audio/'), time }
 			case 'video':
-				return { type: 'Video', url: this.mapMediaUrl(content, 'Video/'), time }
+				return { type: 'video', url: this.mapMediaUrl(content, 'Video/'), time }
 			default:
 				throw new Error(`Unknown atom type: ${type}`)
 		}
@@ -149,7 +159,7 @@ export class SiqXmlContentParser {
 
 	private mapQuestionParam(item: any): PackModel.Fragment[] {
 		if (typeof item === 'string') {
-			return [{ type: 'Text', value: item }]
+			return [{ type: 'text', value: item }]
 		}
 		if (Array.isArray(item)) {
 			return item.map((i: any) => this.mapQuestionParamItem(i))
@@ -159,7 +169,7 @@ export class SiqXmlContentParser {
 
 	private mapQuestionParamItem(item: any): PackModel.Fragment {
 		if (typeof item === 'string') {
-			return { type: 'Text', value: item }
+			return { type: 'text', value: item }
 		}
 		const type = item.$?.type ?? 'text'
 		const content = item._
@@ -173,19 +183,19 @@ export class SiqXmlContentParser {
 			case 'say':
 			case 'text':
 			case '':
-				return { type: 'Text', value: content }
+				return { type: 'text', value: content }
 			case 'image':
-				return { type: 'Image', url: this.mapMediaUrl(content, 'Images/') }
+				return { type: 'image', url: this.mapMediaUrl(content, 'Images/') }
 			case 'voice':
 			case 'audio':
 				return {
-					type: 'Audio',
+					type: 'audio',
 					url: this.mapMediaUrl(content, 'Audio/'),
 					time: durationSeconds,
 				}
 			case 'video':
 				return {
-					type: 'Video',
+					type: 'video',
 					url: this.mapMediaUrl(content, 'Video/'),
 					time: durationSeconds,
 				}

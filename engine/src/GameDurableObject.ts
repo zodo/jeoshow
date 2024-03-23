@@ -5,9 +5,13 @@ import type {
 	GameCommand,
 	ScheduledCommand,
 	ServerCommandOfType,
+	UpdateEvent,
+	UpdateResult,
 } from './game/state/state-machine-models'
 import { updateState } from './game/state/state-machine'
 import { initGame } from './game/create'
+import type { GameEvents } from 'shared/models/events'
+import { a } from 'vitest/dist/suite-a18diDsI'
 
 export class GameDurableObject {
 	state: DurableObjectState
@@ -34,41 +38,35 @@ export class GameDurableObject {
 	}
 
 	async webSocketMessage(ws: WebSocket, message: ArrayBuffer | string) {
-		console.log('Received message:', message)
 		const command: ClientCommand<ClientAction> = {
 			type: 'client',
 			playerId: this.state.getTags(ws)[0],
 			action: JSON.parse(message as string),
 		}
-		await this.modifyState(command, ws)
+		console.log('<- ws:', command.type, command.action.type)
+		await this.modifyState(command, Date.now(), 'ws', ws)
 	}
 
 	async webSocketClose(ws: WebSocket, code: number, reason: string, wasClean: boolean) {
 		ws.close(code, 'Durable Object is closing WebSocket')
 		const userId = this.state.getTags(ws)[0]
-		console.log('User disconnected:', userId)
-		const command: ServerCommandOfType<'disconnect'> = {
+		const command: ServerCommandOfType<'player-disconnect'> = {
 			type: 'server',
-			action: { type: 'disconnect', playerId: userId },
+			action: { type: 'player-disconnect', playerId: userId },
 		}
-		await this.modifyState(command, ws)
+		console.log('<- ws close:', command.type, command.action.type)
+		await this.modifyState(command, Date.now(), 'ws', ws)
 	}
 
 	async alarm() {
 		const now = Date.now()
-		console.log('Alarm triggered, now', now)
 		const scheduledCommands = (await this.storage.get('scheduledCommands')) as string
 		const commands: ScheduledCommand[] = scheduledCommands ? JSON.parse(scheduledCommands) : []
 		const commandsToExecute = commands.filter((c) => c.time <= now)
-		for (const { command } of commandsToExecute) {
-			await this.modifyState(command)
+		for (const { command, time } of commandsToExecute) {
+			console.log('<- alarm:', command.type, command.action.type, time)
+			await this.modifyState(command, now, 'alarm')
 		}
-		const remainingCommands = commands.filter((c) => c.time > now)
-		if (remainingCommands.length > 0) {
-			const closestTime = Math.min(...remainingCommands.map((c) => c.time))
-			await this.storage.setAlarm(closestTime)
-		}
-		await this.storage.put('scheduledCommands', JSON.stringify(remainingCommands))
 	}
 
 	private async initiateWebSocket(request: Request): Promise<Response> {
@@ -123,33 +121,91 @@ export class GameDurableObject {
 		}
 	}
 
-	private async modifyState(command: GameCommand, ws?: WebSocket) {
-		console.log('Modifying state:', command)
+	private async modifyState(
+		command: GameCommand,
+		now: number,
+		origin: 'ws' | 'alarm',
+		ws?: WebSocket
+	) {
 		const currentStateJson = (await this.storage.get('state')) as string
 		const currentState = JSON.parse(currentStateJson) as GameState
 
-		const { state, events } = updateState(currentState, command)
-		if (state !== currentState) {
+		const { state, events } = this.recursivelyUpdateState(currentState, command)
+
+		if (state && state !== currentState) {
 			this.storage.put('state', JSON.stringify(state))
 		}
 
-		for (const event of events) {
-			if (event.type === 'broadcast') {
-				this.broadcast(JSON.stringify(event.event))
-			} else if (event.type === 'reply' && ws) {
+		for (const event of events ?? []) {
+			if (event.type === 'client-broadcast') {
+				console.log('-> broadcast:', event.type, event.event.type)
+				await this.broadcast(JSON.stringify(event.event))
+			} else if (event.type === 'client-reply' && ws) {
+				console.log('-> reply:', event.type)
 				ws.send(JSON.stringify(event.event))
-			} else if (event.type === 'schedule') {
-				const scheduledCommands = (await this.storage.get('scheduledCommands')) as string
-				const commands: ScheduledCommand[] = scheduledCommands
-					? JSON.parse(scheduledCommands)
-					: []
-				const now = Date.now()
-				commands.push({ command: event.command, time: now + event.delaySeconds * 1000 })
-				const closestTime = Math.min(...commands.map((c) => c.time).filter((t) => t > now))
-				console.log('Set alarm for:', closestTime)
-				await this.storage.setAlarm(closestTime)
-				await this.storage.put('scheduledCommands', JSON.stringify(commands))
 			}
 		}
+
+		const scheduledCommands =
+			events?.filter(
+				(e): e is Extract<UpdateEvent, { type: 'schedule' }> => e.type === 'schedule'
+			) ?? []
+		for (const event of scheduledCommands) {
+			console.log('-> schedule:', event.command.type, event.command.action.type)
+		}
+		if (scheduledCommands.length > 0 || origin === 'alarm') {
+			await this.modifyScheduledCommands(now, (commands) => {
+				return [
+					...commands.filter((c) => c.time > now),
+					...scheduledCommands.map((event) => ({
+						command: event.command,
+						time: now + event.delaySeconds * 1000,
+					})),
+				]
+			})
+		}
+	}
+
+	private recursivelyUpdateState(
+		state: GameState,
+		command: GameCommand,
+		depth = 0
+	): UpdateResult {
+		if (depth > 10) {
+			throw new Error(`Likely infinite loop: ${depth}, command: ${JSON.stringify(command)}`)
+		}
+
+		const { state: updatedState, events } = updateState(state, command)
+
+		const triggerEvents =
+			events?.filter(
+				(e): e is Extract<UpdateEvent, { type: 'trigger' }> => e.type === 'trigger'
+			) ?? []
+
+		const nonTriggerEvents = events?.filter((e) => e.type !== 'trigger') ?? []
+
+		const finalState = triggerEvents.reduce<GameState>((currentState, event) => {
+			console.log('-> trigger:', event.command.type, event.command.action.type)
+			const result = this.recursivelyUpdateState(currentState, event.command, depth + 1)
+			nonTriggerEvents.push(...(result.events ?? []))
+			return result.state ?? currentState
+		}, updatedState ?? state)
+
+		return { state: finalState, events: nonTriggerEvents }
+	}
+
+	private async modifyScheduledCommands(
+		now: number,
+		modifier: (commands: ScheduledCommand[]) => ScheduledCommand[]
+	) {
+		const scheduledCommandsJson =
+			((await this.storage.get('scheduledCommands')) as string) || '[]'
+		let commands: ScheduledCommand[] = JSON.parse(scheduledCommandsJson)
+		commands = modifier(commands)
+		const closestTime = Math.min(...commands.map((c) => c.time).filter((t) => t > now))
+		if (closestTime !== Infinity) {
+			await this.storage.setAlarm(closestTime)
+		}
+		await this.storage.put('scheduledCommands', JSON.stringify(commands))
 	}
 }
