@@ -58,8 +58,7 @@ export class GameDurableObject {
 
 	async alarm() {
 		const now = Date.now()
-		const scheduledCommands = (await this.storage.get('scheduledCommands')) as string
-		const commands: ScheduledCommand[] = scheduledCommands ? JSON.parse(scheduledCommands) : []
+		const commands: ScheduledCommand[] = (await this.storage.get('scheduledCommands')) ?? []
 		const commandsToExecute = commands.filter((c) => c.time <= now)
 		for (const { command, time } of commandsToExecute) {
 			console.log('<- alarm:', command.type, command.action.type, time)
@@ -125,13 +124,16 @@ export class GameDurableObject {
 		origin: 'ws' | 'alarm',
 		ws?: WebSocket
 	) {
-		const currentStateJson = (await this.storage.get('state')) as string
-		const currentState = JSON.parse(currentStateJson) as GameState
+		const currentState: GameState | undefined = await this.storage.get('state')
+		if (!currentState) {
+			console.error('State not found')
+			return
+		}
 
 		const { state, events } = this.recursivelyUpdateState(currentState, command)
 
 		if (state && state !== currentState) {
-			await this.storage.put('state', JSON.stringify(state))
+			await this.storage.put('state', state)
 		}
 
 		for (const event of events ?? []) {
@@ -196,14 +198,12 @@ export class GameDurableObject {
 		now: number,
 		modifier: (commands: ScheduledCommand[]) => ScheduledCommand[]
 	) {
-		const scheduledCommandsJson =
-			((await this.storage.get('scheduledCommands')) as string) || '[]'
-		let commands: ScheduledCommand[] = JSON.parse(scheduledCommandsJson)
+		let commands: ScheduledCommand[] = (await this.storage.get('scheduledCommands')) ?? []
 		commands = modifier(commands)
 		const closestTime = Math.min(...commands.map((c) => c.time).filter((t) => t > now))
 		if (closestTime !== Infinity) {
 			await this.storage.setAlarm(closestTime)
 		}
-		await this.storage.put('scheduledCommands', JSON.stringify(commands))
+		await this.storage.put('scheduledCommands', commands)
 	}
 }

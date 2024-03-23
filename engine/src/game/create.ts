@@ -26,5 +26,5 @@ export const initGame = async (ctx: ExecutionContext, packId: string) => {
 		scheduledCommands: [],
 	}
 
-	ctx.state.storage.put('state', JSON.stringify(state))
+	ctx.state.storage.put('state', state)
 }
