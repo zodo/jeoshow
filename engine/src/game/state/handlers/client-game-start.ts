@@ -1,17 +1,19 @@
 import { toSnapshot, type GameState, type Stage } from '../models'
-import type { ClientCommandOfType, UpdateResult } from '../state-machine-models'
+import type { ClientCommandOfType, CommandContext, UpdateResult } from '../state-machine-models'
 import { Timeouts } from '../timeouts'
 
 const handleClientGameStart = (
 	state: GameState,
-	command: ClientCommandOfType<'game-start'>
+	command: ClientCommandOfType<'game-start'>,
+	ctx: CommandContext
 ): UpdateResult => {
 	const alivePlayers = state.players.filter((p) => !p.disconnected)
 	const randomActivePlayer = alivePlayers[Math.floor(Math.random() * alivePlayers.length)]
 	const callbackId: string = Math.random().toString(36).substring(7)
+	const firstRoundId = ctx.pack.rounds[0].id
 	const newStage: Stage = {
 		type: 'round',
-		roundModel: state.pack.rounds[0],
+		roundId: firstRoundId,
 		takenQuestions: [],
 		activePlayer: randomActivePlayer.id,
 		previousAnswers: { answers: [] },
@@ -24,7 +26,7 @@ const handleClientGameStart = (
 		events: [
 			{
 				type: 'client-broadcast',
-				event: { type: 'stage-updated', stage: toSnapshot(newStage) },
+				event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
 			},
 			{
 				type: 'schedule',

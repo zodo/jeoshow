@@ -1,9 +1,10 @@
 import { toSnapshot, type GameState, type Stage } from '../models'
-import type { ServerCommandOfType, UpdateResult } from '../state-machine-models'
+import type { CommandContext, ServerCommandOfType, UpdateResult } from '../state-machine-models'
 
 const handleServerButtonHitTimeout = (
 	state: GameState,
-	command: ServerCommandOfType<'button-hit-timeout'>
+	command: ServerCommandOfType<'button-hit-timeout'>,
+	ctx: CommandContext
 ): UpdateResult => {
 	if (state.stage.type !== 'ready-for-hit') {
 		return { state, events: [] }
@@ -22,7 +23,7 @@ const handleServerButtonHitTimeout = (
 					type: 'server',
 					action: {
 						type: 'answer-show',
-						questionId: state.stage.questionModel.id,
+						questionId: state.stage.questionId,
 					},
 				},
 			},

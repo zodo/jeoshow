@@ -1,9 +1,10 @@
 import { toSnapshot, type GameState, type Stage } from '../models'
-import type { ServerCommandOfType, UpdateResult } from '../state-machine-models'
+import type { CommandContext, ServerCommandOfType, UpdateResult } from '../state-machine-models'
 
 const handleServerAnswerTimeout = (
 	state: GameState,
-	command: ServerCommandOfType<'answer-timeout'>
+	command: ServerCommandOfType<'answer-timeout'>,
+	ctx: CommandContext
 ): UpdateResult => {
 	if (state.stage.type !== 'awaiting-answer') {
 		return { state, events: [] }

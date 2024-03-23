@@ -1,6 +1,8 @@
 import type { ClientAction } from 'shared/models/commands'
 import type { GameEvents } from 'shared/models/events'
 import type { GameState } from './models'
+import type { PackMetadata } from '../metadata'
+import type { PackModel } from 'shared/models/siq'
 
 export type ServerAction =
 	| { type: 'player-disconnect'; playerId: string }
@@ -48,4 +50,27 @@ export interface UpdateResult {
 export interface ScheduledCommand {
 	command: GameCommand
 	time: number
+}
+
+export type CommandContext = {
+	pack: PackModel.Pack
+	mediaMapping: Record<string, string>
+}
+
+export const getRound = (ctx: CommandContext, roundId: string) => {
+	const round = ctx.pack.rounds.find((r) => r.id === roundId)
+	if (!round) {
+		throw new Error(`Round not found: ${roundId}`)
+	}
+	return round
+}
+
+export const getQuestion = (ctx: CommandContext, questionId: string) => {
+	const question = ctx.pack.rounds
+		.flatMap((r) => r.themes.flatMap((t) => t.questions))
+		.find((q) => q.id === questionId)
+	if (!question) {
+		throw new Error(`Question not found: ${questionId}`)
+	}
+	return question
 }

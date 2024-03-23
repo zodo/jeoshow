@@ -30,11 +30,11 @@ export class SiqXmlContentParser {
 		const rounds = (xml.package.rounds.round as any[])
 			.map((round: any) => this.convertRound(round))
 			.filter((r) => r !== undefined)
-			.map((r, idx) => ({ ...r!!, idx }))
+			.map((r, idx) => ({ ...r!!, id: idx.toString() }))
 		return { rounds }
 	}
 
-	private convertRound(r: any): Omit<PackModel.Round, 'idx'> | undefined {
+	private convertRound(r: any): Omit<PackModel.Round, 'id'> | undefined {
 		const themes: PackModel.Theme[] | undefined = r.themes?.theme
 			?.map((t: any) => this.convertTheme(t))
 			?.filter((t: any) => t !== undefined)

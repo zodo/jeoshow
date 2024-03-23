@@ -15,3 +15,7 @@ new_classes = ["GameDurableObject"]
 [[r2_buckets]]
 binding = "JEOSHOW_PACKS"
 bucket_name = "jeoshow-packs"
+
+[[kv_namespaces]]
+binding = "JEOSHOW_PACKS_METADATA"
+id = "jeoshow-packs-metadata"

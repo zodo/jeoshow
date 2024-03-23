@@ -1,16 +1,23 @@
 import type { PackModel } from 'shared/models/siq'
 import { toSnapshot, type GameState, type Stage } from '../models'
-import type { ClientCommandOfType, UpdateEvent, UpdateResult } from '../state-machine-models'
+import {
+	getQuestion,
+	type ClientCommandOfType,
+	type CommandContext,
+	type UpdateEvent,
+	type UpdateResult,
+} from '../state-machine-models'
 import { Timeouts } from '../timeouts'
 
 const handleClientGiveAnswer = (
 	state: GameState,
-	command: ClientCommandOfType<'answer-give'>
+	command: ClientCommandOfType<'answer-give'>,
+	ctx: CommandContext
 ): UpdateResult => {
 	if (state.stage.type !== 'awaiting-answer' || command.playerId !== state.stage.activePlayer) {
 		return { state, events: [] }
 	}
-	const questionModel = state.stage.questionModel
+	const questionModel = getQuestion(ctx, state.stage.questionId)
 	if (isCorrect(questionModel.answers, command.action.value)) {
 		const players = state.players.map((p) =>
 			p.id === command.playerId ? { ...p, score: p.score + questionModel.price } : p
@@ -51,7 +58,7 @@ const handleClientGiveAnswer = (
 				},
 				{
 					type: 'client-broadcast',
-					event: { type: 'stage-updated', stage: toSnapshot(stage) },
+					event: { type: 'stage-updated', stage: toSnapshot(stage, ctx) },
 				},
 				{
 					type: 'trigger',
@@ -107,7 +114,7 @@ const handleClientGiveAnswer = (
 				},
 				{
 					type: 'client-broadcast',
-					event: { type: 'stage-updated', stage: toSnapshot(stage) },
+					event: { type: 'stage-updated', stage: toSnapshot(stage, ctx) },
 				},
 				{
 					type: 'schedule',

@@ -1,6 +1,7 @@
 import type { GameState } from './models'
 import type {
 	ClientCommandOfType,
+	CommandContext,
 	GameCommand,
 	ServerAction,
 	ServerCommandOfType,
@@ -22,7 +23,11 @@ import handleServerAnswerTimeout from './handlers/server-answer-timeout'
 import handleClientMediaFinished from './handlers/client-media-finished'
 
 const clientCommandHandlers: {
-	[K in ClientAction['type']]: (state: GameState, command: ClientCommandOfType<K>) => UpdateResult
+	[K in ClientAction['type']]: (
+		state: GameState,
+		command: ClientCommandOfType<K>,
+		ctx: CommandContext
+	) => UpdateResult
 } = {
 	introduce: handleClientIntroduce,
 	'game-start': handleClientGameStart,
@@ -35,7 +40,11 @@ const clientCommandHandlers: {
 }
 
 const serverCommandHandlers: {
-	[K in ServerAction['type']]: (state: GameState, command: ServerCommandOfType<K>) => UpdateResult
+	[K in ServerAction['type']]: (
+		state: GameState,
+		command: ServerCommandOfType<K>,
+		ctx: CommandContext
+	) => UpdateResult
 } = {
 	'player-disconnect': handlePlayerDisconnect,
 	'button-ready': handleServerButtonReady,
@@ -46,11 +55,15 @@ const serverCommandHandlers: {
 	'answer-timeout': handleServerAnswerTimeout,
 }
 
-export const updateState = (state: GameState, command: GameCommand): UpdateResult => {
+export const updateState = (
+	state: GameState,
+	command: GameCommand,
+	ctx: CommandContext
+): UpdateResult => {
 	switch (command.type) {
 		case 'client':
-			return clientCommandHandlers[command.action.type](state, command as any)
+			return clientCommandHandlers[command.action.type](state, command as any, ctx)
 		case 'server':
-			return serverCommandHandlers[command.action.type](state, command as any)
+			return serverCommandHandlers[command.action.type](state, command as any, ctx)
 	}
 }

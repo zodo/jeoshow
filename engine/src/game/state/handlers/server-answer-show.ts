@@ -1,10 +1,16 @@
 import { toSnapshot, type GameState, type Stage } from '../models'
-import type { ServerCommandOfType, UpdateResult } from '../state-machine-models'
-import { Timeouts, getFragmentsTime } from '../timeouts'
+import {
+	getQuestion,
+	type CommandContext,
+	type ServerCommandOfType,
+	type UpdateResult,
+} from '../state-machine-models'
+import { getFragmentsTime } from '../timeouts'
 
 const handleServerAnswerShow = (
 	state: GameState,
-	command: ServerCommandOfType<'answer-show'>
+	command: ServerCommandOfType<'answer-show'>,
+	ctx: CommandContext
 ): UpdateResult => {
 	if (
 		state.stage.type !== 'ready-for-hit' &&
@@ -14,7 +20,7 @@ const handleServerAnswerShow = (
 		return { state, events: [] }
 	}
 
-	if (state.stage.questionModel.id !== command.action.questionId) {
+	if (state.stage.questionId !== command.action.questionId) {
 		return { state, events: [] }
 	}
 
@@ -23,14 +29,15 @@ const handleServerAnswerShow = (
 		type: 'answer',
 	}
 
-	const answerShowTime = getFragmentsTime(stage.questionModel.answers.content)
+	const questionModel = getQuestion(ctx, state.stage.questionId)
+	const answerShowTime = getFragmentsTime(questionModel.answers.content)
 
 	return {
 		state: { ...state, stage },
 		events: [
 			{
 				type: 'client-broadcast',
-				event: { type: 'stage-updated', stage: toSnapshot(stage) },
+				event: { type: 'stage-updated', stage: toSnapshot(stage, ctx) },
 			},
 			{
 				type: 'schedule',

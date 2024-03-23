@@ -4,7 +4,7 @@ export namespace PackModel {
 	}
 
 	export interface Round {
-		idx: number
+		id: string
 		name: string
 		themes: Theme[]
 		type: RoundType

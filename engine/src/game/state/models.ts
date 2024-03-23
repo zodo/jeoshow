@@ -1,12 +1,16 @@
 import type { PackModel } from 'shared/models/siq'
 import type { GameEvents } from 'shared/models/events'
-import type { ScheduledCommand } from './state-machine-models'
+import {
+	getRound,
+	type CommandContext,
+	type ScheduledCommand,
+	getQuestion,
+} from './state-machine-models'
 
 type PlayerId = string
 
 export interface GameState {
-	pack: PackModel.Pack
-	mediaMapping: Record<string, string>
+	packId: string
 	players: Player[]
 	stage: Stage
 	scheduledCommands: ScheduledCommand[]
@@ -19,18 +23,13 @@ export interface Player {
 	disconnected: boolean
 }
 
-export interface Countdown {
-	max: number
-	finishesAt: number
-}
-
 export type Stage =
 	| { type: 'before-start' }
 	| (RoundStageType & RoundStageBase)
 	| { type: 'after-finish' }
 
 export interface RoundStageBase {
-	roundModel: PackModel.Round
+	roundId: string
 	takenQuestions: string[]
 	activePlayer: string
 	previousAnswers: AnswersSummary
@@ -44,27 +43,27 @@ type RoundStageType =
 	  }
 	| {
 			type: 'question'
-			questionModel: PackModel.Question
+			questionId: string
 			falseStartPlayers: PlayerId[]
 	  }
 	| {
 			type: 'ready-for-hit'
-			questionModel: PackModel.Question
+			questionId: string
 			falseStartPlayers: PlayerId[]
 	  }
 	| {
 			type: 'awaiting-answer'
-			questionModel: PackModel.Question
+			questionId: string
 			answeringPlayer: string
 			falseStartPlayers: PlayerId[]
 	  }
 	| {
 			type: 'answer'
-			questionModel: PackModel.Question
+			questionId: string
 	  }
 	| {
 			type: 'appeal'
-			questionModel: PackModel.Question
+			questionId: string
 			answer: string
 			playerId: PlayerId
 			resolutions: Record<PlayerId, boolean>
@@ -72,7 +71,7 @@ type RoundStageType =
 	| { type: 'appeal-result'; resolution: boolean }
 
 export interface AnswersSummary {
-	model?: PackModel.Question
+	questionId?: string
 	answers: PlayerAnswer[]
 }
 
@@ -83,16 +82,18 @@ export interface PlayerAnswer {
 	scoreDiff: number
 }
 
-export const toSnapshot = (stage: Stage): GameEvents.StageSnapshot => {
+export const toSnapshot = (stage: Stage, ctx: CommandContext): GameEvents.StageSnapshot => {
 	switch (stage.type) {
-		case 'before-start':
+		case 'before-start': {
 			return { type: 'before-start' }
-		case 'round':
+		}
+		case 'round': {
+			const round = getRound(ctx, stage.roundId)
 			return {
 				type: 'round',
-				name: stage.roundModel.name,
+				name: round.name,
 				themes: [
-					...stage.roundModel.themes.map((t) => ({
+					...round.themes.map((t) => ({
 						name: t.name,
 						questions: t.questions.map((q) => ({
 							id: q.id,
@@ -104,9 +105,10 @@ export const toSnapshot = (stage: Stage): GameEvents.StageSnapshot => {
 				activePlayerId: stage.activePlayer,
 				timeoutSeconds: stage.callbackTimeout ?? 0,
 			}
+		}
 		case 'question':
 		case 'ready-for-hit':
-		case 'awaiting-answer':
+		case 'awaiting-answer': {
 			let substate: GameEvents.QuestionState
 			switch (stage.type) {
 				case 'question':
@@ -124,34 +126,40 @@ export const toSnapshot = (stage: Stage): GameEvents.StageSnapshot => {
 					break
 			}
 
+			const round = getRound(ctx, stage.roundId)
+			const question = getQuestion(ctx, stage.questionId)
+			const theme = round.themes.find((t) => t.questions.some((q) => q.id === question.id))
+
 			return {
 				type: 'question',
-				fragments: stage.questionModel.fragments,
-				price: stage.questionModel.price,
-				theme: stage.roundModel.themes.find((t) =>
-					t.questions.some((q) => q.id === stage.questionModel.id)
-				)!.name,
-				themeComment: stage.roundModel.themes.find((t) =>
-					t.questions.some((q) => q.id === stage.questionModel.id)
-				)!.comments,
+				fragments: question.fragments,
+				price: question.price,
+				theme: theme?.name ?? '',
+				themeComment: theme?.comments,
 				substate: substate,
 			}
-		case 'answer':
+		}
+		case 'answer': {
+			const round = getRound(ctx, stage.roundId)
+			const question = getQuestion(ctx, stage.questionId)
 			return {
 				type: 'answer',
-				theme: stage.roundModel.themes.find((t) =>
-					t.questions.some((q) => q.id === stage.questionModel.id)
-				)!.name,
-				model: stage.questionModel.answers,
+				theme: round.themes.find((t) => t.questions.some((q) => q.id === stage.questionId))!
+					.name,
+				model: question.answers,
 			}
-		case 'appeal':
+		}
+		case 'appeal': {
+			const question = getQuestion(ctx, stage.questionId)
 			return {
 				type: 'appeal',
-				model: stage.questionModel,
+				model: question,
 				answer: stage.answer,
 				playerId: stage.playerId,
 				resolutions: stage.resolutions,
 			}
+		}
+
 		case 'appeal-result':
 			return {
 				type: 'appeal-result',

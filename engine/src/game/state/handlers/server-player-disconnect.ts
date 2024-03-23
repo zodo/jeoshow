@@ -1,9 +1,10 @@
 import type { GameState } from '../models'
-import type { ServerCommandOfType, UpdateResult } from '../state-machine-models'
+import type { CommandContext, ServerCommandOfType, UpdateResult } from '../state-machine-models'
 
 const handlePlayerDisconnect = (
 	state: GameState,
-	command: ServerCommandOfType<'player-disconnect'>
+	command: ServerCommandOfType<'player-disconnect'>,
+	ctx: CommandContext
 ): UpdateResult => {
 	const player = state.players.find((p) => p.id === command.action.playerId)
 	if (!player) {

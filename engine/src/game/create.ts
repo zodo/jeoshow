@@ -1,5 +1,6 @@
 import { SiqXmlContentParser } from 'src/siq/xml-parser'
 import type { GameState } from './state/models'
+import { saveMetadata } from './metadata'
 
 export interface ExecutionContext {
 	state: DurableObjectState
@@ -18,9 +19,11 @@ export const initGame = async (ctx: ExecutionContext, packId: string) => {
 	const parser = new SiqXmlContentParser(contentXml, mediaMappingJson)
 	const packModel = parser.convert()
 
+	const kv = ctx.env.JEOSHOW_PACKS_METADATA
+	await saveMetadata(kv, { id: packId, model: packModel, mediaMapping: mediaMappingJson })
+
 	const state: GameState = {
-		pack: packModel,
-		mediaMapping: mediaMappingJson || {},
+		packId,
 		players: [],
 		stage: { type: 'before-start' },
 		scheduledCommands: [],

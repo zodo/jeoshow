@@ -1,10 +1,11 @@
 import { toSnapshot, type GameState } from '../models'
-import type { ClientCommandOfType, UpdateResult } from '../state-machine-models'
+import type { ClientCommandOfType, CommandContext, UpdateResult } from '../state-machine-models'
 import type { GameEvents } from 'shared/models/events'
 
 const handleClientIntroduce = (
 	state: GameState,
-	command: ClientCommandOfType<'introduce'>
+	command: ClientCommandOfType<'introduce'>,
+	ctx: CommandContext
 ): UpdateResult => {
 	const existingPlayer = state.players.find((p) => p.id === command.playerId)
 	const player: GameEvents.Player = {
@@ -24,7 +25,7 @@ const handleClientIntroduce = (
 			},
 			{
 				type: 'client-reply',
-				event: { type: 'stage-updated', stage: toSnapshot(state.stage) },
+				event: { type: 'stage-updated', stage: toSnapshot(state.stage, ctx) },
 			},
 		],
 	}

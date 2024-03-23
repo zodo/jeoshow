@@ -1,20 +1,25 @@
 import { toSnapshot, type GameState, type Stage } from '../models'
-import type { ServerCommandOfType, UpdateResult } from '../state-machine-models'
+import {
+	getRound,
+	type CommandContext,
+	type ServerCommandOfType,
+	type UpdateResult,
+} from '../state-machine-models'
 import { Timeouts } from '../timeouts'
 
 const handleServerRoundReturn = (
 	state: GameState,
-	command: ServerCommandOfType<'round-return'>
+	command: ServerCommandOfType<'round-return'>,
+	ctx: CommandContext
 ): UpdateResult => {
 	if (state.stage.type !== 'answer') {
 		return { state, events: [] }
 	}
+	const roundModel = getRound(ctx, state.stage.roundId)
 
 	const hasMoreQuestions =
-		state.stage.roundModel.themes.flatMap((t) => t.questions).length >
-		state.stage.takenQuestions.length
-	const hasMoreRounds =
-		state.pack.rounds[state.pack.rounds.length - 1].idx !== state.stage.roundModel.idx
+		roundModel.themes.flatMap((t) => t.questions).length > state.stage.takenQuestions.length
+	const hasMoreRounds = ctx.pack.rounds[ctx.pack.rounds.length - 1].id !== state.stage.roundId
 	const callbackId: string = Math.random().toString(36).substring(7)
 
 	if (hasMoreQuestions || hasMoreRounds) {
@@ -28,16 +33,15 @@ const handleServerRoundReturn = (
 			}
 		} else {
 			const answerStage: Extract<Stage, { type: 'answer' }> = state.stage
-			const newRoundModel = state.pack.rounds.find(
-				(r) => r.idx === answerStage.roundModel.idx + 1
-			)
+			const currentRoundIndex = ctx.pack.rounds.findIndex((r) => r.id === answerStage.roundId)
+			const newRoundModel = ctx.pack.rounds[currentRoundIndex + 1]
 			if (!newRoundModel) {
 				throw new Error('newRoundModel not found')
 			}
 			newStage = {
 				...state.stage,
 				type: 'round',
-				roundModel: newRoundModel,
+				roundId: newRoundModel.id,
 				takenQuestions: [],
 				callbackId,
 				callbackTimeout: Timeouts.selectQuestion,
@@ -49,7 +53,7 @@ const handleServerRoundReturn = (
 			events: [
 				{
 					type: 'client-broadcast',
-					event: { type: 'stage-updated', stage: toSnapshot(newStage) },
+					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
 				},
 				{
 					type: 'schedule',
@@ -71,7 +75,7 @@ const handleServerRoundReturn = (
 			events: [
 				{
 					type: 'client-broadcast',
-					event: { type: 'stage-updated', stage: toSnapshot(newStage) },
+					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
 				},
 			],
 		}

@@ -10,6 +10,7 @@ import type {
 } from './game/state/state-machine-models'
 import { updateState } from './game/state/state-machine'
 import { initGame } from './game/create'
+import { loadMetadata, type PackMetadata } from './game/metadata'
 
 export class GameDurableObject {
 	state: DurableObjectState
@@ -129,8 +130,15 @@ export class GameDurableObject {
 			console.error('State not found')
 			return
 		}
-
-		const { state, events } = this.recursivelyUpdateState(currentState, command)
+		const packMetadata = await loadMetadata(
+			this.env.JEOSHOW_PACKS_METADATA,
+			currentState.packId
+		)
+		if (!packMetadata) {
+			console.error('Metadata not found')
+			return
+		}
+		const { state, events } = this.recursivelyUpdateState(currentState, command, packMetadata)
 
 		if (state && state !== currentState) {
 			await this.storage.put('state', state)
@@ -169,13 +177,17 @@ export class GameDurableObject {
 	private recursivelyUpdateState(
 		state: GameState,
 		command: GameCommand,
+		packMetadata: PackMetadata,
 		depth = 0
 	): UpdateResult {
 		if (depth > 10) {
 			throw new Error(`Likely infinite loop: ${depth}, command: ${JSON.stringify(command)}`)
 		}
 
-		const { state: updatedState, events } = updateState(state, command)
+		const { state: updatedState, events } = updateState(state, command, {
+			pack: packMetadata.model,
+			mediaMapping: packMetadata.mediaMapping,
+		})
 
 		const triggerEvents =
 			events?.filter(
@@ -186,7 +198,12 @@ export class GameDurableObject {
 
 		const finalState = triggerEvents.reduce<GameState>((currentState, event) => {
 			console.log('-> trigger:', event.command.type, event.command.action.type)
-			const result = this.recursivelyUpdateState(currentState, event.command, depth + 1)
+			const result = this.recursivelyUpdateState(
+				currentState,
+				event.command,
+				packMetadata,
+				depth + 1
+			)
 			nonTriggerEvents.push(...(result.events ?? []))
 			return result.state ?? currentState
 		}, updatedState ?? state)

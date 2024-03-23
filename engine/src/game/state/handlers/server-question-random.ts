@@ -1,9 +1,15 @@
 import { toSnapshot, type GameState, type Stage } from '../models'
-import type { ServerCommandOfType, UpdateResult } from '../state-machine-models'
+import {
+	getRound,
+	type CommandContext,
+	type ServerCommandOfType,
+	type UpdateResult,
+} from '../state-machine-models'
 
 const handleServerQuestionRandom = (
 	state: GameState,
-	command: ServerCommandOfType<'question-random'>
+	command: ServerCommandOfType<'question-random'>,
+	ctx: CommandContext
 ): UpdateResult => {
 	if (state.stage.type !== 'round') {
 		return { state, events: [] }
@@ -13,7 +19,8 @@ const handleServerQuestionRandom = (
 		return { state, events: [] }
 	}
 
-	const availableQuestionIds = state.stage.roundModel.themes
+	const roundModel = getRound(ctx, state.stage.roundId)
+	const availableQuestionIds = roundModel.themes
 		.flatMap((t) => t.questions)
 		.map((q) => q.id)
 		.filter(

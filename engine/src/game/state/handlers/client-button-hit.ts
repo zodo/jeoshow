@@ -1,10 +1,16 @@
 import { toSnapshot, type GameState, type Stage } from '../models'
-import type { ClientCommandOfType, UpdateEvent, UpdateResult } from '../state-machine-models'
+import type {
+	ClientCommandOfType,
+	CommandContext,
+	UpdateEvent,
+	UpdateResult,
+} from '../state-machine-models'
 import { Timeouts } from '../timeouts'
 
 const handleClientButtonHit = (
 	state: GameState,
-	command: ClientCommandOfType<'button-hit'>
+	command: ClientCommandOfType<'button-hit'>,
+	ctx: CommandContext
 ): UpdateResult => {
 	if (
 		(state.stage.type === 'question' || state.stage.type === 'ready-for-hit') &&
@@ -56,7 +62,7 @@ const handleClientButtonHit = (
 			events: [
 				{
 					type: 'client-broadcast',
-					event: { type: 'stage-updated', stage: toSnapshot(newStage) },
+					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
 				},
 				{
 					type: 'client-broadcast',

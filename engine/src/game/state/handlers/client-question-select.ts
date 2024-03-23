@@ -1,18 +1,25 @@
 import type { PackModel } from 'shared/models/siq'
 import { toSnapshot, type GameState, type Stage } from '../models'
-import type { ClientCommandOfType, UpdateResult } from '../state-machine-models'
+import {
+	getRound,
+	type ClientCommandOfType,
+	type CommandContext,
+	type UpdateResult,
+} from '../state-machine-models'
 import { getFragmentsTime } from '../timeouts'
 
 const handleClientQuestionSelect = (
 	state: GameState,
-	command: ClientCommandOfType<'question-select'>
+	command: ClientCommandOfType<'question-select'>,
+	ctx: CommandContext
 ): UpdateResult => {
 	const stage = state.stage
 	if (stage.type !== 'round') {
 		return {}
 	}
+	const roundModel = getRound(ctx, stage.roundId)
 
-	const question = stage.roundModel.themes
+	const question = roundModel.themes
 		.flatMap((t) => t.questions)
 		.find((q) => q.id === command.action.questionId)
 	if (!question) {
@@ -31,10 +38,10 @@ const handleClientQuestionSelect = (
 
 	const newStage: Extract<Stage, { type: 'question' }> = {
 		type: 'question',
-		roundModel: stage.roundModel,
+		roundId: roundModel.id,
 		activePlayer: command.playerId,
-		questionModel: question,
-		previousAnswers: { model: question, answers: [] },
+		questionId: question.id,
+		previousAnswers: { questionId: question.id, answers: [] },
 		takenQuestions: [...stage.takenQuestions, command.action.questionId],
 		falseStartPlayers: [],
 		callbackId,
@@ -48,7 +55,7 @@ const handleClientQuestionSelect = (
 		events: [
 			{
 				type: 'client-broadcast',
-				event: { type: 'stage-updated', stage: toSnapshot(newStage) },
+				event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
 			},
 			{
 				type: 'schedule',
