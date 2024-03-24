@@ -657,6 +657,11 @@ css-tree@^2.3.1:
     mdn-data "2.0.30"
     source-map-js "^1.0.1"
 
+csshake@^1.7.0:
+  version "1.7.0"
+  resolved "https://registry.yarnpkg.com/csshake/-/csshake-1.7.0.tgz#614b96216ea9a2ec4657636f8c43d64af0206ff7"
+  integrity sha512-J8YPxrFmhNCK/sgoiWwbPDmUPramnEts8E9OZ6hdfh8z5wDjdIfVH0VgUz8HU5px5JpyLgnvPon6L3cmGef8TA==
+
 data-uri-to-buffer@^2.0.0:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/data-uri-to-buffer/-/data-uri-to-buffer-2.0.2.tgz#d296973d5a4897a5dbe31716d118211921f04770"

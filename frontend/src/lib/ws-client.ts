@@ -2,18 +2,19 @@ import { PUBLIC_ENGINE_URL } from '$env/static/public'
 import { WebSocket } from 'partysocket'
 import type { ClientAction } from 'shared/models/commands'
 import type { GameEvents } from 'shared/models/events'
-import { wsConnectionStatusStore } from './store'
+import { writable, type Readable, type Writable } from 'svelte/store'
 
 export class WebSocketGameClient {
 	ws: WebSocket
 	pingInterval: NodeJS.Timeout
+	isConnectedStore: Writable<boolean>
 
 	constructor(gameCode: string, userId: string) {
 		this.ws = new WebSocket(
 			`ws://${PUBLIC_ENGINE_URL}/ws?gameCode=${gameCode}&userId=${userId}`
 		)
 		this.ws.onclose = () => {
-			wsConnectionStatusStore.set('disconnected')
+			this.isConnectedStore.set(false)
 			console.log('Connection closed')
 		}
 
@@ -22,11 +23,13 @@ export class WebSocketGameClient {
 				this.ws.send('ping')
 			}
 		}, 5000)
+
+		this.isConnectedStore = writable(false)
 	}
 
 	onConnect(callback: () => void) {
 		this.ws.onopen = () => {
-			wsConnectionStatusStore.set('connected')
+			this.isConnectedStore.set(true)
 			callback()
 		}
 	}
@@ -48,6 +51,10 @@ export class WebSocketGameClient {
 	close() {
 		clearInterval(this.pingInterval)
 		this.ws.close()
-		wsConnectionStatusStore.set('connected')
+		this.isConnectedStore.set(false)
+	}
+
+	isConnected(): Readable<boolean> {
+		return this.isConnectedStore
 	}
 }

@@ -5,7 +5,14 @@ export const playersStore = writable<GameEvents.Player[]>([])
 
 export const gameStageStore = writable<GameEvents.StageSnapshot | null>(null)
 
-export const hitButtonStore = writable<{ playerId: string; type: 'ok' | 'false' }[]>([])
+export const hitButtonStore = writable<{ playerId: string; type: 'hit' | 'false-start' }[]>([])
+
+export const playerMessagesStore = writable<
+	{
+		playerId: string
+		text: string
+	}[]
+>([])
 
 export const activePlayerIdStore = derived(gameStageStore, ($gameStageStore) => {
 	if ($gameStageStore?.type === 'round') {
@@ -21,14 +28,25 @@ export const activePlayerIdStore = derived(gameStageStore, ($gameStageStore) => 
 	return null
 })
 
-export const wsConnectionStatusStore = writable<'connected' | 'disconnected'>('connected')
-
-export const playerMessagesStore = writable<
-	{
-		playerId: string
-		text: string
-	}[]
->([])
+export const extendedPlayerStore = derived(
+	[playersStore, activePlayerIdStore, hitButtonStore, playerMessagesStore],
+	([$players, $activePlayerId, $hitButton, $playerMessages]) => {
+		return $players
+			.map((player) => ({
+				...player,
+				pressedButton: $hitButton.find((b) => b.playerId === player.id)?.type ?? null,
+				active: $activePlayerId === player.id,
+				messages: $playerMessages
+					.filter((m) => m.playerId === player.id)
+					.map((m) => m.text),
+			}))
+			.sort((a, b) => {
+				if (a.active && !b.active) return -1
+				if (!a.active && b.active) return 1
+				return b.score - a.score
+			})
+	}
+)
 
 export const handleGameEvent = (event: GameEvents.GameEvent) => {
 	switch (event.type) {
@@ -39,27 +57,16 @@ export const handleGameEvent = (event: GameEvents.GameEvent) => {
 			gameStageStore.set(event.stage)
 			break
 		case 'player-hit-the-button':
-			hitButtonStore.update((players) => [
-				...players,
-				{ playerId: event.playerId, type: 'ok' },
-			])
+		case 'player-false-start': {
+			const type = event.type === 'player-hit-the-button' ? 'hit' : 'false-start'
+			hitButtonStore.update((players) => [...players, { playerId: event.playerId, type }])
 			setTimeout(() => {
 				hitButtonStore.update((players) =>
 					players.filter((p) => p.playerId !== event.playerId)
 				)
 			}, 100)
 			break
-		case 'player-false-start':
-			hitButtonStore.update((players) => [
-				...players,
-				{ playerId: event.playerId, type: 'false' },
-			])
-			setTimeout(() => {
-				hitButtonStore.update((players) =>
-					players.filter((p) => p.playerId !== event.playerId)
-				)
-			}, 100)
-			break
+		}
 		case 'player-texted':
 			playerMessagesStore.update((messages) => [
 				...messages,

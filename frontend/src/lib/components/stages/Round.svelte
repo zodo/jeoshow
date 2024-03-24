@@ -3,7 +3,6 @@
 	import type { GameEvents } from 'shared/models/events'
 	import { createEventDispatcher } from 'svelte'
 	import Progress from '../Progress.svelte'
-	import { activePlayerIdStore } from '$lib/store'
 
 	export let userId: string
 	export let round: Extract<GameEvents.StageSnapshot, { type: 'round' }>

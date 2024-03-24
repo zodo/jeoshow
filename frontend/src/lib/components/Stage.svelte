@@ -1,14 +1,14 @@
 <script lang="ts">
-	import { gameStageStore } from '$lib/store'
-	import BeforeStart from '$lib/components/stages/BeforeStart.svelte'
-	import Round from '$lib/components/stages/Round.svelte'
+	import BeforeStart from './stages/BeforeStart.svelte'
+	import Round from './stages/Round.svelte'
 	import Question from './stages/Question.svelte'
 	import AfterFinish from './stages/AfterFinish.svelte'
 	import Answer from './stages/Answer.svelte'
 	import Appeal from './stages/Appeal.svelte'
 	import AppealResult from './stages/AppealResult.svelte'
+	import type { GameEvents } from 'shared/models/events'
 
-	$: stage = $gameStageStore
+	export let stage: GameEvents.StageSnapshot | null
 	export let userId: string
 </script>
 

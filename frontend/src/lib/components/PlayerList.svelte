@@ -1,32 +1,34 @@
 <script lang="ts">
-	import {
-		activePlayerIdStore,
-		hitButtonStore,
-		playersStore,
-		playerMessagesStore,
-	} from '$lib/store'
+	import type { ExtendedPlayer } from '$lib/models'
+	import { flip } from 'svelte/animate'
 	import Player from './Player.svelte'
+
+	export let players: ExtendedPlayer[] = []
 </script>
 
 <section>
-	<h1>Players</h1>
-	<div>
-		{#each $playersStore as player}
-			<Player
-				{player}
-				pressedButton={$hitButtonStore.find((b) => b.playerId === player.id)?.type}
-				active={$activePlayerIdStore === player.id}
-				answers={$playerMessagesStore
-					.filter((m) => m.playerId === player.id)
-					.map((m) => m.text)}
-			/>
-		{/each}
-	</div>
+	{#each players as player (player.id)}
+		<div class:full-width={player.active} animate:flip={{ duration: 300 }}>
+			<Player {player} />
+		</div>
+	{/each}
 </section>
 
 <style>
-	div {
+	section {
 		display: flex;
 		flex-wrap: wrap;
+		justify-content: center;
+		align-items: first baseline;
+		gap: 0.5rem;
+		position: relative;
+		z-index: 0;
+		padding: 1rem;
+		max-width: 400px;
+		user-select: none;
+	}
+
+	.full-width {
+		width: 100%;
 	}
 </style>
