@@ -38,7 +38,6 @@
 		<p>File uploaded with id: {uploadedPackId}</p>
 		<button on:click={createGame}>Create game</button>
 	{:else}
-		<Username />
 		<UploadFile onFinished={onFileUploadFinished} />
 	{/if}
 </section>

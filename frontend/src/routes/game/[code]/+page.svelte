@@ -1,48 +1,24 @@
 <script lang="ts">
-	import { onMount } from 'svelte'
 	import { page } from '$app/stores'
-	import type { GameEvents } from 'shared/models/events'
-	import { handleGameEvent } from '$lib/store'
-	import PlayerList from '$lib/components/PlayerList.svelte'
-	import Stage from '$lib/components/Stage.svelte'
-	import { WebSocketGameClient } from '$lib/ws-client'
-	import type { ClientAction } from 'shared/models/commands'
+	import Game from '$lib/components/Game.svelte'
+	import Username from '$lib/Username.svelte'
 
 	const gameCode: string = $page.data.gameCode
 	const userId: string = $page.data.userId
 
-	let gameClient: WebSocketGameClient
+	let userName: string
+	let joinedGame = false
 
-	onMount(() => {
-		console.log(userId)
-		gameClient = new WebSocketGameClient(gameCode, userId)
+	const isNameValid = (name: string) => typeof name === 'string' && name.length > 0
 
-		gameClient.onConnect(() => {
-			console.log('Connected to WS')
-			gameClient.sendMessage({ type: 'introduce', name: 'Player' })
-		})
-
-		gameClient.onMessage((message: GameEvents.GameEvent) => {
-			handleGameEvent(message)
-		})
-
-		return () => {
-			gameClient.close()
-		}
-	})
-
-	const handleStageEvent = (event: CustomEvent<ClientAction>) => {
-		gameClient.sendMessage(event.detail)
+	$: {
+		console.log(isNameValid(userName), userName)
 	}
 </script>
 
-<section>
-	<h1>Game {gameCode}</h1>
-
-	<button on:click={() => gameClient.sendMessage({ type: 'button-hit' })}>Hit</button>
-	<button on:click={() => gameClient.sendMessage({ type: 'game-start' })}>Reset</button>
-
-	<PlayerList />
-
-	<Stage on:action={handleStageEvent} {userId} />
-</section>
+{#if joinedGame}
+	<Game {gameCode} {userId} {userName} />
+{:else}
+	<Username onUpdate={(name) => (userName = name)} />
+	<button on:click={() => (joinedGame = true)} disabled={!isNameValid(userName)}>Join</button>
+{/if}

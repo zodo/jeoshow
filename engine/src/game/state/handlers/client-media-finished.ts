@@ -1,9 +1,10 @@
 import { type GameState } from '../models'
-import type { ClientCommandOfType, UpdateResult } from '../state-machine-models'
+import type { ClientCommandOfType, CommandContext, UpdateResult } from '../state-machine-models'
 
 const handleClientMediaFinished = (
 	state: GameState,
-	command: ClientCommandOfType<'media-finished'>
+	command: ClientCommandOfType<'media-finished'>,
+	ctx: CommandContext
 ): UpdateResult => {
 	if (state.stage.type === 'question') {
 		return {
