@@ -71,7 +71,7 @@ export const handleGameEvent = (event: GameEvents.GameEvent) => {
 						(m) => !(m.playerId === event.playerId && m.text === event.text)
 					)
 				)
-			}, event.text.length * 700)
+			}, 3500)
 			break
 	}
 }

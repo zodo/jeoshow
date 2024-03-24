@@ -27,6 +27,7 @@ const handleClientGiveAnswer = (
 		)
 		const stage: Extract<Stage, { type: 'awaiting-answer' }> = {
 			...state.stage,
+			activePlayer: command.playerId,
 			previousAnswers: {
 				...state.stage.previousAnswers,
 				answers: [

@@ -93,9 +93,9 @@ export class SiqXmlContentParser {
 			questions = atoms.map((a: any) => this.mapAtom(a))
 		}
 
-		if (mediaAnswers.length === 0) {
+		if (mediaAnswers.filter((x) => x.type === 'text').length === 0) {
 			const text: string = q.right.answer[0]
-			mediaAnswers = [{ type: 'text', value: text }]
+			mediaAnswers = [{ type: 'text', value: text }, ...mediaAnswers]
 		}
 
 		return {
@@ -124,9 +124,9 @@ export class SiqXmlContentParser {
 			.map((p: any) => {
 				return this.mapQuestionParam(p.item)
 			})
-		if (answerMedia.length === 0) {
+		if (answerMedia.flatMap((x) => x).filter((x) => x.type === 'text').length === 0) {
 			const text: string = q.right.answer[0]
-			answerMedia = [[{ type: 'text', value: text }]]
+			answerMedia = [[{ type: 'text', value: text }], ...answerMedia]
 		}
 
 		return {
