@@ -21,6 +21,8 @@ import handleServerButtonHitTimeout from './handlers/server-button-hit-timeout'
 import handleClientGiveAnswer from './handlers/client-answer-give'
 import handleServerAnswerTimeout from './handlers/server-answer-timeout'
 import handleClientMediaFinished from './handlers/client-media-finished'
+import handleClientAppealStart from './handlers/client-appeal-start'
+import handleClientAppealResolve from './handlers/client-appeal-resolve'
 
 const clientCommandHandlers: {
 	[K in ClientAction['type']]: (
@@ -35,8 +37,8 @@ const clientCommandHandlers: {
 	'question-select': handleClientQuestionSelect,
 	'answer-give': handleClientGiveAnswer,
 	'media-finished': handleClientMediaFinished,
-	'start-appeal': () => ({}),
-	'resolve-appeal': () => ({}),
+	'appeal-start': handleClientAppealStart,
+	'appeal-resolve': handleClientAppealResolve,
 }
 
 const serverCommandHandlers: {

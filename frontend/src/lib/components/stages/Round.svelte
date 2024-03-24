@@ -3,7 +3,9 @@
 	import type { GameEvents } from 'shared/models/events'
 	import { createEventDispatcher } from 'svelte'
 	import Progress from '../Progress.svelte'
+	import { activePlayerIdStore } from '$lib/store'
 
+	export let userId: string
 	export let round: Extract<GameEvents.StageSnapshot, { type: 'round' }>
 
 	const dispatch = createEventDispatcher<SvelteCustomEvent>()
@@ -16,6 +18,10 @@
 	<h1>Round</h1>
 
 	<h2>{round.name}</h2>
+
+	{#if round.playerIdsCanAppeal.includes(userId)}
+		<button on:click={() => dispatch('action', { type: 'appeal-start' })}> Appeal! </button>
+	{/if}
 
 	<table>
 		<tbody>

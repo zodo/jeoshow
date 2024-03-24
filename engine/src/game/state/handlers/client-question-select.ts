@@ -43,7 +43,7 @@ const handleClientQuestionSelect = (
 		roundId: roundModel.id,
 		activePlayer: command.playerId,
 		questionId: question.id,
-		previousAnswers: { questionId: question.id, answers: [] },
+		previousAnswers: { questionId: question.id, answers: [], triedToAppeal: [] },
 		takenQuestions: [...stage.takenQuestions, command.action.questionId],
 		falseStartPlayers: [],
 		questionReadTime,

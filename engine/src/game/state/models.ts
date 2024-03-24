@@ -74,6 +74,7 @@ type RoundStageType =
 export interface AnswersSummary {
 	questionId?: string
 	answers: PlayerAnswer[]
+	triedToAppeal: PlayerId[]
 }
 
 export interface PlayerAnswer {
@@ -90,6 +91,10 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): GameEvents.StageS
 		}
 		case 'round': {
 			const round = getRound(ctx, stage.roundId)
+			const playerIdsCanAppeal = stage.previousAnswers.answers
+				.map((a) => a.playerId)
+				.filter((p) => !stage.previousAnswers.triedToAppeal.includes(p))
+
 			return {
 				type: 'round',
 				name: round.name,
@@ -105,6 +110,7 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): GameEvents.StageS
 				],
 				activePlayerId: stage.activePlayer,
 				timeoutSeconds: stage.callbackTimeout ?? 0,
+				playerIdsCanAppeal,
 			}
 		}
 		case 'question':
@@ -152,12 +158,18 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): GameEvents.StageS
 		}
 		case 'appeal': {
 			const question = getQuestion(ctx, stage.questionId)
+
+			const resolutions = Object.entries(stage.resolutions).map(([playerId, resolution]) => ({
+				playerName: playerId,
+				resolution,
+			}))
 			return {
 				type: 'appeal',
 				model: question,
 				answer: stage.answer,
 				playerId: stage.playerId,
-				resolutions: stage.resolutions,
+				resolutions,
+				timeoutSeconds: stage.callbackTimeout ?? 0,
 			}
 		}
 

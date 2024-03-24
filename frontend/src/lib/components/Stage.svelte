@@ -5,6 +5,8 @@
 	import Question from './stages/Question.svelte'
 	import AfterFinish from './stages/AfterFinish.svelte'
 	import Answer from './stages/Answer.svelte'
+	import Appeal from './stages/Appeal.svelte'
+	import AppealResult from './stages/AppealResult.svelte'
 
 	$: stage = $gameStageStore
 	export let userId: string
@@ -17,13 +19,17 @@
 		{#if stage.type === 'before-start'}
 			<BeforeStart on:action />
 		{:else if stage.type === 'round'}
-			<Round round={stage} on:action />
+			<Round round={stage} {userId} on:action />
 		{:else if stage.type === 'question'}
 			<Question question={stage} {userId} on:action />
 		{:else if stage.type === 'answer'}
 			<Answer answer={stage} on:action />
 		{:else if stage.type === 'after-finish'}
 			<AfterFinish />
+		{:else if stage.type === 'appeal'}
+			<Appeal appeal={stage} {userId} on:action />
+		{:else if stage.type === 'appeal-result'}
+			<AppealResult resolution={stage.resolution} />
 		{:else}
 			<p>Unknown stage</p>
 			<pre>{JSON.stringify(stage, null, 2)}</pre>

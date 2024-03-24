@@ -14,7 +14,10 @@ const handleClientGiveAnswer = (
 	command: ClientCommandOfType<'answer-give'>,
 	ctx: CommandContext
 ): UpdateResult => {
-	if (state.stage.type !== 'awaiting-answer' || command.playerId !== state.stage.activePlayer) {
+	if (
+		state.stage.type !== 'awaiting-answer' ||
+		command.playerId !== state.stage.answeringPlayer
+	) {
 		return { state, events: [] }
 	}
 	const questionModel = getQuestion(ctx, state.stage.questionId)

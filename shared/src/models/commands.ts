@@ -5,5 +5,5 @@ export type ClientAction =
 	| { type: 'button-hit' }
 	| { type: 'answer-give'; value: string }
 	| { type: 'media-finished' }
-	| { type: 'start-appeal' }
-	| { type: 'resolve-appeal'; resolution: boolean }
+	| { type: 'appeal-start' }
+	| { type: 'appeal-resolve'; resolution: boolean }

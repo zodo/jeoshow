@@ -30,7 +30,7 @@ const handleServerAnswerShow = (
 	}
 
 	const questionModel = getQuestion(ctx, state.stage.questionId)
-	const answerShowTime = getFragmentsTime(questionModel.answers.content)
+	const answerShowTime = Math.ceil(getFragmentsTime(questionModel.answers.content) * 0.7)
 
 	return {
 		state: { ...state, stage },

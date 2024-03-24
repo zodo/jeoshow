@@ -16,7 +16,7 @@ const handleClientGameStart = (
 		roundId: firstRoundId,
 		takenQuestions: [],
 		activePlayer: randomActivePlayer.id,
-		previousAnswers: { answers: [] },
+		previousAnswers: { answers: [], triedToAppeal: [] },
 		callbackId,
 		callbackTimeout: Timeouts.selectQuestion,
 	}
