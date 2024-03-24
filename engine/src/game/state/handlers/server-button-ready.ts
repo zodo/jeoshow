@@ -17,11 +17,12 @@ const handleServerButtonReady = (
 
 	const callbackId: string = Math.random().toString(36).substring(7)
 
+	const callbackTimeout = Math.floor(state.stage.questionReadTime / 2)
 	const newStage: Extract<Stage, { type: 'ready-for-hit' }> = {
 		...state.stage,
 		type: 'ready-for-hit',
 		callbackId,
-		callbackTimeout: Timeouts.awaitingHit,
+		callbackTimeout,
 	}
 
 	return {
@@ -37,7 +38,7 @@ const handleServerButtonReady = (
 					type: 'server',
 					action: { type: 'button-hit-timeout', callbackId },
 				},
-				delaySeconds: Timeouts.awaitingHit,
+				delaySeconds: callbackTimeout,
 			},
 		],
 	}

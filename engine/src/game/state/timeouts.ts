@@ -8,16 +8,23 @@ export namespace Timeouts {
 
 export const getFragmentsTime = (fragments: PackModel.FragmentGroup[]): number => {
 	let totalTimeSeconds = 0
+	let hasDefinedTime = false
 	for (const fragment of fragments.flatMap((f) => f)) {
 		if (fragment.type === 'text') {
 			totalTimeSeconds += fragment.value.length / 10
 		} else if (fragment.type === 'image') {
-			totalTimeSeconds += 5
+			totalTimeSeconds += 10
 		} else if (fragment.type === 'audio' || fragment.type === 'video') {
-			totalTimeSeconds += fragment.time ?? 14
+			hasDefinedTime = fragment.time !== undefined
+			totalTimeSeconds += fragment.time ?? 15
 		}
 	}
-	const minTime = 4
+	const minTime = 7
+
+	if (hasDefinedTime) {
+		return Math.floor(Math.max(totalTimeSeconds, minTime))
+	}
+
 	const maxTime = 15
 	return Math.floor(Math.min(Math.max(totalTimeSeconds, minTime), maxTime) + 1)
 }

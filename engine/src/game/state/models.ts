@@ -45,6 +45,7 @@ type RoundStageType =
 			type: 'question'
 			questionId: string
 			falseStartPlayers: PlayerId[]
+			questionReadTime: number
 	  }
 	| {
 			type: 'ready-for-hit'

@@ -21,6 +21,13 @@
 			}
 		}
 	}
+
+	const modifyUrl = (url: string) => {
+		if (url.startsWith('http')) {
+			return url
+		}
+		return `/resources/${url}`
+	}
 </script>
 
 <div class="fragments">
@@ -30,18 +37,19 @@
 				{#if fragment.type === 'text'}
 					<p class="text">{fragment.value}</p>
 				{:else if fragment.type === 'image'}
-					<img src={fragment.url} class="image" alt="Fragment" />
+					<img src={modifyUrl(fragment.url)} class="image" alt="Fragment" />
 				{:else if fragment.type === 'audio'}
 					<audio
-						src={fragment.url}
+						src={modifyUrl(fragment.url)}
 						class="audio"
 						on:play={onMediaStarted(fragment)}
 						on:ended={onMediaEnded(fragment)}
 						autoplay
-					></audio>
+					/>
+					<p class="text">MUSIC MUISC</p>
 				{:else if fragment.type === 'video'}
 					<video
-						src={fragment.url}
+						src={modifyUrl(fragment.url)}
 						class="video"
 						on:play={onMediaStarted(fragment)}
 						on:ended={onMediaEnded(fragment)}
@@ -64,7 +72,6 @@
 		color: #333;
 	}
 	img,
-	audio,
 	video {
 		max-width: 100%;
 		height: auto;

@@ -159,7 +159,12 @@ export class GameDurableObject {
 				(e): e is Extract<UpdateEvent, { type: 'schedule' }> => e.type === 'schedule'
 			) ?? []
 		for (const event of scheduledCommands) {
-			console.log('-> schedule:', event.command.type, event.command.action.type)
+			console.log(
+				'-> schedule:',
+				event.command.type,
+				event.command.action.type,
+				event.delaySeconds
+			)
 		}
 		if (scheduledCommands.length > 0 || origin === 'alarm') {
 			await this.modifyScheduledCommands(now, (commands) => {
