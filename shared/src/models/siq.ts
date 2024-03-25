@@ -27,7 +27,7 @@ export namespace PackModel {
 
 	export interface Answers {
 		correct: string[]
-		incorrect: string[]
+		incorrect?: string[]
 		content: FragmentGroup[]
 	}
 

@@ -1,62 +1,68 @@
 <script lang="ts">
-	import type { SvelteCustomEvent } from '$lib/models'
 	import type { GameEvents } from 'shared/models/events'
-	import { createEventDispatcher } from 'svelte'
 	import Progress from '../Progress.svelte'
 	import MediaFragment from '../MediaFragment.svelte'
 
 	export let question: Extract<GameEvents.StageSnapshot, { type: 'question' }>
-	export let userId: string
-
-	const dispatch = createEventDispatcher<SvelteCustomEvent>()
-
-	let answer: string
 </script>
 
-<div class="question-container" class:ready-for-hit={question.substate.type === 'ready-for-hit'}>
-	<div class="theme">Theme: {question.theme}</div>
-	{#if question.themeComment}
-		<div class="theme-comment">{question.themeComment}</div>
-	{/if}
-	<MediaFragment fragments={question.fragments} on:action />
-</div>
-
-{#if question.substate.type === 'ready-for-hit' && question.substate.timeoutSeconds}
-	<Progress seconds={question.substate.timeoutSeconds} />
-{/if}
-
-{#if question.substate.type === 'awaiting-answer' && question.substate.activePlayerId === userId}
-	{#if question.substate.timeoutSeconds}
-		<Progress seconds={question.substate.timeoutSeconds} />
-	{/if}
-	<div class="question-container">
-		<input type="text" placeholder="Your answer" bind:value={answer} />
-		<button
-			on:click={() => dispatch('action', { type: 'answer-give', value: answer })}
-			disabled={!answer}
-		>
-			Give answer
-		</button>
+<section>
+	<div class="header">
+		<div class="theme">{question.theme}</div>
+		{#if question.themeComment}
+			<div class="theme-comment">{question.themeComment}</div>
+		{/if}
 	</div>
-{/if}
+
+	<div class="fragments">
+		<MediaFragment fragments={question.fragments} on:action />
+	</div>
+
+	<div class="progress">
+		{#if (question.substate.type === 'ready-for-hit' || question.substate.type === 'awaiting-answer') && question.substate.timeoutSeconds}
+			{#key question.substate.type}
+				<Progress seconds={question.substate.timeoutSeconds} />
+			{/key}
+		{/if}
+	</div>
+</section>
 
 <style>
-	.question-container {
-		margin: 20px;
-		padding: 20px;
-		border: 1px solid #ddd;
-		border-radius: 8px;
+	section {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		height: 100%;
 	}
-	.ready-for-hit {
-		background-color: #f0f0f0;
-		border-color: #666;
+
+	.header {
+		margin-top: 1rem;
 	}
+
 	.theme {
 		font-weight: bold;
-		margin-bottom: 10px;
+		font-size: 1.5rem;
+		text-align: center;
 	}
+
 	.theme-comment {
-		margin-top: 10px;
+		font-size: 1rem;
 		font-style: italic;
+		text-align: center;
+	}
+
+	.fragments {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		margin: 1rem;
+	}
+
+	.progress {
+		width: 100%;
+		height: 3.5rem;
+		padding: 1rem;
 	}
 </style>

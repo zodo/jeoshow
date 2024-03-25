@@ -7,9 +7,11 @@
 <style>
 	:global(:root) {
 		--color-background: #e6ebe0;
+		--color-background-darker: #d0d8c8;
 		--color-danger: #ed6a5a;
 		--color-warn: #f4f1bb;
 		--color-accent: #36c9c6;
+		--color-accent-dark: #2a9c99;
 		--color-neutral: #9bc1bc;
 		--color-text: #1a2927;
 	}

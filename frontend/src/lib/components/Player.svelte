@@ -80,7 +80,6 @@
 	}
 
 	.active {
-		justify-content: center;
 		--badge-background: var(--color-accent);
 	}
 

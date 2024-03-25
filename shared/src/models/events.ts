@@ -55,7 +55,7 @@ export namespace GameEvents {
 				model: PackModel.Question
 				answer: string
 				playerId: string
-				resolutions: { playerName: string; resolution: boolean }[]
+				resolutions: { playerId: string; resolution: boolean }[]
 				timeoutSeconds: number
 		  }
 		| { type: 'appeal-result'; resolution: boolean }

@@ -5,20 +5,35 @@
 	export let answer: Extract<GameEvents.StageSnapshot, { type: 'answer' }>
 </script>
 
-<div class="answer-container">
-	<div class="theme">Theme: {answer.theme}</div>
-	<MediaFragment fragments={answer.model.content} on:action />
-</div>
+<section>
+	<div class="theme">{answer.theme}</div>
+
+	<div class="fragments">
+		<MediaFragment fragments={answer.model.content} on:action />
+	</div>
+</section>
 
 <style>
-	.answer-container {
-		margin: 20px;
-		padding: 20px;
-		border: 1px solid #ddd;
-		border-radius: 8px;
+	section {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		height: 100%;
 	}
+
 	.theme {
+		margin-top: 1rem;
 		font-weight: bold;
-		margin-bottom: 10px;
+		font-size: 1.5rem;
+		text-align: center;
+	}
+
+	.fragments {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		margin: 1rem;
 	}
 </style>

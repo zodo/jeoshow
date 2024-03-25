@@ -160,7 +160,7 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): GameEvents.StageS
 			const question = getQuestion(ctx, stage.questionId)
 
 			const resolutions = Object.entries(stage.resolutions).map(([playerId, resolution]) => ({
-				playerName: playerId,
+				playerId,
 				resolution,
 			}))
 			return {

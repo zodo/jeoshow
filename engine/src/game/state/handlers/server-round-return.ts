@@ -26,7 +26,9 @@ const handleServerRoundReturn = (
 	let activePlayer = state.stage.activePlayer
 	if (state.players.find((p) => p.id === activePlayer)?.disconnected) {
 		const alivePlayers = state.players.filter((p) => !p.disconnected)
-		activePlayer = alivePlayers[Math.floor(Math.random() * alivePlayers.length)].id
+		if (alivePlayers.length > 0) {
+			activePlayer = alivePlayers[Math.floor(Math.random() * alivePlayers.length)].id
+		}
 	}
 
 	if (hasMoreQuestions || hasMoreRounds) {

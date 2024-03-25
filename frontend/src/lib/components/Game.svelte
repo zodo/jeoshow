@@ -1,55 +1,84 @@
 <script lang="ts">
-	import { onMount } from 'svelte'
 	import type { GameEvents } from 'shared/models/events'
-	import { extendedPlayerStore, handleGameEvent, gameStageStore } from '$lib/store'
 	import PlayerList from '$lib/components/PlayerList.svelte'
 	import Stage from '$lib/components/Stage.svelte'
-	import { WebSocketGameClient } from '$lib/ws-client'
-	import type { ClientAction } from 'shared/models/commands'
 	import DisconnectedOverlay from './DisconnectedOverlay.svelte'
+	import type { ExtendedPlayer } from '$lib/models'
+	import Controls from './Controls.svelte'
 
-	export let gameCode: string
 	export let userId: string
-	export let userName: string
-
-	let gameClient: WebSocketGameClient
-	let gameConnected = false
-
-	onMount(() => {
-		gameClient = new WebSocketGameClient(gameCode, userId)
-
-		gameClient.onConnect(() => {
-			console.log('Connected to WS')
-			gameClient.sendMessage({ type: 'introduce', name: userName })
-		})
-
-		gameClient.onMessage((message: GameEvents.GameEvent) => {
-			handleGameEvent(message)
-		})
-
-		gameClient.isConnected().subscribe((connected) => {
-			gameConnected = connected
-		})
-
-		return () => {
-			gameClient.close()
-		}
-	})
-
-	const handleStageEvent = (event: CustomEvent<ClientAction>) => {
-		gameClient.sendMessage(event.detail)
-	}
+	export let players: ExtendedPlayer[] = []
+	export let stage: GameEvents.StageSnapshot
+	export let disconnected = false
 </script>
 
 <section>
-	<h1>Game {gameCode}</h1>
+	<div class="players">
+		<PlayerList {players} />
+	</div>
+	<div class="stage">
+		<Stage {stage} {userId} {players} on:action />
+	</div>
+	<div class="controls">
+		<Controls {stage} {userId} on:action />
+	</div>
 
-	<button on:click={() => gameClient.sendMessage({ type: 'button-hit' })}>Hit</button>
-	<button on:click={() => gameClient.sendMessage({ type: 'game-start' })}>Reset</button>
-
-	<PlayerList players={$extendedPlayerStore} />
-
-	<Stage stage={$gameStageStore} on:action={handleStageEvent} {userId} />
-
-	<DisconnectedOverlay showOverlay={!gameConnected} />
+	<DisconnectedOverlay showOverlay={disconnected} />
 </section>
+
+<style>
+	section {
+		max-width: 950px;
+		margin: 0 auto;
+
+		display: grid;
+		grid-template-rows: 25vh auto 4rem;
+		grid-template-columns: 1fr;
+		grid-template-areas:
+			'players'
+			'stage'
+			'controls';
+		height: 100dvh;
+		max-height: 1000px;
+		user-select: none;
+	}
+
+	@media (min-width: 900px) {
+		section {
+			grid-template-rows: 1fr 100px;
+			grid-template-columns: 300px 1fr;
+			grid-template-areas:
+				'players stage'
+				'none controls';
+			max-height: 850px;
+		}
+	}
+
+	.players {
+		grid-area: players;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.players::after {
+		content: '';
+		position: absolute;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		height: 20px;
+		background: linear-gradient(rgba(0, 0, 0, 0), var(--color-background));
+		pointer-events: none;
+	}
+
+	.stage {
+		grid-area: stage;
+		margin: 1rem;
+		overflow: auto;
+	}
+
+	.controls {
+		margin: 0 1rem;
+		grid-area: controls;
+	}
+</style>

@@ -1,23 +1,34 @@
 <script lang="ts">
 	import DisconnectedOverlay from '$lib/components/DisconnectedOverlay.svelte'
+	import Game from '$lib/components/Game.svelte'
 	import PlayerList from '$lib/components/PlayerList.svelte'
+	import Stage from '$lib/components/Stage.svelte'
 	import type { ExtendedPlayer } from '$lib/models'
+	import type { GameEvents } from 'shared/models/events'
 	import { readable } from 'svelte/store'
 
 	const randomBoolean = readable(true, (set) => {
 		const interval = setInterval(() => {
-			set(Math.random() > 0.5)
+			set(Math.random() > 0)
 		}, 2000)
 
 		return () => clearInterval(interval)
 	})
 
+	let currentStage = 0
+	let stages: GameEvents.StageSnapshot[] = [
+		{
+			type: 'before-start',
+		},
+	]
+
 	let players: ExtendedPlayer[] = []
+	let stage: GameEvents.StageSnapshot = stages[0]
 
 	$: {
 		let tmpPlayers: ExtendedPlayer[] = [
 			{
-				id: '1',
+				id: 'userId',
 				name: 'Player 1 long name very',
 				score: 0,
 				disconnected: false,
@@ -70,16 +81,205 @@
 		})
 
 		players = tmpPlayers
+
+		stages = [
+			{
+				type: 'before-start',
+			},
+			{
+				type: 'round',
+				name: '1-й раунд',
+				themes: [
+					{
+						name: 'С Новым годом!',
+						questions: [
+							{ id: 'e28971f8-0', price: 100, available: true },
+							{ id: 'e28971f8-1', price: 200, available: true },
+							{ id: 'e28971f8-2', price: 300, available: true },
+							{ id: 'e28971f8-3', price: 400, available: true },
+							{ id: 'e28971f8-4', price: 500, available: true },
+						],
+					},
+					{
+						name: 'Мешапы',
+						questions: [
+							{ id: '2db8d6c0-0', price: 100, available: true },
+							{ id: '2db8d6c0-1', price: 200, available: false },
+							{ id: '2db8d6c0-2', price: 300, available: true },
+							{ id: '2db8d6c0-3', price: 400, available: true },
+							{ id: '2db8d6c0-4', price: 500, available: true },
+						],
+					},
+					{
+						name: 'Компуктерные игры',
+						questions: [
+							{ id: 'dd8de52f-0', price: 100, available: true },
+							{ id: 'dd8de52f-1', price: 200, available: true },
+							{ id: 'dd8de52f-2', price: 300, available: true },
+							{ id: 'dd8de52f-3', price: 400, available: false },
+							{ id: 'dd8de52f-4', price: 500, available: false },
+						],
+					},
+					{
+						name: 'Мемные видосики',
+						questions: [
+							{ id: 'f7e29128-0', price: 100, available: true },
+							{ id: 'f7e29128-1', price: 200, available: true },
+							{ id: 'f7e29128-2', price: 300, available: true },
+							{ id: 'f7e29128-3', price: 400, available: true },
+							{ id: 'f7e29128-4', price: 500, available: true },
+						],
+					},
+					{
+						name: 'Мам кути мутики',
+						questions: [
+							{ id: 'a1a3f5d1-0', price: 100, available: true },
+							{ id: 'a1a3f5d1-1', price: 200, available: true },
+							{ id: 'a1a3f5d1-2', price: 300, available: true },
+							{ id: 'a1a3f5d1-3', price: 400, available: true },
+							{ id: 'a1a3f5d1-4', price: 500, available: true },
+						],
+					},
+					{
+						name: 'Косплей',
+						questions: [
+							{ id: '87500c08-0', price: 100, available: true },
+							{ id: '87500c08-1', price: 200, available: true },
+							{ id: '87500c08-2', price: 300, available: true },
+							{ id: '87500c08-3', price: 400, available: true },
+							{ id: '87500c08-4', price: 500, available: true },
+						],
+					},
+					{
+						name: 'Аниме',
+						questions: [
+							{ id: 'c30a94d9-0', price: 100, available: true },
+							{ id: 'c30a94d9-1', price: 200, available: true },
+							{ id: 'c30a94d9-2', price: 300, available: true },
+							{ id: 'c30a94d9-3', price: 400, available: true },
+							{ id: 'c30a94d9-4', price: 500, available: true },
+						],
+					},
+					{
+						name: 'Напас лавандос',
+						questions: [
+							{ id: '658d0f99-0', price: 100, available: true },
+							{ id: '658d0f99-1', price: 200, available: true },
+							{ id: '658d0f99-2', price: 300, available: true },
+							{ id: '658d0f99-3', price: 400, available: true },
+							{ id: '658d0f99-4', price: 500, available: true },
+						],
+					},
+				],
+				activePlayerId: 'userId',
+				timeoutSeconds: 60,
+				playerIdsCanAppeal: $randomBoolean ? ['userId'] : ['another'],
+			},
+			{
+				type: 'question',
+				fragments: [
+					[
+						{ type: 'text', value: 'назовите игру  из игротеки по картинке' },
+						{
+							type: 'image',
+							url: 'packs/20a7156dbaa92f87d88e94ad2345330297257502/slf3lg.jpg',
+						},
+					],
+				],
+				price: 100,
+				theme: 'Игротека',
+				themeComment: 'Выбери итд',
+				substate: { type: 'idle' },
+			},
+			{
+				type: 'question',
+				fragments: [
+					[{ type: 'text', value: 'Пошёл нахуй' }],
+					[
+						{
+							type: 'video',
+							url: 'packs/51e8d9882b7ef55307fd49318a2f4b88fb296541/glmpcd.mp4',
+						},
+					],
+				],
+				price: 100,
+				theme: 'Игротека',
+				themeComment: 'Выбери итд',
+				substate: { type: 'ready-for-hit', timeoutSeconds: 8 },
+			},
+			{
+				type: 'question',
+				fragments: [
+					[
+						{ type: 'text', value: 'назовите игру  из игротеки по картинке' },
+						{
+							type: 'image',
+							url: 'packs/20a7156dbaa92f87d88e94ad2345330297257502/slf3lg.jpg',
+						},
+					],
+				],
+				price: 100,
+				theme: 'Игротека',
+				themeComment: 'Выбери итд',
+				substate: { type: 'awaiting-answer', activePlayerId: 'userId', timeoutSeconds: 12 },
+			},
+			{
+				type: 'answer',
+				theme: 'Совместный режим',
+				model: {
+					correct: ['18'],
+					content: [
+						[{ type: 'text', value: '18' }],
+						[
+							{
+								type: 'audio',
+								url: 'packs/20a7156dbaa92f87d88e94ad2345330297257502/xhpckn.jpg',
+							},
+						],
+					],
+				},
+			},
+			{
+				type: 'appeal',
+				model: {
+					id: '1',
+					fragments: [],
+					answers: {
+						correct: ['18'],
+						incorrect: [],
+						content: [],
+					},
+					price: 100,
+				},
+				answer: '19',
+				playerId: 'userId',
+				resolutions: [
+					{ playerId: '2', resolution: true },
+					{ playerId: '3', resolution: false },
+					{ playerId: 'userId', resolution: true },
+				],
+				timeoutSeconds: 10,
+			},
+			{
+				type: 'appeal-result',
+				resolution: true,
+			},
+			{
+				type: 'after-finish',
+			},
+		]
+
+		stage = stages[currentStage]
 	}
 </script>
 
-<section>
-	<!-- <button on:click={() => gameClient.sendMessage({ type: 'button-hit' })}>Hit</button>
-	<button on:click={() => gameClient.sendMessage({ type: 'game-start' })}>Reset</button> -->
-
-	<PlayerList {players} />
-
-	<!-- <Stage stage={$gameStageStore} {userId} on:action={handleStageEvent} /> -->
-
-	<DisconnectedOverlay showOverlay={false} />
-</section>
+<Game
+	userId={'userId'}
+	{stage}
+	{players}
+	on:action={(e) => {
+		currentStage++
+		if (currentStage >= stages.length) currentStage = 0
+		stage = stages[currentStage]
+	}}
+/>

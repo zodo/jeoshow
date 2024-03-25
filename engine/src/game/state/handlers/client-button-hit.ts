@@ -69,10 +69,6 @@ const handleClientButtonHit = (
 					event: { type: 'player-hit-the-button', playerId: command.playerId },
 				},
 				{
-					type: 'client-broadcast',
-					event: { type: 'player-texted', playerId: command.playerId, text: "I'm lucky" },
-				},
-				{
 					type: 'schedule',
 					command: {
 						type: 'server',
