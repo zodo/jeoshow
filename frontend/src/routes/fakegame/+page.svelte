@@ -15,7 +15,7 @@
 	let players: ExtendedPlayer[] = []
 
 	$: {
-		const tmpPlayers: ExtendedPlayer[] = [
+		let tmpPlayers: ExtendedPlayer[] = [
 			{
 				id: '1',
 				name: 'Player 1 long name very',
@@ -32,7 +32,7 @@
 				disconnected: false,
 				pressedButton: null,
 				active: $randomBoolean,
-				messages: $randomBoolean ? [] : ['hi!', 'hello!'],
+				messages: [],
 			},
 			{
 				id: '3',
@@ -45,11 +45,30 @@
 			},
 		]
 
+		tmpPlayers = [
+			...tmpPlayers,
+			...tmpPlayers.map((p) => ({
+				...p,
+				id: p.id + 'a',
+				active: false,
+				pressedButton: null,
+				disconnected: false,
+			})),
+			...tmpPlayers.map((p) => ({
+				...p,
+				id: p.id + 'b',
+				active: false,
+				pressedButton: null,
+				disconnected: false,
+			})),
+		]
+
 		tmpPlayers.sort((a, b) => {
 			if (a.active && !b.active) return -1
 			if (!a.active && b.active) return 1
 			return b.score - a.score
 		})
+
 		players = tmpPlayers
 	}
 </script>

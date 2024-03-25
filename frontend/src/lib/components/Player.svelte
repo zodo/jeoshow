@@ -49,14 +49,15 @@
 
 <style>
 	.badge {
+		width: 100%;
 		--badge-background: var(--color-neutral);
 		background-color: var(--badge-background);
 		padding: 0.3rem 0.5rem;
 		border-radius: 1.5rem;
-		transition:
-			background-color 0.8s,
-			width 0.8s;
+		transition: background-color 0.8s;
 		position: relative;
+		display: flex;
+		justify-content: space-between;
 	}
 
 	.score {
@@ -67,7 +68,6 @@
 	}
 
 	.name {
-		max-width: 10rem;
 		text-wrap: nowrap;
 		text-overflow: ellipsis;
 		overflow: hidden;
@@ -80,8 +80,6 @@
 	}
 
 	.active {
-		width: 100%;
-		display: flex;
 		justify-content: center;
 		--badge-background: var(--color-accent);
 	}
