@@ -1,4 +1,4 @@
-import { PUBLIC_ENGINE_URL } from '$env/static/public'
+import { PUBLIC_ENGINE_WEBSOCKET_URL } from '$env/static/public'
 import { WebSocket } from 'partysocket'
 import type { ClientAction } from 'shared/models/commands'
 import type { GameEvents } from 'shared/models/events'
@@ -11,7 +11,7 @@ export class WebSocketGameClient {
 
 	constructor(gameCode: string, userId: string) {
 		this.ws = new WebSocket(
-			`ws://${PUBLIC_ENGINE_URL}/ws?gameCode=${gameCode}&userId=${userId}`
+			`${PUBLIC_ENGINE_WEBSOCKET_URL}/ws?gameCode=${gameCode}&userId=${userId}`
 		)
 		this.ws.onclose = () => {
 			this.isConnectedStore.set(false)

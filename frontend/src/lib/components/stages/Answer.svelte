@@ -19,6 +19,7 @@
 		flex-direction: column;
 		align-items: center;
 		height: 100%;
+		width: 100%;
 	}
 
 	.theme {
@@ -35,5 +36,6 @@
 		align-items: center;
 		justify-content: center;
 		margin: 1rem;
+		width: 100%;
 	}
 </style>

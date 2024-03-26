@@ -55,6 +55,9 @@ const serverCommandHandlers: {
 	'round-return': handleServerRoundReturn,
 	'button-hit-timeout': handleServerButtonHitTimeout,
 	'answer-timeout': handleServerAnswerTimeout,
+	'state-cleanup': (s, c, t) => {
+		throw new Error('Should not be called')
+	},
 }
 
 export const updateState = (

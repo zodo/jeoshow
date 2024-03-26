@@ -100,10 +100,6 @@
 		background-color: var(--color-accent);
 	}
 
-	td.highlight {
-		color: var(--color-accent);
-	}
-
 	th:first-child {
 		width: 10rem;
 		font-weight: normal;

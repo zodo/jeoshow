@@ -23,6 +23,14 @@ const handlePlayerDisconnect = (
 				type: 'client-broadcast',
 				event: { type: 'players-updated', players: newPlayers },
 			},
+			{
+				type: 'schedule',
+				command: {
+					type: 'server',
+					action: { type: 'state-cleanup' },
+				},
+				delaySeconds: 60,
+			},
 		],
 	}
 }

@@ -31,6 +31,8 @@ export class GameDurableObject {
 			return this.initiateWebSocket(request)
 		} else if (url.pathname === '/create-game') {
 			return this.createGame(request)
+		} else if (url.pathname === '/get-game-info') {
+			return this.getGameInfo(request)
 		}
 
 		return new Response('Not found', { status: 404 })
@@ -62,8 +64,14 @@ export class GameDurableObject {
 		const commands: ScheduledCommand[] = (await this.storage.get('scheduledCommands')) ?? []
 		const commandsToExecute = commands.filter((c) => c.time <= now)
 		for (const { command, time } of commandsToExecute) {
-			console.log('<- alarm:', command.type, command.action.type, time)
-			await this.modifyState(command, now, 'alarm')
+			if (command.type === 'server' && command.action.type === 'state-cleanup') {
+				if (this.state.getWebSockets().length === 0) {
+					await this.cleanup()
+				}
+			} else {
+				console.log('<- alarm:', command.type, command.action.type, time)
+				await this.modifyState(command, now, 'alarm')
+			}
 		}
 	}
 
@@ -227,5 +235,36 @@ export class GameDurableObject {
 			await this.storage.setAlarm(closestTime)
 		}
 		await this.storage.put('scheduledCommands', commands)
+	}
+
+	private async cleanup() {
+		console.log('Cleaning up')
+		await this.storage.deleteAlarm()
+		await this.storage.delete('state')
+		await this.storage.delete('scheduledCommands')
+	}
+
+	private async getGameInfo(request: Request): Promise<Response> {
+		const body = (await request.json()) as any
+		const userId = body.userId
+		if (!userId) {
+			return new Response('userId is required', { status: 400 })
+		}
+
+		const currentState: GameState | undefined = await this.storage.get('state')
+		const gameExists = !!currentState
+		const playerName = currentState?.players?.find((p) => p.id === userId)?.name
+		return new Response(
+			JSON.stringify({
+				playerName,
+				gameExists,
+			}),
+			{
+				status: 200,
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			}
+		)
 	}
 }

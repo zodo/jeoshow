@@ -92,6 +92,7 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): GameEvents.StageS
 		case 'round': {
 			const round = getRound(ctx, stage.roundId)
 			const playerIdsCanAppeal = stage.previousAnswers.answers
+				.filter((a) => !a.isCorrect)
 				.map((a) => a.playerId)
 				.filter((p) => !stage.previousAnswers.triedToAppeal.includes(p))
 

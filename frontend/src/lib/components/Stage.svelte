@@ -37,9 +37,7 @@
 
 <style>
 	section {
-		background-color: var(--color-background-darker);
 		width: 100%;
 		height: 100%;
-		border-radius: 1.5rem;
 	}
 </style>

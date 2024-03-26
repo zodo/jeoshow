@@ -1,29 +1,11 @@
 <script lang="ts">
-	import UploadFile from '$lib/UploadFile.svelte'
-	import Username from '$lib/Username.svelte'
-	import { PUBLIC_ENGINE_URL } from '$env/static/public'
-	import { goto } from '$app/navigation'
+	import { enhance } from '$app/forms'
+	import type { ActionData } from './$types'
 
-	let uploadedPackId: string | null = '20a7156dbaa92f87d88e94ad2345330297257502'
+	export let form: ActionData
 
-	const onFileUploadFinished = (packId: string) => {
-		console.log('File uploaded with id:', packId)
-		uploadedPackId = packId
-	}
-
-	const createGame = async () => {
-		const res = await fetch(`http://${PUBLIC_ENGINE_URL}/create-game`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				packId: uploadedPackId,
-			}),
-		})
-		const data = (await res.json()) as any
-		goto(`/game/${data.gameCode}`)
-	}
+	let fileInput: HTMLInputElement
+	$: fileSelected = fileInput && fileInput.files && fileInput.files.length > 0
 </script>
 
 <svelte:head>
@@ -32,13 +14,12 @@
 </svelte:head>
 
 <section>
-	<input type="text" bind:value={uploadedPackId} placeholder="Enter the pack id" />
-
-	{#if uploadedPackId}
-		<p>File uploaded with id: {uploadedPackId}</p>
-		<button on:click={createGame}>Create game</button>
-	{:else}
-		<UploadFile onFinished={onFileUploadFinished} />
+	<form method="post" enctype="multipart/form-data">
+		<input id="pack" type="file" name="pack" bind:this={fileInput} />
+		<button type="submit">Upload</button>
+	</form>
+	{#if form?.message}
+		<p>{form.message}</p>
 	{/if}
 </section>
 
@@ -48,6 +29,50 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		flex: 0.6;
+		height: 100dvh;
+		width: 100%;
+	}
+
+	form {
+		margin: 0 auto;
+		display: flex;
+	}
+
+	button {
+		margin: 0;
+		padding: 1rem;
+		border: none;
+		border-radius: 0 1rem 1rem 0;
+		background-color: var(--color-accent);
+		font-size: 1rem;
+		transition: background-color 0.8s;
+		cursor: pointer;
+	}
+
+	button:hover {
+		background-color: var(--color-accent-dark);
+	}
+
+	input {
+		height: 3.5rem;
+		font-size: 1rem;
+		margin: 0;
+		padding: 1rem;
+		border: none;
+		border-radius: 1rem 0 0 1rem; /* Opposite of the button to fit together */
+		background-color: var(--color-neutral);
+		cursor: pointer;
+		display: inline-block; /* Or use flex for better control */
+		transition: background-color 0.8s;
+	}
+
+	/* Optional: Style label on hover */
+	input:hover {
+		background-color: var(--color-accent-dark);
+	}
+
+	p {
+		text-align: center;
+		color: var(--color-danger);
 	}
 </style>

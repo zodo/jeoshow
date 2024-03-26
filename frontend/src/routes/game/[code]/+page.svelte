@@ -1,25 +1,88 @@
 <script lang="ts">
 	import { page } from '$app/stores'
-	import Game from '$lib/components/Game.svelte'
 	import GameLogic from '$lib/components/GameLogic.svelte'
-	import Username from '$lib/Username.svelte'
+	import { onMount } from 'svelte'
 
+	const errorMessage: string = $page.data.errorMessage
 	const gameCode: string = $page.data.gameCode
 	const userId: string = $page.data.userId
+	const existingPlayerName: string = $page.data.playerName
 
-	let userName: string
-	let joinedGame = false
+	onMount(() => {
+		const initValue = localStorage.getItem('userName') ?? ''
+		playerName = initValue
+		loadedFromLocalStorage = true
+	})
+
+	let loadedFromLocalStorage = false
+	let playerName: string = existingPlayerName
+	let joinedGame = existingPlayerName && existingPlayerName !== ''
 
 	const isNameValid = (name: string) => typeof name === 'string' && name.length > 0
 
-	$: {
-		console.log(isNameValid(userName), userName)
+	const handleJoin = () => {
+		localStorage.setItem('userName', playerName)
+		joinedGame = true
 	}
 </script>
 
-{#if joinedGame}
-	<GameLogic {gameCode} {userId} {userName} />
+{#if errorMessage}
+	<section>
+		<p>{errorMessage}</p>
+		<a href="/">Go home</a>
+	</section>
+{:else if joinedGame}
+	<GameLogic {gameCode} {userId} {playerName} />
 {:else}
-	<Username onUpdate={(name) => (userName = name)} />
-	<button on:click={() => (joinedGame = true)} disabled={!isNameValid(userName)}>Join</button>
+	<section>
+		<div class="text-to-copy">{$page.url}</div>
+		<form on:submit|preventDefault={handleJoin}>
+			<input
+				name="somerandom"
+				type="text"
+				bind:value={playerName}
+				autocomplete="off"
+				placeholder={loadedFromLocalStorage ? 'Your name' : ''}
+			/>
+			<button type="submit" disabled={!isNameValid(playerName)}>Join</button>
+		</form>
+	</section>
 {/if}
+
+<style>
+	section {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		height: 100dvh;
+	}
+
+	form {
+		display: flex;
+	}
+
+	button {
+		margin: 0;
+		padding: 1rem;
+		border: none;
+		border-radius: 0 1rem 1rem 0;
+		background-color: var(--color-accent);
+		font-size: 1rem;
+		cursor: pointer;
+	}
+
+	input {
+		font-size: 1rem;
+		margin: 0;
+		padding: 1rem;
+		border: none;
+		border-radius: 1rem 0 0 1rem;
+		background-color: var(--color-neutral);
+	}
+
+	.text-to-copy {
+		margin-bottom: 1rem;
+		font-family: var(--font-mono);
+	}
+</style>

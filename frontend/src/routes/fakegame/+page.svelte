@@ -9,7 +9,7 @@
 
 	const randomBoolean = readable(true, (set) => {
 		const interval = setInterval(() => {
-			set(Math.random() > 0)
+			set(Math.random() > 0.5)
 		}, 2000)
 
 		return () => clearInterval(interval)
@@ -222,6 +222,25 @@
 				theme: 'Игротека',
 				themeComment: 'Выбери итд',
 				substate: { type: 'awaiting-answer', activePlayerId: 'userId', timeoutSeconds: 12 },
+			},
+			{
+				type: 'question',
+				fragments: [
+					[
+						{
+							type: 'image',
+							url: 'packs/d801081f33199d5ba893ccbd5df18f0d99681200/jyq5r.jpg',
+						},
+						{
+							type: 'text',
+							value: 'Часовая башня В ЭТОМ ПРИМОРСКОМ ГОРОДЕ Грузии – реплика башни в турецком Измире',
+						},
+					],
+				],
+				price: 300,
+				theme: 'Башни на фото',
+				themeComment: '',
+				substate: { type: 'ready-for-hit', timeoutSeconds: 8 },
 			},
 			{
 				type: 'answer',

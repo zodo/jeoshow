@@ -5,6 +5,8 @@
 	import DisconnectedOverlay from './DisconnectedOverlay.svelte'
 	import type { ExtendedPlayer } from '$lib/models'
 	import Controls from './Controls.svelte'
+	import { scale } from 'svelte/transition'
+	import { quintInOut } from 'svelte/easing'
 
 	export let userId: string
 	export let players: ExtendedPlayer[] = []
@@ -12,7 +14,7 @@
 	export let disconnected = false
 </script>
 
-<section>
+<section in:scale={{ duration: 700, easing: quintInOut }} style="--player-count: {players.length}">
 	<div class="players">
 		<PlayerList {players} />
 	</div>
@@ -32,7 +34,7 @@
 		margin: 0 auto;
 
 		display: grid;
-		grid-template-rows: 25vh auto 4rem;
+		grid-template-rows: calc(var(--player-count) * 1rem + 6rem) auto 4rem;
 		grid-template-columns: 1fr;
 		grid-template-areas:
 			'players'
@@ -74,7 +76,9 @@
 	.stage {
 		grid-area: stage;
 		margin: 1rem;
-		overflow: auto;
+		overflow: scroll;
+		background-color: var(--color-background-darker);
+		border-radius: 1.5rem;
 	}
 
 	.controls {

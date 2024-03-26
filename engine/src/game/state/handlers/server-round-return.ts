@@ -12,7 +12,6 @@ const handleServerRoundReturn = (
 	command: ServerCommandOfType<'round-return'>,
 	ctx: CommandContext
 ): UpdateResult => {
-	console.log('handleServerRoundReturn', JSON.stringify(state, null, 2))
 	if (state.stage.type !== 'answer' && state.stage.type !== 'appeal-result') {
 		return { state, events: [] }
 	}

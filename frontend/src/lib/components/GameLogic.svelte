@@ -8,7 +8,7 @@
 
 	export let gameCode: string
 	export let userId: string
-	export let userName: string
+	export let playerName: string
 
 	let gameClient: WebSocketGameClient
 	let gameConnected = false
@@ -18,7 +18,7 @@
 
 		gameClient.onConnect(() => {
 			console.log('Connected to WS')
-			gameClient.sendMessage({ type: 'introduce', name: userName })
+			gameClient.sendMessage({ type: 'introduce', name: playerName })
 		})
 
 		gameClient.onMessage((message: GameEvents.GameEvent) => {
@@ -52,3 +52,13 @@
 		<p>Loading...</p>
 	</section>
 {/if}
+
+<style>
+	section {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		height: 100dvh;
+	}
+</style>

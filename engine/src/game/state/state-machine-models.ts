@@ -12,6 +12,7 @@ export type ServerAction =
 	| { type: 'answer-timeout'; callbackId: string }
 	| { type: 'round-return' }
 	| { type: 'question-random'; callbackId: string }
+	| { type: 'state-cleanup' }
 
 export type ServerCommand<A> = {
 	type: 'server'
