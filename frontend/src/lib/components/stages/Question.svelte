@@ -29,9 +29,9 @@
 
 <style>
 	section {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
+		display: grid;
+		grid-template-rows: min-content 1fr min-content;
+
 		height: 100%;
 	}
 
@@ -52,13 +52,7 @@
 	}
 
 	.fragments {
-		height: 100%;
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		margin: 1rem;
+		overflow: scroll;
 	}
 
 	.progress {

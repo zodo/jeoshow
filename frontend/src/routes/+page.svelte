@@ -3,9 +3,6 @@
 	import type { ActionData } from './$types'
 
 	export let form: ActionData
-
-	let fileInput: HTMLInputElement
-	$: fileSelected = fileInput && fileInput.files && fileInput.files.length > 0
 </script>
 
 <svelte:head>
@@ -15,7 +12,7 @@
 
 <section>
 	<form method="post" enctype="multipart/form-data">
-		<input id="pack" type="file" name="pack" bind:this={fileInput} />
+		<input id="pack" type="file" name="pack" />
 		<button type="submit">Upload</button>
 	</form>
 	{#if form?.message}
@@ -25,16 +22,10 @@
 
 <style>
 	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		height: 100dvh;
-		width: 100%;
+		max-width: 100%;
 	}
 
 	form {
-		margin: 0 auto;
 		display: flex;
 	}
 
@@ -64,6 +55,7 @@
 		cursor: pointer;
 		display: inline-block; /* Or use flex for better control */
 		transition: background-color 0.8s;
+		flex: 0 1 auto;
 	}
 
 	/* Optional: Style label on hover */

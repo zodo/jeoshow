@@ -1,5 +1,4 @@
 import { PUBLIC_ENGINE_URL } from '$env/static/public'
-import { error } from '@sveltejs/kit'
 
 export async function load({ cookies, params }) {
 	const userId = cookies.get('user_id')

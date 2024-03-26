@@ -51,11 +51,10 @@
 
 <style>
 	section {
+		max-width: 100%;
 		display: flex;
 		flex-direction: column;
-		justify-content: center;
 		align-items: center;
-		height: 100dvh;
 	}
 
 	form {

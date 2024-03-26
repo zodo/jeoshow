@@ -48,7 +48,7 @@
 		</button>
 	{/if}
 	{#if showAnswerInput}
-		<div class="question" in:scale={{ duration: 300, easing: quintInOut }}>
+		<div class="answer" in:scale={{ duration: 300, easing: quintInOut }}>
 			<form
 				on:submit|preventDefault={() =>
 					dispatch('action', { type: 'answer-give', value: answer })}
@@ -63,7 +63,7 @@
 <style>
 	section {
 		width: 100%;
-		max-width: 400px;
+		max-width: 600px;
 		margin: 0 auto;
 	}
 
@@ -79,7 +79,6 @@
 	}
 
 	.hit-button {
-		width: 100%;
 		height: 3rem;
 		font-size: 1.5rem;
 		background-color: var(--color-neutral);
@@ -99,16 +98,16 @@
 		background-color: var(--color-danger);
 	}
 
-	.question {
+	.answer {
 		width: 100%;
 	}
 
-	.question form {
+	.answer form {
 		display: flex;
 		height: 3rem;
 	}
 
-	.question input {
+	.answer input {
 		height: 100%;
 		flex: 1;
 		padding: 0.5rem;
@@ -119,7 +118,7 @@
 		font-family: var(--font-serif);
 	}
 
-	.question button {
+	.answer button {
 		padding: 0.5rem 1rem;
 		font-size: 1rem;
 		border: none;

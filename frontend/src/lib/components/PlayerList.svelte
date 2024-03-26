@@ -19,15 +19,13 @@
 		display: flex;
 		flex-wrap: wrap;
 		align-items: center;
-		align-content: center;
+		align-content: flex-start;
 		gap: 0.5rem;
 		position: relative;
 		z-index: 0;
-		padding: 1rem;
 		user-select: none;
 		overflow-x: auto;
 		height: 100%;
-		margin-top: 0.5rem;
 	}
 
 	.player {

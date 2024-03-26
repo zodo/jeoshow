@@ -42,7 +42,9 @@
 			{#if fragment.type === 'text'}
 				<span>{fragment.value}</span>
 			{:else if fragment.type === 'image'}
-				<img src={modifyUrl(fragment.url)} alt="Fragment" />
+				<div class="media-wrapper">
+					<img src={modifyUrl(fragment.url)} alt="Fragment" />
+				</div>
 			{:else if fragment.type === 'audio'}
 				<audio
 					src={modifyUrl(fragment.url)}
@@ -59,15 +61,17 @@
 					/>
 				</svg>
 			{:else if fragment.type === 'video'}
-				<video
-					src={modifyUrl(fragment.url)}
-					on:play={onMediaStarted(fragment)}
-					on:ended={onMediaEnded(fragment)}
-					autoplay
-					disableRemotePlayback
-				>
-					<track kind="captions" />
-				</video>
+				<div class="media-wrapper">
+					<video
+						src={modifyUrl(fragment.url)}
+						on:play={onMediaStarted(fragment)}
+						on:ended={onMediaEnded(fragment)}
+						autoplay
+						disableRemotePlayback
+					>
+						<track kind="captions" />
+					</video>
+				</div>
 			{/if}
 		{/each}
 	{/each}
@@ -75,13 +79,14 @@
 
 <style>
 	.fragments {
+		height: 100%;
+		width: 100%;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
 		justify-content: center;
-		width: 100%;
-		height: 100%;
-		padding: 0 1rem;
+		padding: 1rem;
+		gap: 0.5rem;
 	}
 
 	span {
@@ -92,9 +97,14 @@
 
 	img,
 	video {
-		width: 100%;
-		max-height: 40vh;
 		object-fit: contain;
+		width: 100%;
+		height: 100%;
+	}
+
+	.media-wrapper {
+		width: 100%;
+		max-height: 50%;
 	}
 
 	@keyframes pulse {
