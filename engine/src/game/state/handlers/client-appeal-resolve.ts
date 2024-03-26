@@ -71,14 +71,6 @@ const handleClientAppealResolve = (
 					},
 					delaySeconds: Timeouts.appealResult,
 				},
-				{
-					type: 'client-broadcast',
-					event: {
-						type: 'player-texted',
-						playerId: command.playerId,
-						text: command.action.resolution ? 'I agree' : 'I disagree',
-					},
-				},
 			],
 		}
 	} else if (disagreeSize >= disagreeLimit) {
@@ -107,14 +99,6 @@ const handleClientAppealResolve = (
 					},
 					delaySeconds: Timeouts.appealResult,
 				},
-				{
-					type: 'client-broadcast',
-					event: {
-						type: 'player-texted',
-						playerId: command.playerId,
-						text: command.action.resolution ? 'I agree' : 'I disagree',
-					},
-				},
 			],
 		}
 	} else {
@@ -129,14 +113,6 @@ const handleClientAppealResolve = (
 				{
 					type: 'client-broadcast',
 					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
-				},
-				{
-					type: 'client-broadcast',
-					event: {
-						type: 'player-texted',
-						playerId: command.playerId,
-						text: command.action.resolution ? 'I agree' : 'I disagree',
-					},
 				},
 			],
 		}

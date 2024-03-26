@@ -14,22 +14,35 @@
 	export let disconnected = false
 </script>
 
-<section in:scale={{ duration: 700, easing: quintInOut }} style="--player-count: {players.length}">
-	<div class="players">
-		<PlayerList {players} />
-	</div>
-	<div class="stage">
-		<Stage {stage} {userId} {players} on:action />
-	</div>
-	<div class="controls">
-		<Controls {stage} {userId} on:action />
-	</div>
+<div class="section-wrapper">
+	<section
+		in:scale={{ duration: 700, easing: quintInOut }}
+		style="--player-count: {players.length}"
+	>
+		<div class="players">
+			<PlayerList {players} />
+		</div>
+		<div class="stage">
+			<Stage {stage} {userId} {players} on:action />
+		</div>
+		<div class="controls">
+			<Controls {stage} {userId} on:action />
+		</div>
 
-	<DisconnectedOverlay showOverlay={disconnected} />
-</section>
+		<DisconnectedOverlay showOverlay={disconnected} />
+	</section>
+</div>
 
 <style>
+	.section-wrapper {
+		height: 100vh;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
 	section {
+		width: 100%;
 		max-width: 950px;
 		margin: 0 auto;
 
@@ -40,14 +53,14 @@
 			'players'
 			'stage'
 			'controls';
-		height: 100dvh;
+		height: 100vh;
 		max-height: 1000px;
 		user-select: none;
 	}
 
-	@media (min-width: 900px) {
+	@media (min-width: 600px) {
 		section {
-			grid-template-rows: 1fr 100px;
+			grid-template-rows: 1fr 4rem;
 			grid-template-columns: 300px 1fr;
 			grid-template-areas:
 				'players stage'

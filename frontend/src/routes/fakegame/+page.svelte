@@ -1,8 +1,5 @@
 <script lang="ts">
-	import DisconnectedOverlay from '$lib/components/DisconnectedOverlay.svelte'
 	import Game from '$lib/components/Game.svelte'
-	import PlayerList from '$lib/components/PlayerList.svelte'
-	import Stage from '$lib/components/Stage.svelte'
 	import type { ExtendedPlayer } from '$lib/models'
 	import type { GameEvents } from 'shared/models/events'
 	import { readable } from 'svelte/store'
@@ -39,7 +36,7 @@
 			{
 				id: '2',
 				name: 'Player 2',
-				score: -50,
+				score: $randomBoolean ? 100 : 700,
 				disconnected: false,
 				pressedButton: null,
 				active: $randomBoolean,

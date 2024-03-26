@@ -89,14 +89,14 @@
 		transition: background-color 0.8s;
 	}
 
-	.hit-button:active {
-		transition: none;
-		background-color: var(--color-danger);
-	}
-
 	.hit-button.ready {
 		transition: none;
 		background-color: var(--color-accent);
+	}
+
+	.hit-button:active {
+		transition: none;
+		background-color: var(--color-danger);
 	}
 
 	.question {
@@ -116,6 +116,7 @@
 		border: none;
 		border-radius: 1.5rem 0 0 1.5rem;
 		text-align: center;
+		font-family: var(--font-serif);
 	}
 
 	.question button {
