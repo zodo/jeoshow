@@ -1,19 +1,38 @@
 <script lang="ts">
 	import { enhance } from '$app/forms'
+	import type { ChangeEventHandler, EventHandler } from 'svelte/elements'
 	import type { ActionData } from './$types'
 
 	export let form: ActionData
+	let formLoading = false
+	let hasFiles = false
+
+	const handleInputChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+		const target = e.target as HTMLInputElement
+		hasFiles = (target?.files && target.files.length > 0) ?? false
+	}
 </script>
 
-<svelte:head>
-	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
-</svelte:head>
-
 <section>
-	<form method="post" enctype="multipart/form-data">
-		<input id="pack" type="file" name="pack" />
-		<button type="submit">Upload</button>
+	<form
+		method="post"
+		enctype="multipart/form-data"
+		use:enhance={() => {
+			formLoading = true
+			return async ({ result, update }) => {
+				formLoading = false
+				update()
+			}
+		}}
+	>
+		<input id="pack" type="file" name="pack" on:change={handleInputChange} />
+		<button type="submit" disabled={formLoading || !hasFiles}>
+			{#if formLoading}
+				Loading...
+			{:else}
+				Upload
+			{/if}
+		</button>
 	</form>
 	{#if form?.message}
 		<p>{form.message}</p>
@@ -58,7 +77,6 @@
 		flex: 0 1 auto;
 	}
 
-	/* Optional: Style label on hover */
 	input:hover {
 		background-color: var(--color-accent-dark);
 	}

@@ -1,11 +1,12 @@
 <script lang="ts">
 	import type { SvelteCustomEvent } from '$lib/models'
-	import type { GameEvents } from 'shared/models/events'
-	import { createEventDispatcher, onMount } from 'svelte'
+	import type { StageSnapshot } from 'shared/models/models'
+	import { createEventDispatcher } from 'svelte'
 	import { quintInOut } from 'svelte/easing'
 	import { scale } from 'svelte/transition'
+	import Keydown from 'svelte-keydown'
 
-	export let stage: GameEvents.StageSnapshot
+	export let stage: StageSnapshot
 	export let userId: string
 
 	const dispatch = createEventDispatcher<SvelteCustomEvent>()
@@ -25,7 +26,31 @@
 			answer = ''
 		}
 	}
+
+	let hitButton: HTMLButtonElement
+	let buttonActive = false
+	let spacebarPressed = false
 </script>
+
+<Keydown
+	pauseOnInput
+	on:Space={(e) => {
+		e.preventDefault()
+		if (hitButton && !spacebarPressed) {
+			hitButton.click()
+			buttonActive = true
+			spacebarPressed = true
+			setTimeout(() => {
+				buttonActive = false
+			}, 100)
+		}
+	}}
+	on:keyup={() => {
+		if (spacebarPressed) {
+			spacebarPressed = false
+		}
+	}}
+/>
 
 <section>
 	{#if showHitButton}
@@ -33,7 +58,9 @@
 			on:click={() => dispatch('action', { type: 'button-hit' })}
 			class="base-button hit-button"
 			class:ready={stage.type === 'question' && stage.substate.type === 'ready-for-hit'}
+			class:active={buttonActive}
 			in:scale={{ duration: 300, easing: quintInOut }}
+			bind:this={hitButton}
 		>
 			Hit
 		</button>
@@ -63,7 +90,6 @@
 <style>
 	section {
 		width: 100%;
-		max-width: 600px;
 		margin: 0 auto;
 	}
 
@@ -76,6 +102,7 @@
 		border-radius: 1.5rem;
 		cursor: pointer;
 		transition: background-color 0.8s;
+		-webkit-tap-highlight-color: transparent;
 	}
 
 	.hit-button {
@@ -93,7 +120,8 @@
 		background-color: var(--color-accent);
 	}
 
-	.hit-button:active {
+	.hit-button:active,
+	.hit-button.active {
 		transition: none;
 		background-color: var(--color-danger);
 	}

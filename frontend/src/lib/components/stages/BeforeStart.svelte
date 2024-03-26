@@ -9,7 +9,7 @@
 
 <section>
 	<button
-		transition:scale={{ duration: 300, easing: quintInOut }}
+		in:scale={{ duration: 300, easing: quintInOut }}
 		on:click={() => dispatch('action', { type: 'game-start' })}
 	>
 		Start

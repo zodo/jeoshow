@@ -1,12 +1,14 @@
-import type { ClientAction } from 'shared/models/commands'
-import type { GameEvents } from 'shared/models/events'
+import type { ClientAction } from 'shared/models/messages'
+import type { Player } from 'shared/models/models'
 
-export type SvelteCustomEvent = {
-	action: ClientAction
-}
+export type SvelteCustomEvent = { action: ClientAction }
 
 export type ExtendedPlayer = {
 	pressedButton: 'hit' | 'false-start' | null
 	active: boolean
 	messages: string[]
-} & GameEvents.Player
+} & Player
+
+export type PlayerMessage = { playerId: string; text: string }
+
+export type PlayerButtonHit = { playerId: string; type: 'hit' | 'false-start' }

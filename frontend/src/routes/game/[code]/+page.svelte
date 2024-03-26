@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores'
-	import GameLogic from '$lib/components/GameLogic.svelte'
+	import InteractiveGame from '$lib/components/InteractiveGame.svelte'
 	import { onMount } from 'svelte'
 
 	const errorMessage: string = $page.data.errorMessage
@@ -32,7 +32,7 @@
 		<a href="/">Go home</a>
 	</section>
 {:else if joinedGame}
-	<GameLogic {gameCode} {userId} {playerName} />
+	<InteractiveGame {gameCode} {userId} {playerName} />
 {:else}
 	<section>
 		<div class="text-to-copy">{$page.url}</div>

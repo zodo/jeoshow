@@ -1,90 +1,26 @@
-import type { PackModel } from 'shared/models/siq'
-import type { GameEvents } from 'shared/models/events'
-import {
-	getRound,
-	type CommandContext,
-	type ScheduledCommand,
-	getQuestion,
-} from './state-machine-models'
+import type { QuestionState, StageSnapshot } from 'shared/models/models'
+import type { Stage } from './models/state'
+import type { CommandContext } from './models/state-machine'
 
-type PlayerId = string
-
-export interface GameState {
-	packId: string
-	players: Player[]
-	stage: Stage
-	scheduledCommands: ScheduledCommand[]
+export const getRound = (ctx: CommandContext, roundId: string) => {
+	const round = ctx.pack.rounds.find((r) => r.id === roundId)
+	if (!round) {
+		throw new Error(`Round not found: ${roundId}`)
+	}
+	return round
 }
 
-export interface Player {
-	id: PlayerId
-	name: string
-	score: number
-	disconnected: boolean
+export const getQuestion = (ctx: CommandContext, questionId: string) => {
+	const question = ctx.pack.rounds
+		.flatMap((r) => r.themes.flatMap((t) => t.questions))
+		.find((q) => q.id === questionId)
+	if (!question) {
+		throw new Error(`Question not found: ${questionId}`)
+	}
+	return question
 }
 
-export type Stage =
-	| { type: 'before-start' }
-	| (RoundStageType & RoundStageBase)
-	| { type: 'after-finish' }
-
-export interface RoundStageBase {
-	roundId: string
-	takenQuestions: string[]
-	activePlayer: string
-	previousAnswers: AnswersSummary
-	callbackId?: string
-	callbackTimeout?: number
-}
-
-type RoundStageType =
-	| {
-			type: 'round'
-	  }
-	| {
-			type: 'question'
-			questionId: string
-			falseStartPlayers: PlayerId[]
-			questionReadTime: number
-	  }
-	| {
-			type: 'ready-for-hit'
-			questionId: string
-			falseStartPlayers: PlayerId[]
-	  }
-	| {
-			type: 'awaiting-answer'
-			questionId: string
-			answeringPlayer: string
-			falseStartPlayers: PlayerId[]
-	  }
-	| {
-			type: 'answer'
-			questionId: string
-	  }
-	| {
-			type: 'appeal'
-			questionId: string
-			answer: string
-			playerId: PlayerId
-			resolutions: Record<PlayerId, boolean>
-	  }
-	| { type: 'appeal-result'; resolution: boolean }
-
-export interface AnswersSummary {
-	questionId?: string
-	answers: PlayerAnswer[]
-	triedToAppeal: PlayerId[]
-}
-
-export interface PlayerAnswer {
-	playerId: PlayerId
-	text: string
-	isCorrect: boolean
-	scoreDiff: number
-}
-
-export const toSnapshot = (stage: Stage, ctx: CommandContext): GameEvents.StageSnapshot => {
+export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => {
 	switch (stage.type) {
 		case 'before-start': {
 			return { type: 'before-start' }
@@ -117,7 +53,7 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): GameEvents.StageS
 		case 'question':
 		case 'ready-for-hit':
 		case 'awaiting-answer': {
-			let substate: GameEvents.QuestionState
+			let substate: QuestionState
 			switch (stage.type) {
 				case 'question':
 					substate = { type: 'idle' }

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { GameEvents } from 'shared/models/events'
+	import type { StageSnapshot } from 'shared/models/models'
 	import MediaFragment from '../MediaFragment.svelte'
 
-	export let answer: Extract<GameEvents.StageSnapshot, { type: 'answer' }>
+	export let answer: Extract<StageSnapshot, { type: 'answer' }>
 </script>
 
 <section>
@@ -17,12 +17,10 @@
 	section {
 		display: grid;
 		grid-template-rows: min-content 1fr;
-
 		height: 100%;
 	}
 
 	.theme {
-		margin-top: 1rem;
 		font-weight: bold;
 		font-size: 1.5rem;
 		text-align: center;

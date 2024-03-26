@@ -1,13 +1,12 @@
 <script lang="ts">
 	import type { SvelteCustomEvent } from '$lib/models'
-	import type { GameEvents } from 'shared/models/events'
+	import type { StageSnapshot } from 'shared/models/models'
 	import { createEventDispatcher } from 'svelte'
-	import Progress from '../Progress.svelte'
 	import { scale } from 'svelte/transition'
 	import { quintInOut } from 'svelte/easing'
 
 	export let userId: string
-	export let round: Extract<GameEvents.StageSnapshot, { type: 'round' }>
+	export let round: Extract<StageSnapshot, { type: 'round' }>
 
 	const isActiveUser = userId === round.activePlayerId
 
@@ -17,14 +16,14 @@
 	}
 </script>
 
-<section transition:scale={{ duration: 300, easing: quintInOut }}>
+<section in:scale={{ duration: 300, easing: quintInOut }}>
 	<div>
 		<table class:active-user={isActiveUser}>
 			<caption>{round.name}</caption>
 			<tbody>
 				{#each round.themes as { name, questions }}
 					<tr>
-						<th>{name}</th>
+						<td>{name}</td>
 						{#each questions as { id, price, available }}
 							<td
 								class:available={available && isActiveUser}
@@ -39,10 +38,6 @@
 			</tbody>
 		</table>
 	</div>
-
-	{#if round.timeoutSeconds && false}
-		<Progress seconds={round.timeoutSeconds} />
-	{/if}
 </section>
 
 <style>
@@ -58,15 +53,12 @@
 	div {
 		overflow-x: auto;
 		width: 100%;
-		padding: 1rem;
 	}
 
 	table {
 		border-collapse: collapse;
 		width: 100%;
 		margin: 0 auto;
-		max-width: 40rem;
-		table-layout: fixed;
 	}
 
 	table caption {
@@ -83,7 +75,7 @@
 	}
 
 	td {
-		padding: 0.5rem 0.1em;
+		padding: 0.5rem 0.2em;
 		text-align: center;
 		transition: background-color 0.3s;
 	}
@@ -100,8 +92,8 @@
 		background-color: var(--color-accent);
 	}
 
-	th:first-child {
-		width: 10rem;
+	td:first-child {
+		max-width: 10rem;
 		font-weight: normal;
 		text-align: left;
 	}

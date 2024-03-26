@@ -1,19 +1,16 @@
-import { toSnapshot, type GameState, type Stage } from '../models'
-import {
-	getRound,
-	type CommandContext,
-	type ServerCommandOfType,
-	type UpdateResult,
-} from '../state-machine-models'
+import type { GameState, Stage } from '../models/state'
+import type { ServerCommand } from '../models/state-commands'
+import type { CommandContext, UpdateResult } from '../models/state-machine'
+import { getRound, toSnapshot } from '../state-utils'
 import { Timeouts } from '../timeouts'
 
 const handleServerRoundReturn = (
 	state: GameState,
-	command: ServerCommandOfType<'round-return'>,
+	command: ServerCommand.OfType<'round-return'>,
 	ctx: CommandContext
 ): UpdateResult => {
 	if (state.stage.type !== 'answer' && state.stage.type !== 'appeal-result') {
-		return { state, events: [] }
+		return { state, effects: [] }
 	}
 	const roundModel = getRound(ctx, state.stage.roundId)
 
@@ -60,7 +57,7 @@ const handleServerRoundReturn = (
 
 		return {
 			state: { ...state, stage: newStage },
-			events: [
+			effects: [
 				{
 					type: 'client-broadcast',
 					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
@@ -82,7 +79,7 @@ const handleServerRoundReturn = (
 
 		return {
 			state: { ...state, stage: newStage },
-			events: [
+			effects: [
 				{
 					type: 'client-broadcast',
 					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },

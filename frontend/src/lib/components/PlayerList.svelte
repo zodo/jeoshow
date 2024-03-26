@@ -28,6 +28,12 @@
 		height: 100%;
 	}
 
+	@media (min-width: 600px) {
+		section {
+			align-content: center;
+		}
+	}
+
 	.player {
 		flex: 1 1 auto;
 	}

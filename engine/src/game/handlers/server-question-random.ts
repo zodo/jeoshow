@@ -1,22 +1,19 @@
-import { toSnapshot, type GameState, type Stage } from '../models'
-import {
-	getRound,
-	type CommandContext,
-	type ServerCommandOfType,
-	type UpdateResult,
-} from '../state-machine-models'
+import type { GameState, Stage } from '../models/state'
+import type { ServerCommand } from '../models/state-commands'
+import type { CommandContext, UpdateResult } from '../models/state-machine'
+import { getRound } from '../state-utils'
 
 const handleServerQuestionRandom = (
 	state: GameState,
-	command: ServerCommandOfType<'question-random'>,
+	command: ServerCommand.OfType<'question-random'>,
 	ctx: CommandContext
 ): UpdateResult => {
 	if (state.stage.type !== 'round') {
-		return { state, events: [] }
+		return { state, effects: [] }
 	}
 
 	if (state.stage.callbackId !== command.action.callbackId) {
-		return { state, events: [] }
+		return { state, effects: [] }
 	}
 
 	const roundModel = getRound(ctx, state.stage.roundId)
@@ -29,7 +26,7 @@ const handleServerQuestionRandom = (
 
 	return {
 		state: state,
-		events: [
+		effects: [
 			{
 				type: 'trigger',
 				command: {

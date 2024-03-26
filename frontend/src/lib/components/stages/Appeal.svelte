@@ -1,13 +1,13 @@
 <script lang="ts">
 	import type { ExtendedPlayer, SvelteCustomEvent } from '$lib/models'
-	import type { GameEvents } from 'shared/models/events'
+	import type { StageSnapshot } from 'shared/models/models'
 	import { createEventDispatcher } from 'svelte'
 	import Progress from '../Progress.svelte'
 	import { quintInOut } from 'svelte/easing'
 	import { scale } from 'svelte/transition'
 
 	export let userId: string
-	export let appeal: Extract<GameEvents.StageSnapshot, { type: 'appeal' }>
+	export let appeal: Extract<StageSnapshot, { type: 'appeal' }>
 	export let players: ExtendedPlayer[] = []
 
 	$: appealingUserName = players.find((p) => p.id === appeal.playerId)?.name
@@ -22,7 +22,7 @@
 	const dispatch = createEventDispatcher<SvelteCustomEvent>()
 </script>
 
-<section transition:scale={{ duration: 300, easing: quintInOut }}>
+<section in:scale={{ duration: 300, easing: quintInOut }}>
 	<div class="header">Appeal</div>
 
 	<div class="content">
@@ -75,7 +75,6 @@
 	}
 
 	.header {
-		padding-top: 1rem;
 		font-weight: bold;
 		font-size: 1.5rem;
 		text-align: center;

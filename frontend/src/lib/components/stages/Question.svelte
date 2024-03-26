@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { GameEvents } from 'shared/models/events'
+	import type { StageSnapshot } from 'shared/models/models'
 	import Progress from '../Progress.svelte'
 	import MediaFragment from '../MediaFragment.svelte'
 
-	export let question: Extract<GameEvents.StageSnapshot, { type: 'question' }>
+	export let question: Extract<StageSnapshot, { type: 'question' }>
 </script>
 
 <section>
-	<div class="header">
+	<div>
 		<div class="theme">{question.theme}</div>
 		{#if question.themeComment}
 			<div class="theme-comment">{question.themeComment}</div>
@@ -19,10 +19,12 @@
 	</div>
 
 	<div class="progress">
-		{#if (question.substate.type === 'ready-for-hit' || question.substate.type === 'awaiting-answer') && question.substate.timeoutSeconds}
-			{#key question.substate.type}
-				<Progress seconds={question.substate.timeoutSeconds} />
-			{/key}
+		{#if question.substate.type === 'ready-for-hit' && question.substate.timeoutSeconds}
+			<Progress seconds={question.substate.timeoutSeconds} />
+		{/if}
+
+		{#if question.substate.type === 'awaiting-answer' && question.substate.timeoutSeconds}
+			<Progress seconds={question.substate.timeoutSeconds} />
 		{/if}
 	</div>
 </section>
@@ -31,12 +33,7 @@
 	section {
 		display: grid;
 		grid-template-rows: min-content 1fr min-content;
-
 		height: 100%;
-	}
-
-	.header {
-		margin-top: 1rem;
 	}
 
 	.theme {
@@ -57,7 +54,6 @@
 
 	.progress {
 		width: 100%;
-		height: 3.5rem;
-		padding: 1rem;
+		height: 1rem;
 	}
 </style>

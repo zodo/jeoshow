@@ -1,24 +1,20 @@
 import type { PackModel } from 'shared/models/siq'
-import { toSnapshot, type GameState, type Stage } from '../models'
-import {
-	getQuestion,
-	type ClientCommandOfType,
-	type CommandContext,
-	type UpdateEvent,
-	type UpdateResult,
-} from '../state-machine-models'
+import type { GameState, Stage } from '../models/state'
+import type { ClientCommand } from '../models/state-commands'
+import type { CommandContext, UpdateResult } from '../models/state-machine'
+import { getQuestion, toSnapshot } from '../state-utils'
 import { Timeouts } from '../timeouts'
 
 const handleClientGiveAnswer = (
 	state: GameState,
-	command: ClientCommandOfType<'answer-give'>,
+	command: ClientCommand.OfType<'answer-give'>,
 	ctx: CommandContext
 ): UpdateResult => {
 	if (
 		state.stage.type !== 'awaiting-answer' ||
 		command.playerId !== state.stage.answeringPlayer
 	) {
-		return { state, events: [] }
+		return { state, effects: [] }
 	}
 	const questionModel = getQuestion(ctx, state.stage.questionId)
 	if (isCorrect(questionModel.answers, command.action.value)) {
@@ -44,7 +40,7 @@ const handleClientGiveAnswer = (
 
 		return {
 			state: { ...state, players, stage },
-			events: [
+			effects: [
 				{
 					type: 'client-broadcast',
 					event: {
@@ -100,7 +96,7 @@ const handleClientGiveAnswer = (
 
 		return {
 			state: { ...state, players, stage },
-			events: [
+			effects: [
 				{
 					type: 'client-broadcast',
 					event: {

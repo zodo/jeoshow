@@ -1,10 +1,12 @@
-import { toSnapshot, type GameState, type Stage } from '../models'
-import type { ClientCommandOfType, CommandContext, UpdateResult } from '../state-machine-models'
+import type { GameState, Stage } from '../models/state'
+import type { ClientCommand } from '../models/state-commands'
+import type { CommandContext, UpdateResult } from '../models/state-machine'
+import { toSnapshot } from '../state-utils'
 import { Timeouts } from '../timeouts'
 
 const handleClientGameStart = (
 	state: GameState,
-	command: ClientCommandOfType<'game-start'>,
+	command: ClientCommand.OfType<'game-start'>,
 	ctx: CommandContext
 ): UpdateResult => {
 	const alivePlayers = state.players.filter((p) => !p.disconnected)
@@ -23,7 +25,7 @@ const handleClientGameStart = (
 
 	return {
 		state: { ...state, stage: newStage },
-		events: [
+		effects: [
 			{
 				type: 'client-broadcast',
 				event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },

@@ -1,18 +1,19 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
-	import { scale } from 'svelte/transition'
+	import { fade } from 'svelte/transition'
 	import { quintInOut } from 'svelte/easing'
-	export let seconds: number // Default value of 10 seconds
-	let percentage = 100 // Start with 100% width
+	export let seconds: number
+	let percentage = 100
 
 	onMount(() => {
 		setTimeout(() => {
-			percentage -= 100 / (seconds - 1) // Initial percentage
+			percentage -= 100 / seconds
 		}, 100)
 
 		const interval = setInterval(() => {
-			percentage -= 100 / (seconds - 1)
+			percentage -= 100 / seconds
 			if (percentage <= 0) {
+				percentage = 0
 				clearInterval(interval)
 			}
 		}, 1000)
@@ -23,7 +24,7 @@
 	})
 </script>
 
-<div class="progress-container" transition:scale={{ duration: 500, easing: quintInOut }}>
+<div class="progress-container" in:fade={{ duration: 1000, easing: quintInOut }}>
 	<div class="progress-bar" style="width: {percentage}%; opacity: {percentage / 100}"></div>
 </div>
 

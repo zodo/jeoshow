@@ -1,18 +1,17 @@
-import type { ClientAction } from 'shared/models/commands'
-import type { GameState } from './game/state/models'
+import { updateState } from './game/state-update'
+import { loadMetadata, type PackMetadata } from './game/metadata'
+import { createState } from './game/state-create'
 import type {
 	ClientCommand,
 	GameCommand,
 	ScheduledCommand,
-	ServerCommandOfType,
-	UpdateEvent,
-	UpdateResult,
-} from './game/state/state-machine-models'
-import { updateState } from './game/state/state-machine'
-import { initGame } from './game/create'
-import { loadMetadata, type PackMetadata } from './game/metadata'
+	ServerCommand,
+} from './game/models/state-commands'
+import type { ClientAction } from 'shared/models/messages'
+import type { GameState } from './game/models/state'
+import type { UpdateEffect, UpdateResult } from './game/models/state-machine'
 
-export class GameDurableObject {
+class GameDurableObject {
 	state: DurableObjectState
 	storage: DurableObjectStorage
 	env: CfEnv
@@ -51,7 +50,7 @@ export class GameDurableObject {
 	async webSocketClose(ws: WebSocket, code: number, reason: string, wasClean: boolean) {
 		ws.close(code, 'Durable Object is closing WebSocket')
 		const userId = this.state.getTags(ws)[0]
-		const command: ServerCommandOfType<'player-disconnect'> = {
+		const command: ServerCommand.OfType<'player-disconnect'> = {
 			type: 'server',
 			action: { type: 'player-disconnect', playerId: userId },
 		}
@@ -64,14 +63,8 @@ export class GameDurableObject {
 		const commands: ScheduledCommand[] = (await this.storage.get('scheduledCommands')) ?? []
 		const commandsToExecute = commands.filter((c) => c.time <= now)
 		for (const { command, time } of commandsToExecute) {
-			if (command.type === 'server' && command.action.type === 'state-cleanup') {
-				if (this.state.getWebSockets().length === 0) {
-					await this.cleanup()
-				}
-			} else {
-				console.log('<- alarm:', command.type, command.action.type, time)
-				await this.modifyState(command, now, 'alarm')
-			}
+			console.log('<- alarm:', command.type, command.action.type, time)
+			await this.modifyState(command, now, 'alarm')
 		}
 	}
 
@@ -111,7 +104,8 @@ export class GameDurableObject {
 	private async createGame(request: Request) {
 		const body = (await request.json()) as any
 		const packId = body.packId
-		await initGame({ state: this.state, env: this.env }, packId)
+		const state = await createState(this.env, packId)
+		await this.state.storage.put('state', state)
 		return new Response(null, {
 			status: 201,
 			headers: {
@@ -133,6 +127,12 @@ export class GameDurableObject {
 		origin: 'ws' | 'alarm',
 		ws?: WebSocket
 	) {
+		if (command.type === 'server' && command.action.type === 'state-cleanup') {
+			if (this.state.getWebSockets().length === 0) {
+				await this.cleanup()
+			}
+			return
+		}
 		const currentState: GameState | undefined = await this.storage.get('state')
 		if (!currentState) {
 			console.error('State not found')
@@ -146,7 +146,11 @@ export class GameDurableObject {
 			console.error('Metadata not found')
 			return
 		}
-		const { state, events } = this.recursivelyUpdateState(currentState, command, packMetadata)
+		const { state, effects: events } = this.recursivelyUpdateState(
+			currentState,
+			command,
+			packMetadata
+		)
 
 		if (state && state !== currentState) {
 			await this.storage.put('state', state)
@@ -164,7 +168,7 @@ export class GameDurableObject {
 
 		const scheduledCommands =
 			events?.filter(
-				(e): e is Extract<UpdateEvent, { type: 'schedule' }> => e.type === 'schedule'
+				(e): e is Extract<UpdateEffect, { type: 'schedule' }> => e.type === 'schedule'
 			) ?? []
 		for (const event of scheduledCommands) {
 			console.log(
@@ -197,14 +201,14 @@ export class GameDurableObject {
 			throw new Error(`Likely infinite loop: ${depth}, command: ${JSON.stringify(command)}`)
 		}
 
-		const { state: updatedState, events } = updateState(state, command, {
+		const { state: updatedState, effects: events } = updateState(state, command, {
 			pack: packMetadata.model,
 			mediaMapping: packMetadata.mediaMapping,
 		})
 
 		const triggerEvents =
 			events?.filter(
-				(e): e is Extract<UpdateEvent, { type: 'trigger' }> => e.type === 'trigger'
+				(e): e is Extract<UpdateEffect, { type: 'trigger' }> => e.type === 'trigger'
 			) ?? []
 
 		const nonTriggerEvents = events?.filter((e) => e.type !== 'trigger') ?? []
@@ -217,11 +221,11 @@ export class GameDurableObject {
 				packMetadata,
 				depth + 1
 			)
-			nonTriggerEvents.push(...(result.events ?? []))
+			nonTriggerEvents.push(...(result.effects ?? []))
 			return result.state ?? currentState
 		}, updatedState ?? state)
 
-		return { state: finalState, events: nonTriggerEvents }
+		return { state: finalState, effects: nonTriggerEvents }
 	}
 
 	private async modifyScheduledCommands(
@@ -268,3 +272,5 @@ export class GameDurableObject {
 		)
 	}
 }
+
+export default GameDurableObject

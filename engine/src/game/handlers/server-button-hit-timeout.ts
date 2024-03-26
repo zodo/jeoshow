@@ -1,22 +1,23 @@
-import { toSnapshot, type GameState, type Stage } from '../models'
-import type { CommandContext, ServerCommandOfType, UpdateResult } from '../state-machine-models'
+import type { GameState } from '../models/state'
+import type { ServerCommand } from '../models/state-commands'
+import type { CommandContext, UpdateResult } from '../models/state-machine'
 
 const handleServerButtonHitTimeout = (
 	state: GameState,
-	command: ServerCommandOfType<'button-hit-timeout'>,
+	command: ServerCommand.OfType<'button-hit-timeout'>,
 	ctx: CommandContext
 ): UpdateResult => {
 	if (state.stage.type !== 'ready-for-hit') {
-		return { state, events: [] }
+		return { state, effects: [] }
 	}
 
 	if (state.stage.callbackId !== command.action.callbackId) {
-		return { state, events: [] }
+		return { state, effects: [] }
 	}
 
 	return {
 		state: state,
-		events: [
+		effects: [
 			{
 				type: 'trigger',
 				command: {

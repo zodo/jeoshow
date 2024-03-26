@@ -1,18 +1,19 @@
-import { toSnapshot, type GameState, type Stage } from '../models'
-import type { CommandContext, ServerCommandOfType, UpdateResult } from '../state-machine-models'
-import { Timeouts } from '../timeouts'
+import type { GameState, Stage } from '../models/state'
+import type { ServerCommand } from '../models/state-commands'
+import type { CommandContext, UpdateResult } from '../models/state-machine'
+import { toSnapshot } from '../state-utils'
 
 const handleServerButtonReady = (
 	state: GameState,
-	command: ServerCommandOfType<'button-ready'>,
+	command: ServerCommand.OfType<'button-ready'>,
 	ctx: CommandContext
 ): UpdateResult => {
 	if (state.stage.type !== 'question') {
-		return { state, events: [] }
+		return { state, effects: [] }
 	}
 
 	if (command.action.callbackId && state.stage.callbackId !== command.action.callbackId) {
-		return { state, events: [] }
+		return { state, effects: [] }
 	}
 
 	const callbackId: string = Math.random().toString(36).substring(7)
@@ -27,7 +28,7 @@ const handleServerButtonReady = (
 
 	return {
 		state: { ...state, stage: newStage },
-		events: [
+		effects: [
 			{
 				type: 'client-broadcast',
 				event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },

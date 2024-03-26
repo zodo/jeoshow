@@ -1,16 +1,12 @@
-import type { PackModel } from 'shared/models/siq'
-import { toSnapshot, type GameState, type Stage } from '../models'
-import {
-	getRound,
-	type ClientCommandOfType,
-	type CommandContext,
-	type UpdateResult,
-} from '../state-machine-models'
+import type { GameState, Stage } from '../models/state'
+import type { ClientCommand } from '../models/state-commands'
+import type { CommandContext, UpdateResult } from '../models/state-machine'
+import { getRound, toSnapshot } from '../state-utils'
 import { getFragmentsTime } from '../timeouts'
 
 const handleClientQuestionSelect = (
 	state: GameState,
-	command: ClientCommandOfType<'question-select'>,
+	command: ClientCommand.OfType<'question-select'>,
 	ctx: CommandContext
 ): UpdateResult => {
 	const stage = state.stage
@@ -52,7 +48,7 @@ const handleClientQuestionSelect = (
 
 	return {
 		state: { ...state, stage: newStage },
-		events: [
+		effects: [
 			{
 				type: 'client-broadcast',
 				event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },

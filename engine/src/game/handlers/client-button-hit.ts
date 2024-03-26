@@ -1,15 +1,12 @@
-import { toSnapshot, type GameState, type Stage } from '../models'
-import type {
-	ClientCommandOfType,
-	CommandContext,
-	UpdateEvent,
-	UpdateResult,
-} from '../state-machine-models'
+import type { GameState, Stage } from '../models/state'
+import type { ClientCommand } from '../models/state-commands'
+import type { CommandContext, UpdateResult } from '../models/state-machine'
+import { toSnapshot } from '../state-utils'
 import { Timeouts } from '../timeouts'
 
 const handleClientButtonHit = (
 	state: GameState,
-	command: ClientCommandOfType<'button-hit'>,
+	command: ClientCommand.OfType<'button-hit'>,
 	ctx: CommandContext
 ): UpdateResult => {
 	if (
@@ -17,7 +14,7 @@ const handleClientButtonHit = (
 		state.stage.falseStartPlayers.includes(command.playerId)
 	) {
 		return {
-			events: [
+			effects: [
 				{
 					type: 'client-broadcast',
 					event: { type: 'player-false-start', playerId: command.playerId },
@@ -31,7 +28,7 @@ const handleClientButtonHit = (
 		}
 		return {
 			state: { ...state, stage: newStage },
-			events: [
+			effects: [
 				{
 					type: 'client-broadcast',
 					event: { type: 'player-texted', playerId: command.playerId, text: 'РАНО' },
@@ -59,7 +56,7 @@ const handleClientButtonHit = (
 				...state,
 				stage: newStage,
 			},
-			events: [
+			effects: [
 				{
 					type: 'client-broadcast',
 					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
@@ -81,7 +78,7 @@ const handleClientButtonHit = (
 	} else {
 		return {
 			state: state,
-			events: [
+			effects: [
 				{
 					type: 'client-broadcast',
 					event: { type: 'player-hit-the-button', playerId: command.playerId },

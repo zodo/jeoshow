@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { PackModel } from 'shared/models/siq'
-	import { createEventDispatcher } from 'svelte'
+	import { createEventDispatcher, onMount } from 'svelte'
 	import type { SvelteCustomEvent } from '$lib/models'
-	import { draw, scale } from 'svelte/transition'
+	import { scale } from 'svelte/transition'
 	import { quintInOut } from 'svelte/easing'
 
 	export let fragments: PackModel.FragmentGroup[]
@@ -14,6 +14,9 @@
 		if (fragment.type === 'audio' || fragment.type === 'video') {
 			allMediaUrls = [...allMediaUrls, fragment.url]
 		}
+		if (fragment.type === 'audio') {
+			animateSong = true
+		}
 	}
 	const onMediaEnded = (fragment: PackModel.Fragment) => () => {
 		if (fragment.type === 'audio' || fragment.type === 'video') {
@@ -21,6 +24,9 @@
 			if (allMediaUrls.length === 0) {
 				dispatch('action', { type: 'media-finished' })
 			}
+		}
+		if (fragment.type === 'audio') {
+			animateSong = false
 		}
 	}
 
@@ -30,13 +36,15 @@
 		}
 		return `/resources/${url}`
 	}
+
+	let animateSong = false
+	function setMediaVolume(e: Event) {
+		const media = e.target as HTMLMediaElement
+		media.volume = 0.5
+	}
 </script>
 
-<div
-	class="fragments"
-	in:scale={{ duration: 1000, easing: quintInOut }}
-	out:scale={{ duration: 300, easing: quintInOut }}
->
+<div class="fragments" in:scale={{ duration: 1000, easing: quintInOut }}>
 	{#each fragments as fragmentGroup}
 		{#each fragmentGroup as fragment}
 			{#if fragment.type === 'text'}
@@ -51,8 +59,14 @@
 					on:play={onMediaStarted(fragment)}
 					on:ended={onMediaEnded(fragment)}
 					autoplay
+					on:canplay={setMediaVolume}
 				/>
-				<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+				<svg
+					class:animate={animateSong}
+					viewBox="0 0 24 24"
+					fill="none"
+					xmlns="http://www.w3.org/2000/svg"
+				>
 					<path
 						d="M12.75 12.508L21.25 9.108V14.7609C20.7449 14.4375 20.1443 14.25 19.5 14.25C17.7051 14.25 16.25 15.7051 16.25 17.5C16.25 19.2949 17.7051 20.75 19.5 20.75C21.2949 20.75 22.75 19.2949 22.75 17.5C22.75 17.5 22.75 17.5 22.75 17.5L22.75 7.94625C22.75 6.80342 22.75 5.84496 22.6696 5.08131C22.6582 4.97339 22.6448 4.86609 22.63 4.76597C22.5525 4.24426 22.4156 3.75757 22.1514 3.35115C22.0193 3.14794 21.8553 2.96481 21.6511 2.80739C21.6128 2.77788 21.573 2.74927 21.5319 2.7216L21.5236 2.71608C20.8164 2.2454 20.0213 2.27906 19.2023 2.48777C18.4102 2.68961 17.4282 3.10065 16.224 3.60469L14.13 4.48115C13.5655 4.71737 13.0873 4.91751 12.712 5.1248C12.3126 5.34535 11.9686 5.60548 11.7106 5.99311C11.4527 6.38075 11.3455 6.7985 11.2963 7.25204C11.25 7.67831 11.25 8.19671 11.25 8.80858V16.7609C10.7448 16.4375 10.1443 16.25 9.5 16.25C7.70507 16.25 6.25 17.7051 6.25 19.5C6.25 21.2949 7.70507 22.75 9.5 22.75C11.2949 22.75 12.75 21.2949 12.75 19.5C12.75 19.5 12.75 19.5 12.75 19.5L12.75 12.508Z"
 					/>
@@ -68,6 +82,7 @@
 						on:ended={onMediaEnded(fragment)}
 						autoplay
 						disableRemotePlayback
+						on:canplay={setMediaVolume}
 					>
 						<track kind="captions" />
 					</video>
@@ -120,6 +135,9 @@
 	svg {
 		width: max(4rem, 10vw);
 		aspect-ratio: 1/1;
+	}
+
+	svg.animate {
 		animation: pulse 1s infinite ease-in-out;
 	}
 

@@ -1,14 +1,16 @@
-import { toSnapshot, type GameState } from '../models'
-import type { ClientCommandOfType, CommandContext, UpdateResult } from '../state-machine-models'
-import type { GameEvents } from 'shared/models/events'
+import type { Player } from 'shared/models/models'
+import type { GameState } from '../models/state'
+import type { ClientCommand } from '../models/state-commands'
+import type { CommandContext, UpdateResult } from '../models/state-machine'
+import { toSnapshot } from '../state-utils'
 
 const handleClientIntroduce = (
 	state: GameState,
-	command: ClientCommandOfType<'introduce'>,
+	command: ClientCommand.OfType<'introduce'>,
 	ctx: CommandContext
 ): UpdateResult => {
 	const existingPlayer = state.players.find((p) => p.id === command.playerId)
-	const player: GameEvents.Player = {
+	const player: Player = {
 		id: command.playerId,
 		name: command.action.name,
 		score: existingPlayer?.score || 0,
@@ -18,7 +20,7 @@ const handleClientIntroduce = (
 
 	return {
 		state: { ...state, players: newPlayers },
-		events: [
+		effects: [
 			{
 				type: 'client-broadcast',
 				event: { type: 'players-updated', players: newPlayers },

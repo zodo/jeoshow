@@ -7,7 +7,7 @@
 </script>
 
 <section>
-	<div transition:scale={{ duration: 300, easing: quintInOut }}>
+	<div in:scale={{ duration: 300, easing: quintInOut }}>
 		<h1>Готово</h1>
 
 		<table>

@@ -1,14 +1,15 @@
-import { type GameState } from '../models'
-import type { ClientCommandOfType, CommandContext, UpdateResult } from '../state-machine-models'
+import type { GameState } from '../models/state'
+import type { ClientCommand } from '../models/state-commands'
+import type { CommandContext, UpdateResult } from '../models/state-machine'
 
 const handleClientMediaFinished = (
 	state: GameState,
-	command: ClientCommandOfType<'media-finished'>,
+	command: ClientCommand.OfType<'media-finished'>,
 	ctx: CommandContext
 ): UpdateResult => {
 	if (state.stage.type === 'question') {
 		return {
-			events: [
+			effects: [
 				{
 					type: 'trigger',
 					command: {
@@ -20,7 +21,7 @@ const handleClientMediaFinished = (
 		}
 	} else if (state.stage.type === 'answer') {
 		return {
-			events: [
+			effects: [
 				{
 					type: 'trigger',
 					command: {

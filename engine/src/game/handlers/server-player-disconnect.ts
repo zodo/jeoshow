@@ -1,14 +1,15 @@
-import type { GameState } from '../models'
-import type { CommandContext, ServerCommandOfType, UpdateResult } from '../state-machine-models'
+import type { GameState } from '../models/state'
+import type { ServerCommand } from '../models/state-commands'
+import type { CommandContext, UpdateResult } from '../models/state-machine'
 
 const handlePlayerDisconnect = (
 	state: GameState,
-	command: ServerCommandOfType<'player-disconnect'>,
+	command: ServerCommand.OfType<'player-disconnect'>,
 	ctx: CommandContext
 ): UpdateResult => {
 	const player = state.players.find((p) => p.id === command.action.playerId)
 	if (!player) {
-		return { state, events: [] }
+		return { state, effects: [] }
 	}
 	const newPlayers = state.players.map((p) => {
 		if (p.id === command.action.playerId) {
@@ -18,7 +19,7 @@ const handlePlayerDisconnect = (
 	})
 	return {
 		state: { ...state, players: newPlayers },
-		events: [
+		effects: [
 			{
 				type: 'client-broadcast',
 				event: { type: 'players-updated', players: newPlayers },

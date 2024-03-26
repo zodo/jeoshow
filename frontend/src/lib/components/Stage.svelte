@@ -6,11 +6,11 @@
 	import Answer from './stages/Answer.svelte'
 	import Appeal from './stages/Appeal.svelte'
 	import AppealResult from './stages/AppealResult.svelte'
-	import type { GameEvents } from 'shared/models/events'
 	import type { ExtendedPlayer } from '$lib/models'
+	import type { StageSnapshot } from 'shared/models/models'
 
 	export let players: ExtendedPlayer[] = []
-	export let stage: GameEvents.StageSnapshot
+	export let stage: StageSnapshot
 	export let userId: string
 </script>
 
@@ -39,5 +39,6 @@
 	section {
 		width: 100%;
 		height: 100%;
+		padding: 1rem;
 	}
 </style>

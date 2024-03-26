@@ -1,13 +1,13 @@
-import type { GameState } from './models'
+import type { ClientAction } from 'shared/models/messages'
+import type { GameState } from './models/state'
 import type {
-	ClientCommandOfType,
-	CommandContext,
+	ClientCommand,
 	GameCommand,
 	ServerAction,
-	ServerCommandOfType,
-	UpdateResult,
-} from './state-machine-models'
-import type { ClientAction } from 'shared/models/commands'
+	ServerCommand,
+} from './models/state-commands'
+import type { CommandContext, UpdateResult } from './models/state-machine'
+
 import handleClientIntroduce from './handlers/client-introduce'
 import handleClientGameStart from './handlers/client-game-start'
 import handleClientButtonHit from './handlers/client-button-hit'
@@ -24,10 +24,23 @@ import handleClientMediaFinished from './handlers/client-media-finished'
 import handleClientAppealStart from './handlers/client-appeal-start'
 import handleClientAppealResolve from './handlers/client-appeal-resolve'
 
+export const updateState = (
+	state: GameState,
+	command: GameCommand,
+	ctx: CommandContext
+): UpdateResult => {
+	switch (command.type) {
+		case 'client':
+			return clientCommandHandlers[command.action.type](state, command as any, ctx)
+		case 'server':
+			return serverCommandHandlers[command.action.type](state, command as any, ctx)
+	}
+}
+
 const clientCommandHandlers: {
 	[K in ClientAction['type']]: (
 		state: GameState,
-		command: ClientCommandOfType<K>,
+		command: ClientCommand.OfType<K>,
 		ctx: CommandContext
 	) => UpdateResult
 } = {
@@ -44,7 +57,7 @@ const clientCommandHandlers: {
 const serverCommandHandlers: {
 	[K in ServerAction['type']]: (
 		state: GameState,
-		command: ServerCommandOfType<K>,
+		command: ServerCommand.OfType<K>,
 		ctx: CommandContext
 	) => UpdateResult
 } = {
@@ -58,17 +71,4 @@ const serverCommandHandlers: {
 	'state-cleanup': (s, c, t) => {
 		throw new Error('Should not be called')
 	},
-}
-
-export const updateState = (
-	state: GameState,
-	command: GameCommand,
-	ctx: CommandContext
-): UpdateResult => {
-	switch (command.type) {
-		case 'client':
-			return clientCommandHandlers[command.action.type](state, command as any, ctx)
-		case 'server':
-			return serverCommandHandlers[command.action.type](state, command as any, ctx)
-	}
 }

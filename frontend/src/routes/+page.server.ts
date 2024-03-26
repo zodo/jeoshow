@@ -10,9 +10,13 @@ export const actions = {
 		let gameId: string
 		try {
 			const formData = await request.formData()
+			console.log('Uploading pack')
 			const packId = await uploadPack(formData, platform)
+			console.log(`Pack uploaded: ${packId}, creating game`)
 			gameId = await createGame(packId)
+			console.log(`Game created: ${gameId}`)
 		} catch (e) {
+			console.error(e)
 			if (e instanceof Error) {
 				return fail(500, { message: e.message })
 			} else {

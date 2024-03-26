@@ -1,9 +1,21 @@
 <script lang="ts">
 	import type { ExtendedPlayer } from '$lib/models'
 	import { slide } from 'svelte/transition'
-	import { quintOut } from 'svelte/easing'
+	import { backInOut, cubicOut, quintOut } from 'svelte/easing'
+	import { tweened } from 'svelte/motion'
 
 	export let player: ExtendedPlayer
+
+	const score = tweened(0, {
+		duration: 3000,
+		easing: cubicOut,
+	})
+
+	$: {
+		if ($score !== player.score) {
+			score.set(player.score)
+		}
+	}
 </script>
 
 <div
@@ -15,7 +27,9 @@
 	class:active={player.active}
 >
 	<div title={player.name} class="name">{player.name}</div>
-	<div class="score">{player.score}</div>
+	<div class="score">
+		{$score.toFixed(0)}
+	</div>
 
 	{#if player.disconnected}
 		<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">

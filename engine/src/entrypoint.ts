@@ -1,4 +1,5 @@
-import { GameDurableObject } from './GameDurableObject'
+import GameDurableObject from './durable-object'
+
 export { GameDurableObject }
 
 export default {

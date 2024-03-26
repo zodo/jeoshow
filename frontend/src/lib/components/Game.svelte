@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { GameEvents } from 'shared/models/events'
+	import type { StageSnapshot } from 'shared/models/models'
 	import PlayerList from '$lib/components/PlayerList.svelte'
 	import Stage from '$lib/components/Stage.svelte'
 	import DisconnectedOverlay from './DisconnectedOverlay.svelte'
@@ -10,7 +10,7 @@
 
 	export let userId: string
 	export let players: ExtendedPlayer[] = []
-	export let stage: GameEvents.StageSnapshot
+	export let stage: StageSnapshot
 	export let disconnected = false
 </script>
 

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Game from '$lib/components/Game.svelte'
 	import type { ExtendedPlayer } from '$lib/models'
-	import type { GameEvents } from 'shared/models/events'
+	import type { StageSnapshot } from 'shared/models/models'
 	import { readable } from 'svelte/store'
 
 	const randomBoolean = readable(true, (set) => {
@@ -13,14 +13,14 @@
 	})
 
 	let currentStage = 0
-	let stages: GameEvents.StageSnapshot[] = [
+	let stages: StageSnapshot[] = [
 		{
 			type: 'before-start',
 		},
 	]
 
 	let players: ExtendedPlayer[] = []
-	let stage: GameEvents.StageSnapshot = stages[0]
+	let stage: StageSnapshot = stages[0]
 
 	$: {
 		let tmpPlayers: ExtendedPlayer[] = [

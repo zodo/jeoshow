@@ -1,14 +1,12 @@
-import { toSnapshot, type GameState, type Stage } from '../models'
-import {
-	type ClientCommandOfType,
-	type CommandContext,
-	type UpdateResult,
-} from '../state-machine-models'
+import type { GameState, Stage } from '../models/state'
+import type { ClientCommand } from '../models/state-commands'
+import type { CommandContext, UpdateResult } from '../models/state-machine'
+import { toSnapshot } from '../state-utils'
 import { Timeouts } from '../timeouts'
 
 const handleClientAppealResolve = (
 	state: GameState,
-	command: ClientCommandOfType<'appeal-resolve'>,
+	command: ClientCommand.OfType<'appeal-resolve'>,
 	ctx: CommandContext
 ): UpdateResult => {
 	if (state.stage.type !== 'appeal' || command.playerId === state.stage.playerId) {
@@ -54,7 +52,7 @@ const handleClientAppealResolve = (
 
 		return {
 			state: { ...state, players: newPlayers, stage: newStage },
-			events: [
+			effects: [
 				{
 					type: 'client-broadcast',
 					event: { type: 'players-updated', players: newPlayers },
@@ -86,7 +84,7 @@ const handleClientAppealResolve = (
 
 		return {
 			state: { ...state, stage: newStage },
-			events: [
+			effects: [
 				{
 					type: 'client-broadcast',
 					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
@@ -109,7 +107,7 @@ const handleClientAppealResolve = (
 
 		return {
 			state: { ...state, stage: newStage },
-			events: [
+			effects: [
 				{
 					type: 'client-broadcast',
 					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },

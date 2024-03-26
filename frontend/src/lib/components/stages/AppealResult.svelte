@@ -5,7 +5,7 @@
 	export let resolution: boolean
 </script>
 
-<section transition:scale={{ duration: 300, easing: quintInOut }}>
+<section in:scale={{ duration: 300, easing: quintInOut }}>
 	<h1>Appeal</h1>
 
 	{#if resolution}
@@ -31,13 +31,12 @@
 	}
 
 	p {
-		background-color: var(--color-danger);
+		color: var(--color-danger);
 		padding: 1rem;
-		border-radius: 1rem;
 		display: inline-block;
 	}
 
 	p.approved {
-		background-color: var(--color-accent);
+		color: var(--color-accent);
 	}
 </style>

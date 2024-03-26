@@ -1,15 +1,12 @@
-import { toSnapshot, type GameState, type Stage } from '../models'
-import {
-	getQuestion,
-	type CommandContext,
-	type ServerCommandOfType,
-	type UpdateResult,
-} from '../state-machine-models'
+import type { GameState, Stage } from '../models/state'
+import type { ServerCommand } from '../models/state-commands'
+import type { CommandContext, UpdateResult } from '../models/state-machine'
+import { getQuestion, toSnapshot } from '../state-utils'
 import { getFragmentsTime } from '../timeouts'
 
 const handleServerAnswerShow = (
 	state: GameState,
-	command: ServerCommandOfType<'answer-show'>,
+	command: ServerCommand.OfType<'answer-show'>,
 	ctx: CommandContext
 ): UpdateResult => {
 	if (
@@ -17,11 +14,11 @@ const handleServerAnswerShow = (
 		state.stage.type !== 'question' &&
 		state.stage.type !== 'awaiting-answer'
 	) {
-		return { state, events: [] }
+		return { state, effects: [] }
 	}
 
 	if (state.stage.questionId !== command.action.questionId) {
-		return { state, events: [] }
+		return { state, effects: [] }
 	}
 
 	const stage: Extract<Stage, { type: 'answer' }> = {
@@ -34,7 +31,7 @@ const handleServerAnswerShow = (
 
 	return {
 		state: { ...state, stage },
-		events: [
+		effects: [
 			{
 				type: 'client-broadcast',
 				event: { type: 'stage-updated', stage: toSnapshot(stage, ctx) },

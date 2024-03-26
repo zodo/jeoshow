@@ -1,7 +1,6 @@
 import { PUBLIC_ENGINE_WEBSOCKET_URL } from '$env/static/public'
 import { WebSocket } from 'partysocket'
-import type { ClientAction } from 'shared/models/commands'
-import type { GameEvents } from 'shared/models/events'
+import type { ClientAction, GameEvent } from 'shared/models/messages'
 import { writable, type Readable, type Writable } from 'svelte/store'
 
 export class WebSocketGameClient {
@@ -34,11 +33,11 @@ export class WebSocketGameClient {
 		}
 	}
 
-	onMessage(callback: (event: GameEvents.GameEvent) => void) {
+	onMessage(callback: (event: GameEvent) => void) {
 		this.ws.onmessage = (event) => {
 			if (event.data !== 'pong') {
 				console.log('Received message:', event.data)
-				const gameEvent = JSON.parse(event.data) as GameEvents.GameEvent
+				const gameEvent = JSON.parse(event.data) as GameEvent
 				callback(gameEvent)
 			}
 		}
