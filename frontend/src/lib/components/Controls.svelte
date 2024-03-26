@@ -22,10 +22,16 @@
 	$: showHitButton = !showAnswerInput && !showAppealButton
 
 	$: {
-		if (!showAnswerInput) {
+		if (showAnswerInput) {
+			if (answerInput) {
+				answerInput.focus()
+			}
+		} else {
 			answer = ''
 		}
 	}
+
+	let answerInput: HTMLInputElement
 
 	let hitButton: HTMLButtonElement
 	let buttonActive = false
@@ -80,7 +86,12 @@
 				on:submit|preventDefault={() =>
 					dispatch('action', { type: 'answer-give', value: answer })}
 			>
-				<input type="text" placeholder="Your answer" bind:value={answer} />
+				<input
+					type="text"
+					placeholder="Your answer"
+					bind:value={answer}
+					bind:this={answerInput}
+				/>
 				<button disabled={!answer}> Give answer </button>
 			</form>
 		</div>
