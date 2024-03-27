@@ -130,8 +130,8 @@ class GameDurableObject {
 		if (command.type === 'server' && command.action.type === 'state-cleanup') {
 			if (this.state.getWebSockets().length === 0) {
 				await this.cleanup()
+				return
 			}
-			return
 		}
 		const currentState: GameState | undefined = await this.storage.get('state')
 		if (!currentState) {
