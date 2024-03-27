@@ -64,6 +64,7 @@
 
 <style>
 	form {
+		max-width: 100%;
 		display: flex;
 	}
 
