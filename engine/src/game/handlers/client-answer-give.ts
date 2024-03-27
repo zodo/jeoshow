@@ -89,7 +89,6 @@ const handleClientGiveAnswer = (
 					},
 				],
 			},
-			activePlayer: command.playerId,
 			callbackId,
 			callbackTimeout: Timeouts.awaitingHit,
 		}

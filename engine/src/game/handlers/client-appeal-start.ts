@@ -29,6 +29,10 @@ const handleClientAppealStart = (
 		playerId: command.playerId,
 		resolutions: {},
 		callbackTimeout: Timeouts.appealTimeout,
+		previousAnswers: {
+			...state.stage.previousAnswers,
+			triedToAppeal: [...state.stage.previousAnswers.triedToAppeal, command.playerId],
+		},
 	}
 
 	return {
@@ -38,21 +42,14 @@ const handleClientAppealStart = (
 				type: 'client-broadcast',
 				event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
 			},
-			...state.players.map(
-				(p) =>
-					({
-						type: 'schedule',
-						command: {
-							type: 'client',
-							action: {
-								type: 'appeal-resolve',
-								resolution: false,
-							},
-							playerId: p.id,
-						},
-						delaySeconds: Timeouts.appealTimeout,
-					}) as const
-			),
+			{
+				type: 'schedule',
+				command: {
+					type: 'server',
+					action: { type: 'round-return' },
+				},
+				delaySeconds: Timeouts.appealTimeout,
+			},
 		],
 	}
 }

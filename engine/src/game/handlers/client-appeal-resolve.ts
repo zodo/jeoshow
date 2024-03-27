@@ -76,10 +76,6 @@ const handleClientAppealResolve = (
 			...state.stage,
 			type: 'appeal-result',
 			resolution: false,
-			previousAnswers: {
-				...state.stage.previousAnswers,
-				triedToAppeal: [...state.stage.previousAnswers.triedToAppeal, appealingPlayerId],
-			},
 		}
 
 		return {

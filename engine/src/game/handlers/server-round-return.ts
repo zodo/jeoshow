@@ -9,7 +9,11 @@ const handleServerRoundReturn = (
 	command: ServerCommand.OfType<'round-return'>,
 	ctx: CommandContext
 ): UpdateResult => {
-	if (state.stage.type !== 'answer' && state.stage.type !== 'appeal-result') {
+	if (
+		state.stage.type !== 'answer' &&
+		state.stage.type !== 'appeal-result' &&
+		state.stage.type !== 'appeal'
+	) {
 		return { state, effects: [] }
 	}
 	const roundModel = getRound(ctx, state.stage.roundId)
