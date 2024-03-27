@@ -23,12 +23,13 @@ export class SiqXmlContentParser {
 			},
 			parseAttributeValue: false,
 			isArray: (name: string) =>
-				['round', 'theme', 'question', 'answer', 'param', 'atom'].includes(name),
+				['round', 'theme', 'question', 'answer', 'param'].includes(name),
 		})
 	}
 
 	convert(): PackModel.Pack {
 		const xml = this.parser.parse(this.xml)
+		// console.log(JSON.stringify(xml, null, 2))
 		const rounds = (xml.package.rounds.round as any[])
 			.map((round: any) => this.convertRound(round))
 			.filter((r) => r !== undefined)
@@ -80,19 +81,23 @@ export class SiqXmlContentParser {
 	}
 
 	private getLegacyQuestion(q: any, id: string): PackModel.Question | undefined {
-		const atoms = q.scenario?.atom ?? []
-		if (atoms.length === 0) {
-			return undefined
-		}
-		const markerIndex = atoms.findIndex((a: any) => a.$?.type === 'marker')
+		const atoms = q.scenario?.atom
 		let questions: PackModel.Fragment[] = []
 		let mediaAnswers: PackModel.Fragment[] = []
 
-		if (markerIndex > 0) {
-			questions = atoms.slice(0, markerIndex).map((a: any) => this.mapAtom(a))
-			mediaAnswers = atoms.slice(markerIndex + 1).map((a: any) => this.mapAtom(a))
+		if (Array.isArray(atoms)) {
+			const markerIndex = atoms.findIndex((a: any) => a.$?.type === 'marker')
+
+			if (markerIndex > 0) {
+				questions = atoms.slice(0, markerIndex).map((a: any) => this.mapAtom(a))
+				mediaAnswers = atoms.slice(markerIndex + 1).map((a: any) => this.mapAtom(a))
+			} else {
+				questions = atoms.map((a: any) => this.mapAtom(a))
+			}
+		} else if (typeof atoms === 'object' || typeof atoms === 'string') {
+			questions = [this.mapAtom(atoms)]
 		} else {
-			questions = atoms.map((a: any) => this.mapAtom(a))
+			return undefined
 		}
 
 		if (mediaAnswers.filter((x) => x.type === 'text').length === 0) {
@@ -112,8 +117,12 @@ export class SiqXmlContentParser {
 		}
 	}
 
-	private getNewQuestion(q: any, id: string): PackModel.Question {
-		const params = q.params.param
+	private getNewQuestion(q: any, id: string): PackModel.Question | undefined {
+		const params = q?.params?.param
+
+		if (!Array.isArray(params)) {
+			return undefined
+		}
 
 		const questions = params
 			.filter((p: any) => p.$.name === 'question')
@@ -144,6 +153,14 @@ export class SiqXmlContentParser {
 	}
 
 	private mapAtom(a: any): PackModel.Fragment {
+		if (typeof a === 'string') {
+			return { type: 'text', value: this.cleanupText(a) }
+		}
+		if (Array.isArray(a)) {
+			// string array
+			const value = (a as string[]).map((x) => this.cleanupText(x)).join(' ')
+			return { type: 'text', value }
+		}
 		const type = a.$?.type ?? ''
 		const content = a._
 		let time: number | undefined
@@ -155,7 +172,7 @@ export class SiqXmlContentParser {
 			case 'say':
 			case 'text':
 			case '':
-				return { type: 'text', value: content }
+				return { type: 'text', value: this.cleanupText(content) }
 			case 'image':
 				return { type: 'image', url: this.mapMediaUrl(content, 'Images/') }
 			case 'voice':
@@ -180,7 +197,7 @@ export class SiqXmlContentParser {
 
 	private mapQuestionParamItem(item: any): PackModel.Fragment {
 		if (typeof item === 'string') {
-			return { type: 'text', value: item }
+			return { type: 'text', value: this.cleanupText(item) }
 		}
 		const type = item.$?.type ?? 'text'
 		const content = item._
@@ -194,7 +211,7 @@ export class SiqXmlContentParser {
 			case 'say':
 			case 'text':
 			case '':
-				return { type: 'text', value: content }
+				return { type: 'text', value: this.cleanupText(content) }
 			case 'image':
 				return { type: 'image', url: this.mapMediaUrl(content, 'Images/') }
 			case 'voice':
@@ -245,5 +262,9 @@ export class SiqXmlContentParser {
 		// Ensure the hash is within the 32-bit integer range and return it
 		const numHash = hash >>> 0
 		return numHash.toString(16)
+	}
+
+	private cleanupText(text: string): string {
+		return text.replace(/\s+/g, ' ').replaceAll('\n', ' ').replaceAll('\r', ' ').trim()
 	}
 }
