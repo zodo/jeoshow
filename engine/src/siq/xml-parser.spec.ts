@@ -2,7 +2,7 @@ import { test } from 'vitest'
 import { SiqXmlContentParser } from './xml-parser'
 
 test('converts XML to pack model', () => {
-	const converter = new SiqXmlContentParser(xml, {
+	const converter = new SiqXmlContentParser(xml, 'id', {
 		'photo_2024-03-07_21-45-26_1.jpg': 'another link',
 	})
 	const pack = converter.convert()

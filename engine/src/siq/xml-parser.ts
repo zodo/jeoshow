@@ -4,10 +4,12 @@ import type { PackModel } from 'shared/models/siq'
 export class SiqXmlContentParser {
 	parser: XMLParser
 	xml: string
+	packId: string
 	mediaMapping: Record<string, string>
 
-	constructor(xml: string, mediaMapping: Record<string, string>) {
+	constructor(xml: string, packId: string, mediaMapping: Record<string, string>) {
 		this.xml = xml
+		this.packId = packId
 		this.mediaMapping = mediaMapping
 		this.parser = new XMLParser({
 			ignoreAttributes: false,
@@ -221,13 +223,17 @@ export class SiqXmlContentParser {
 			url = url.slice(1)
 		}
 		const urlEncoded = encodeURI(url)
-		return (
+		const newMediaUrl =
 			this.mediaMapping[prefix + url] ??
 			this.mediaMapping[url] ??
 			this.mediaMapping[prefix + urlEncoded] ??
 			this.mediaMapping[urlEncoded] ??
 			url
-		)
+		if (newMediaUrl.startsWith('http')) {
+			return newMediaUrl
+		} else {
+			return `${this.packId}/${newMediaUrl}`
+		}
 	}
 
 	private djb2Hash(str: string): string {

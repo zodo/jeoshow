@@ -34,7 +34,7 @@
 		if (url.startsWith('http')) {
 			return url
 		}
-		return `/resources/${url}`
+		return `/resources/packs/${url}`
 	}
 
 	let animateSong = false

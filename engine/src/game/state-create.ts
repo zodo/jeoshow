@@ -11,7 +11,7 @@ export const createState = async (env: CfEnv, packId: string): Promise<GameState
 
 	const mediaMapping = await env.JEOSHOW_PACKS.get('packs/' + packId + '/mapping.json')
 	const mediaMappingJson = ((await mediaMapping?.json()) as Record<string, string>) ?? {}
-	const parser = new SiqXmlContentParser(contentXml, mediaMappingJson)
+	const parser = new SiqXmlContentParser(contentXml, packId, mediaMappingJson)
 	const packModel = parser.convert()
 
 	const kv = env.JEOSHOW_PACKS_METADATA

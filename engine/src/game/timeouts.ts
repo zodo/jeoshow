@@ -13,6 +13,9 @@ export const getFragmentsTime = (fragments: PackModel.FragmentGroup[]): number =
 	let hasDefinedTime = false
 	for (const fragment of fragments.flatMap((f) => f)) {
 		if (fragment.type === 'text') {
+			if (!fragment.value) {
+				console.log(JSON.stringify(fragments, null, 2))
+			}
 			totalTimeSeconds += fragment.value.length / 10
 		} else if (fragment.type === 'image') {
 			totalTimeSeconds += 10
