@@ -99,7 +99,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-		justify-content: center;
+		justify-content: safe center;
 		padding: 1rem;
 		gap: 0.5rem;
 	}
