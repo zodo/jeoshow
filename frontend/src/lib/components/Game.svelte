@@ -12,13 +12,14 @@
 	export let players: ExtendedPlayer[] = []
 	export let stage: StageSnapshot
 	export let disconnected = false
+	export let blinkStage = false
 </script>
 
 <section in:scale={{ duration: 700, easing: quintInOut }} style="--player-count: {players.length}">
 	<div class="players">
 		<PlayerList {players} />
 	</div>
-	<div class="stage">
+	<div class="stage" class:blink={blinkStage}>
 		<Stage {stage} {userId} {players} on:action />
 	</div>
 	<div class="controls">
@@ -77,6 +78,12 @@
 		overflow: scroll;
 		background-color: var(--color-background-darker);
 		border-radius: 1.5rem;
+		transition: background-color 0.8s;
+	}
+
+	.blink {
+		background-color: var(--color-accent);
+		transition: none;
 	}
 
 	.controls {

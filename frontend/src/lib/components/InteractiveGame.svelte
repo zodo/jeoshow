@@ -17,6 +17,7 @@
 	let stage: StageSnapshot | null
 	let players: ExtendedPlayer[]
 	let disconnected = true
+	let blinkStage = false
 
 	onMount(() => {
 		wsClient = new WebSocketGameClient(gameCode, userId)
@@ -26,6 +27,9 @@
 		})
 		gameState.extendedPlayers.subscribe((newPlayers) => {
 			players = newPlayers
+		})
+		gameState.stageBlink.subscribe((blink) => {
+			blinkStage = blink
 		})
 
 		wsClient.onConnect(() => {
@@ -52,7 +56,7 @@
 </script>
 
 {#if stage}
-	<Game {userId} {players} {stage} {disconnected} on:action={handleStageEvent} />
+	<Game {userId} {players} {stage} {disconnected} {blinkStage} on:action={handleStageEvent} />
 {:else}
 	<section>
 		<p>Loading...</p>

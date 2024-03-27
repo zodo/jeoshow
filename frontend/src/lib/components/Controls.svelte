@@ -127,7 +127,6 @@
 	}
 
 	.hit-button.ready {
-		transition: none;
 		background-color: var(--color-accent);
 	}
 

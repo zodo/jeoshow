@@ -1,6 +1,6 @@
 import type { GameEvent } from 'shared/models/messages'
 import type { Player, StageSnapshot } from 'shared/models/models'
-import { derived, writable } from 'svelte/store'
+import { derived, readable, writable } from 'svelte/store'
 import type { PlayerButtonHit, PlayerMessage } from './models'
 
 export class GameState {
@@ -37,6 +37,21 @@ export class GameState {
 				})
 		}
 	)
+
+	stageBlink = readable(false, (set) => {
+		let readyForBlink = false
+		this.stage.subscribe((stage) => {
+			if (stage?.type === 'question' && stage.substate.type === 'ready-for-hit') {
+				if (readyForBlink) {
+					set(true)
+					readyForBlink = false
+					setTimeout(() => set(false), 100)
+				}
+			} else {
+				readyForBlink = true
+			}
+		})
+	})
 
 	handleGameEvent = (event: GameEvent) => {
 		switch (event.type) {

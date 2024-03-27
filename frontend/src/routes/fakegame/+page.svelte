@@ -293,6 +293,7 @@
 	userId={'userId'}
 	{stage}
 	{players}
+	blinkStage={false}
 	on:action={(e) => {
 		currentStage++
 		if (currentStage >= stages.length) currentStage = 0
