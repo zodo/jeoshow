@@ -35,33 +35,34 @@
 
 	let hitButton: HTMLButtonElement
 	let buttonActive = false
-	let spacebarPressed = false
-</script>
+	let alreadyHit = false
 
-<Keydown
-	pauseOnInput
-	on:Space={(e) => {
-		e.preventDefault()
-		if (hitButton && !spacebarPressed) {
+	const clickHit = (e: Event) => {
+		if (hitButton && !alreadyHit) {
 			hitButton.click()
+			dispatch('action', { type: 'button-hit' })
 			buttonActive = true
-			spacebarPressed = true
 			setTimeout(() => {
 				buttonActive = false
 			}, 100)
+			alreadyHit = true
 		}
-	}}
-	on:keyup={() => {
-		if (spacebarPressed) {
-			spacebarPressed = false
-		}
-	}}
-/>
+	}
+
+	const releaseHit = () => {
+		alreadyHit = false
+	}
+</script>
+
+<Keydown pauseOnInput on:Space={clickHit} on:keyup={releaseHit} />
 
 <section>
 	{#if showHitButton}
 		<button
-			on:click={() => dispatch('action', { type: 'button-hit' })}
+			on:mousedown={clickHit}
+			on:mouseup={releaseHit}
+			on:touchstart={clickHit}
+			on:touchend={releaseHit}
 			class="base-button hit-button medium-shadow"
 			class:ready={stage.type === 'question' && stage.substate.type === 'ready-for-hit'}
 			class:active={buttonActive}
