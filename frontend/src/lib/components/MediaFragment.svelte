@@ -51,7 +51,11 @@
 				<span>{fragment.value}</span>
 			{:else if fragment.type === 'image'}
 				<div class="media-wrapper">
-					<img src={modifyUrl(fragment.url)} alt="Fragment" />
+					<img
+						class="medium-shadow-filter"
+						src={modifyUrl(fragment.url)}
+						alt="Fragment"
+					/>
 				</div>
 			{:else if fragment.type === 'audio'}
 				<audio
@@ -62,6 +66,7 @@
 					on:canplay={setMediaVolume}
 				/>
 				<svg
+					class="medium-shadow-filter"
 					class:animate={animateSong}
 					viewBox="0 0 24 24"
 					fill="none"
@@ -83,6 +88,7 @@
 						autoplay
 						disableRemotePlayback
 						on:canplay={setMediaVolume}
+						class="medium-shadow-filter"
 					>
 						<track kind="captions" />
 					</video>

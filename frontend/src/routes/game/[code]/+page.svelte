@@ -36,7 +36,7 @@
 {:else}
 	<section>
 		<div class="text-to-copy">{$page.url}</div>
-		<form on:submit|preventDefault={handleJoin}>
+		<form on:submit|preventDefault={handleJoin} class="medium-shadow-filter">
 			<input
 				name="somerandom"
 				type="text"

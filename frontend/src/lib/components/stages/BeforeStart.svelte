@@ -10,6 +10,7 @@
 <section>
 	<button
 		in:scale={{ duration: 300, easing: quintInOut }}
+		class="medium-shadow"
 		on:click={() => dispatch('action', { type: 'game-start' })}
 	>
 		Start

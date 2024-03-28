@@ -182,7 +182,7 @@
 						},
 						{
 							type: 'image',
-							url: 'packs/20a7156dbaa92f87d88e94ad2345330297257502/slf3lg.jpg',
+							url: '51e8d9882b7ef55307fd49318a2f4b88fb296541/xpwuwf.jpg',
 						},
 					],
 				],
@@ -198,7 +198,7 @@
 					[
 						{
 							type: 'video',
-							url: 'packs/51e8d9882b7ef55307fd49318a2f4b88fb296541/glmpcd.mp4',
+							url: '51e8d9882b7ef55307fd49318a2f4b88fb296541/94r48p.mp4',
 						},
 					],
 				],
@@ -214,7 +214,7 @@
 						{ type: 'text', value: 'назовите игру  из игротеки по картинке' },
 						{
 							type: 'image',
-							url: 'packs/20a7156dbaa92f87d88e94ad2345330297257502/slf3lg.jpg',
+							url: '51e8d9882b7ef55307fd49318a2f4b88fb296541/pmw4o.jpg',
 						},
 					],
 				],
@@ -229,7 +229,7 @@
 					[
 						{
 							type: 'image',
-							url: 'packs/d801081f33199d5ba893ccbd5df18f0d99681200/jyq5r.jpg',
+							url: '51e8d9882b7ef55307fd49318a2f4b88fb296541/pmw4o.jpg',
 						},
 						{
 							type: 'text',

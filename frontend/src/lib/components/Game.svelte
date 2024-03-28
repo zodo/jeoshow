@@ -16,10 +16,10 @@
 </script>
 
 <section in:scale={{ duration: 700, easing: quintInOut }}>
-	<div class="players">
+	<div class="players medium-shadow-filter">
 		<PlayerList {players} />
 	</div>
-	<div class="stage" class:blink={blinkStage}>
+	<div class="stage medium-shadow" class:blink={blinkStage}>
 		<Stage {stage} {userId} {players} on:action />
 	</div>
 	<div class="controls">
@@ -52,7 +52,7 @@
 			grid-template-columns: 250px 1fr;
 			grid-template-areas:
 				'players stage'
-				'. controls';
+				'players controls';
 		}
 	}
 

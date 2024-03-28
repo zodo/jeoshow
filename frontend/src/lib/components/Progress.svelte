@@ -25,7 +25,10 @@
 </script>
 
 <div class="progress-container" in:fade={{ duration: 1000, easing: quintInOut }}>
-	<div class="progress-bar" style="width: {percentage}%; opacity: {percentage / 100}"></div>
+	<div
+		class="progress-bar medium-shadow"
+		style="width: {percentage}%; opacity: {percentage / 100}"
+	></div>
 </div>
 
 <style>

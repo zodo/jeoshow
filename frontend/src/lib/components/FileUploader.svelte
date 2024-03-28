@@ -47,7 +47,7 @@
 	}
 </script>
 
-<form on:submit={handleFormSubmit}>
+<form on:submit={handleFormSubmit} class="medium-shadow-filter">
 	<input id="pack" type="file" name="pack" on:change={handleInputChange} />
 	<button type="submit" disabled={formLoading || !hasFiles}>
 		{#if formLoading}

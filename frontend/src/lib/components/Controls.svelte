@@ -62,7 +62,7 @@
 	{#if showHitButton}
 		<button
 			on:click={() => dispatch('action', { type: 'button-hit' })}
-			class="base-button hit-button"
+			class="base-button hit-button medium-shadow"
 			class:ready={stage.type === 'question' && stage.substate.type === 'ready-for-hit'}
 			class:active={buttonActive}
 			in:scale={{ duration: 300, easing: quintInOut }}
@@ -73,7 +73,7 @@
 	{/if}
 	{#if showAppealButton}
 		<button
-			class="base-button appeal-button"
+			class="base-button appeal-button medium-shadow"
 			on:click={() => dispatch('action', { type: 'appeal-start' })}
 			in:scale={{ duration: 300, easing: quintInOut }}
 		>
@@ -81,7 +81,7 @@
 		</button>
 	{/if}
 	{#if showAnswerInput}
-		<div class="answer" in:scale={{ duration: 300, easing: quintInOut }}>
+		<div class="answer medium-shadow-filter" in:scale={{ duration: 300, easing: quintInOut }}>
 			<form
 				on:submit|preventDefault={() =>
 					dispatch('action', { type: 'answer-give', value: answer })}
