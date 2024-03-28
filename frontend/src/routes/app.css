@@ -4,16 +4,31 @@
 	--font-mono: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console, monospace;
 	--font-serif: Iowan Old Style, Apple Garamond, Baskerville, Times New Roman, Droid Serif, Times,
 		Source Serif Pro, serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
-	--color-background: #e6ebe0;
-	--color-background-darker: #d0d8c8;
-	--color-danger: #ed6a5a;
-	--color-warn: #f4f1bb;
-	--color-accent: #36c9c6;
-	--color-accent-dark: #2a9c99;
-	--color-neutral: #9bc1bc;
-	--color-text: #1a2927;
-	--shadow-color: rgba(47, 53, 46, 0.14);
+	--color-background: #fdf6e3; /* Soft cream, providing a warm, inviting base */
+	--color-background-darker: #f3e0c3; /* Warmer shade for depth, reminiscent of sand */
+	--color-danger: #ff6b6b; /* Warmer, more inviting red */
+	--color-warn: #ffd166; /* Warm, golden yellow for a friendly warning color */
+	--color-accent: #ffad5a; /* Warm orange, bright and welcoming */
+	--color-accent-dark: #f57c00; /* Darker orange, for depth and contrast */
+	--color-neutral: #b8a398; /* Warm beige, neutral yet cozy for secondary elements */
+	--color-text: #4e342e; /* Warm brown, ensuring readability and warmth */
+	--shadow-color: rgba(78, 52, 46, 0.14); /* Updated shadow color to match the warm tones */
 }
+
+@media (prefers-color-scheme: dark) {
+	:root {
+		--color-background: #2b2d2f; /* Deep charcoal, offering a sleek, warm base */
+		--color-background-darker: #1e2022; /* Almost black, adding depth and sophistication */
+		--color-danger: #ff6b6b; /* Consistent warm red for alerts, standing out against dark */
+		--color-warn: #ffc107; /* Amber, for a warm yet noticeable warning color */
+		--color-accent: #ff9800; /* Warm amber-orange, vibrant against dark backgrounds */
+		--color-accent-dark: #e65100; /* Deep orange, for depth and rich contrast */
+		--color-neutral: #795548; /* Warm brown, maintaining warmth in secondary elements */
+		--color-text: #eceff1; /* Off-white, for high contrast and readability */
+		--shadow-color: rgba(85, 85, 85, 0.14); /* Light shadow for subtle depth */
+	}
+}
+
 html {
 	height: 100%;
 	width: 100%;
@@ -32,6 +47,13 @@ body {
 
 * {
 	box-sizing: border-box;
+}
+
+input,
+button,
+textarea {
+	font-family: var(--font-body);
+	color: var(--color-text);
 }
 
 .medium-shadow {
