@@ -12,13 +12,15 @@
 
 	const dispatch = createEventDispatcher<SvelteCustomEvent>()
 	const selectQuestion = (questionId: string) => {
-		dispatch('action', { type: 'question-select', questionId })
+		if (isActiveUser) {
+			dispatch('action', { type: 'question-select', questionId })
+		}
 	}
 </script>
 
 <section in:scale={{ duration: 300, easing: quintInOut }}>
 	<div>
-		<table class:active-user={isActiveUser}>
+		<table>
 			<caption>{round.name}</caption>
 			<tbody>
 				{#each round.themes as { name, questions }}
@@ -68,10 +70,6 @@
 
 	tr:not(:last-child) {
 		border-bottom: 2px solid var(--color-neutral);
-	}
-
-	.active-user tr:not(:last-child) {
-		border-bottom: 2px solid var(--color-accent);
 	}
 
 	td {

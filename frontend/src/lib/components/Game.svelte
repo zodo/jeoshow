@@ -49,7 +49,7 @@
 	@media (orientation: landscape) {
 		section {
 			grid-template-rows: 1fr 3rem;
-			grid-template-columns: 250px 1fr;
+			grid-template-columns: 1fr 3.5fr;
 			grid-template-areas:
 				'players stage'
 				'players controls';
@@ -67,7 +67,7 @@
 		overflow: scroll;
 		background-color: var(--color-background-darker);
 		border-radius: 1.5rem;
-		transition: background-color 0.8s;
+		transition: background-color 0.5s;
 	}
 
 	.blink {

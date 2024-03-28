@@ -110,7 +110,7 @@
 		font-size: 1.5rem;
 		background-color: var(--color-neutral);
 		border: none;
-		border-radius: 1.5rem;
+		border-radius: 1.3rem;
 		cursor: pointer;
 		transition: background-color 0.8s;
 		-webkit-tap-highlight-color: transparent;
@@ -121,7 +121,6 @@
 		font-size: 1.5rem;
 		background-color: var(--color-neutral);
 		border: none;
-		border-radius: 1.5rem;
 		cursor: pointer;
 		transition: background-color 0.8s;
 	}

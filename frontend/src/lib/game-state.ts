@@ -4,6 +4,12 @@ import { derived, readable, writable } from 'svelte/store'
 import type { PlayerButtonHit, PlayerMessage } from './models'
 
 export class GameState {
+	userId: string
+
+	constructor(userId: string) {
+		this.userId = userId
+	}
+
 	players = writable<Player[]>([])
 	stage = writable<StageSnapshot | null>(null)
 	hitButton = writable<PlayerButtonHit[]>([])
@@ -39,16 +45,32 @@ export class GameState {
 	)
 
 	stageBlink = readable(false, (set) => {
-		let readyForBlink = false
+		let readyForBlinkOnReady = false
+		let blinkOnRoundAndActivePlayerInterval: NodeJS.Timeout | undefined
 		this.stage.subscribe((stage) => {
 			if (stage?.type === 'question' && stage.substate.type === 'ready-for-hit') {
-				if (readyForBlink) {
+				if (readyForBlinkOnReady) {
 					set(true)
-					readyForBlink = false
+					readyForBlinkOnReady = false
 					setTimeout(() => set(false), 100)
 				}
 			} else {
-				readyForBlink = true
+				readyForBlinkOnReady = true
+			}
+			if (
+				stage?.type === 'round' &&
+				stage.activePlayerId === this.userId &&
+				!blinkOnRoundAndActivePlayerInterval
+			) {
+				blinkOnRoundAndActivePlayerInterval = setInterval(() => {
+					set(true)
+					setTimeout(() => set(false), 100)
+					setTimeout(() => set(true), 300)
+					setTimeout(() => set(false), 400)
+				}, 15000)
+			} else {
+				clearInterval(blinkOnRoundAndActivePlayerInterval)
+				blinkOnRoundAndActivePlayerInterval = undefined
 			}
 		})
 	})

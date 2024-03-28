@@ -21,7 +21,7 @@
 
 	onMount(() => {
 		wsClient = new WebSocketGameClient(gameCode, userId)
-		gameState = new GameState()
+		gameState = new GameState(userId)
 		gameState.stage.subscribe((newStage) => {
 			stage = newStage
 		})
