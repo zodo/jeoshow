@@ -51,9 +51,14 @@ body {
 
 input,
 button,
-textarea {
+textarea,
+::-webkit-input-placeholder {
 	font-family: var(--font-body);
 	color: var(--color-text);
+}
+
+::-webkit-input-placeholder {
+	opacity: 0.5;
 }
 
 .medium-shadow {
