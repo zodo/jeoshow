@@ -44,6 +44,7 @@ const handleClientAppealResolve = (
 			...state.stage,
 			type: 'appeal-result',
 			resolution: true,
+			activePlayer: state.stage.playerId,
 			previousAnswers: {
 				answers: [],
 				triedToAppeal: [],
