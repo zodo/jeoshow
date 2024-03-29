@@ -48,6 +48,7 @@ export class SiqXmlContentParser {
 
 		return {
 			name: r.$?.name ?? '?',
+			comments: r.info?.comments ?? '',
 			themes: themes,
 			type: r.$?.type === 'final' ? 'Final' : 'Standard',
 		}

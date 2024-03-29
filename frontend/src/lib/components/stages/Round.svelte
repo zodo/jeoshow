@@ -20,8 +20,13 @@
 
 <section in:scale={{ duration: 300, easing: quintInOut }}>
 	<div>
+		<div>
+			<div class="round-name">{round.name}</div>
+			{#if round.comments}
+				<div class="round-comment">{round.comments}</div>
+			{/if}
+		</div>
 		<table>
-			<caption>{round.name}</caption>
 			<tbody>
 				{#each round.themes as { name, questions }}
 					<tr>
@@ -60,12 +65,20 @@
 	table {
 		border-collapse: collapse;
 		width: 100%;
-		margin: 0 auto;
+		margin: 1rem auto;
 	}
 
-	table caption {
-		font-size: 1.5em;
-		margin: 0.5em 0 0.75em;
+	.round-name {
+		font-weight: bold;
+		font-size: 1.5rem;
+		text-align: center;
+	}
+
+	.round-comment {
+		margin-top: 0.5rem;
+		font-size: 0.8rem;
+		font-style: italic;
+		text-align: center;
 	}
 
 	tr:not(:last-child) {

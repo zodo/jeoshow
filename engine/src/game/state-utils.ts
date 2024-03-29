@@ -35,6 +35,7 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 			return {
 				type: 'round',
 				name: round.name,
+				comments: round.comments,
 				themes: [
 					...round.themes.map((t) => ({
 						name: t.name,

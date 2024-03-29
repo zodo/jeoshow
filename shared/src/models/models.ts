@@ -17,6 +17,7 @@ export type StageSnapshot =
 	| {
 			type: 'round'
 			name: string
+			comments?: string
 			themes: {
 				name: string
 				questions: {
