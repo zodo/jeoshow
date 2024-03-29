@@ -15,7 +15,7 @@ const handleClientAppealResolve = (
 
 	const resolutions = {
 		...state.stage.resolutions,
-		[state.stage.playerId]: command.action.resolution,
+		[command.playerId]: command.action.resolution,
 	}
 
 	const playerCount = state.players.filter((p) => !p.disconnected).length
@@ -23,12 +23,11 @@ const handleClientAppealResolve = (
 	const agreeSize = Object.values(resolutions).filter((r) => r).length
 	const disagreeSize = Object.values(resolutions).filter((r) => !r).length
 
-	const agreeLimit = (playerCount - 1) / 2
-	const disagreeLimit = playerCount / 2
+	const votesLimit = Math.ceil(playerCount / 2)
 
 	const previousAnswers = state.stage.previousAnswers.answers
 	const appealingPlayerId = state.stage.playerId
-	if (agreeSize >= agreeLimit) {
+	if (agreeSize >= votesLimit) {
 		const newPlayers = state.players.map((p) => {
 			const prevAnswer = previousAnswers.find((a) => a.playerId === p.id)
 			if (prevAnswer && p.id === appealingPlayerId) {
@@ -72,7 +71,7 @@ const handleClientAppealResolve = (
 				},
 			],
 		}
-	} else if (disagreeSize >= disagreeLimit) {
+	} else if (disagreeSize >= votesLimit) {
 		const newStage: Extract<Stage, { type: 'appeal-result' }> = {
 			...state.stage,
 			type: 'appeal-result',
