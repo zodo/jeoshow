@@ -5,38 +5,15 @@
 	export let resolution: boolean
 </script>
 
-<section in:scale={{ duration: 300, easing: quintInOut }}>
-	<h1>Appeal</h1>
+<section
+	class="align-center flex h-full flex-col justify-center text-center"
+	in:scale={{ duration: 300, easing: quintInOut }}
+>
+	<h1 class="mb-4 text-3xl">Appeal</h1>
 
 	{#if resolution}
-		<p class="approved">Approved</p>
+		<p class="text-accent">Approved</p>
 	{:else}
-		<p>No no</p>
+		<p class="text-danger">No no</p>
 	{/if}
 </section>
-
-<style>
-	section {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		height: 100%;
-	}
-
-	h1 {
-		font-size: 2rem;
-		text-align: center;
-		margin: 0;
-	}
-
-	p {
-		color: var(--color-danger);
-		padding: 1rem;
-		display: inline-block;
-	}
-
-	p.approved {
-		color: var(--color-accent);
-	}
-</style>

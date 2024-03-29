@@ -5,7 +5,7 @@
 	"trailingComma": "es5",
 	"bracketSpacing": true,
 	"quoteProps": "as-needed",
-	"plugins": ["prettier-plugin-svelte"],
+	"plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
 	"overrides": [
 		{
 			"files": "*.svelte",
@@ -13,5 +13,7 @@
 				"parser": "svelte"
 			}
 		}
-	]
+	],
+	"tailwindConfig": "./frontend/tailwind.config.js",
+	"tailwindFunctions": ["clsx", "cn"]
 }

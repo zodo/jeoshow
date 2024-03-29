@@ -14,7 +14,7 @@
 	export let userId: string
 </script>
 
-<section>
+<section class="h-full w-full p-4">
 	{#if stage.type === 'before-start'}
 		<BeforeStart on:action />
 	{:else if stage.type === 'round'}
@@ -34,11 +34,3 @@
 		<pre>{JSON.stringify(stage, null, 2)}</pre>
 	{/if}
 </section>
-
-<style>
-	section {
-		width: 100%;
-		height: 100%;
-		padding: 1rem;
-	}
-</style>

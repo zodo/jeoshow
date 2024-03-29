@@ -298,6 +298,7 @@
 	{stage}
 	{players}
 	blinkStage={false}
+	disconnected={false}
 	on:action={(e) => {
 		currentStage++
 		if (currentStage >= stages.length) currentStage = 0

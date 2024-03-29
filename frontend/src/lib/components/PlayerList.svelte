@@ -2,43 +2,22 @@
 	import type { ExtendedPlayer } from '$lib/models'
 	import { flip } from 'svelte/animate'
 	import Player from './Player.svelte'
+	import { cn } from '$lib/style-utils'
 
 	export let players: ExtendedPlayer[] = []
 </script>
 
-<section>
+<section
+	class="flex h-full select-none flex-wrap content-start items-center gap-2 landscape:content-center"
+>
 	{#each players as player (player.id)}
-		<div class="player" class:active={player.active} animate:flip={{ duration: 300 }}>
+		<div
+			class={cn('flex-auto', {
+				'basis-full': player.active,
+			})}
+			animate:flip={{ duration: 300 }}
+		>
 			<Player {player} />
 		</div>
 	{/each}
 </section>
-
-<style>
-	section {
-		display: flex;
-		flex-wrap: wrap;
-		align-items: center;
-		align-content: flex-start;
-		gap: 0.5rem;
-		position: relative;
-		z-index: 0;
-		user-select: none;
-		overflow-x: auto;
-		height: 100%;
-	}
-
-	@media (min-width: 600px) {
-		section {
-			align-content: center;
-		}
-	}
-
-	.player {
-		flex: 1 1 auto;
-	}
-
-	.active {
-		flex: 1 1 100%;
-	}
-</style>

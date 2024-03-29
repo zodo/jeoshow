@@ -1,50 +1,29 @@
 <script lang="ts">
 	import { onMount } from 'svelte'
 	import { fade } from 'svelte/transition'
-	import { quintInOut } from 'svelte/easing'
+	import { linear, quintIn, quintInOut, quintOut } from 'svelte/easing'
+	import { tweened } from 'svelte/motion'
 	export let seconds: number
-	let percentage = 100
+
+	const width = tweened(100, {
+		duration: seconds * 1000,
+		easing: linear,
+	})
+
+	const opacity = tweened(1, {
+		duration: seconds * 1000,
+		easing: quintIn,
+	})
 
 	onMount(() => {
-		setTimeout(() => {
-			percentage -= 100 / seconds
-		}, 100)
-
-		const interval = setInterval(() => {
-			percentage -= 100 / seconds
-			if (percentage <= 0) {
-				percentage = 0
-				clearInterval(interval)
-			}
-		}, 1000)
-
-		return () => {
-			clearInterval(interval) // Cleanup on component destroy
-		}
+		width.set(0)
+		opacity.set(0)
 	})
 </script>
 
-<div class="progress-container" in:fade={{ duration: 1000, easing: quintInOut }}>
+<div class="flex w-full justify-center" in:fade={{ duration: 1000, easing: quintInOut }}>
 	<div
-		class="progress-bar medium-shadow"
-		style="width: {percentage}%; opacity: {percentage / 100}"
+		class="h-4 w-full rounded-3xl bg-accent-dark shadow-md"
+		style="width: {$width}%; opacity: {$opacity}"
 	></div>
 </div>
-
-<style>
-	.progress-container {
-		width: 100%;
-		display: flex;
-		justify-content: center;
-	}
-
-	.progress-bar {
-		background-color: var(--color-accent-dark);
-		width: 100%;
-		height: 1rem;
-		transition:
-			width 1s linear,
-			opacity 1s linear;
-		border-radius: 1.5rem;
-	}
-</style>

@@ -47,9 +47,19 @@
 	}
 </script>
 
-<form on:submit={handleFormSubmit} class="medium-shadow-filter">
-	<input id="pack" type="file" name="pack" on:change={handleInputChange} />
-	<button type="submit" disabled={formLoading || !hasFiles}>
+<form class="flex max-w-full drop-shadow-md" on:submit={handleFormSubmit}>
+	<input
+		class="inline-block h-14 flex-1 rounded-l-2xl bg-neutral p-4 transition-colors hover:bg-accent-dark"
+		id="pack"
+		type="file"
+		name="pack"
+		on:change={handleInputChange}
+	/>
+	<button
+		class="min-w-20 rounded-r-2xl bg-accent p-4 transition-colors hover:bg-accent-dark"
+		type="submit"
+		disabled={formLoading || !hasFiles}
+	>
 		{#if formLoading}
 			{uploadProgress?.toFixed(0)}%
 		{:else}
@@ -59,51 +69,5 @@
 </form>
 
 {#if message}
-	<p>{message}</p>
+	<p class="text-center text-danger">{message}</p>
 {/if}
-
-<style>
-	form {
-		max-width: 100%;
-		display: flex;
-	}
-
-	button {
-		margin: 0;
-		padding: 1rem;
-		border: none;
-		border-radius: 0 1rem 1rem 0;
-		background-color: var(--color-accent);
-		font-size: 1rem;
-		transition: background-color 0.8s;
-		cursor: pointer;
-		min-width: 5rem;
-	}
-
-	button:hover {
-		background-color: var(--color-accent-dark);
-	}
-
-	input {
-		height: 3.5rem;
-		font-size: 1rem;
-		margin: 0;
-		padding: 1rem;
-		border: none;
-		border-radius: 1rem 0 0 1rem; /* Opposite of the button to fit together */
-		background-color: var(--color-neutral);
-		cursor: pointer;
-		display: inline-block; /* Or use flex for better control */
-		transition: background-color 0.8s;
-		flex: 0 1 auto;
-	}
-
-	input:hover {
-		background-color: var(--color-accent-dark);
-	}
-
-	p {
-		text-align: center;
-		color: var(--color-danger);
-	}
-</style>

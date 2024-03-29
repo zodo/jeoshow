@@ -1,19 +1,21 @@
 <script lang="ts">
-	import './app.css'
+	import '../app.css'
 </script>
 
-<div>
+<div class="flex h-full w-full flex-col items-center justify-center p-4">
 	<slot />
 </div>
 
-<style>
-	div {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		height: 100%;
-		width: 100%;
-		padding: 1rem;
+<style lang="postcss">
+	:global(body) {
+		@apply m-0 h-full w-full overflow-hidden overscroll-none bg-background font-sans text-text;
+	}
+
+	:global(html) {
+		@apply h-full w-full;
+	}
+
+	:global(button) {
+		-webkit-tap-highlight-color: transparent;
 	}
 </style>

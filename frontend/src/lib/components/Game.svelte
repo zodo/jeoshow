@@ -7,6 +7,7 @@
 	import Controls from './Controls.svelte'
 	import { scale } from 'svelte/transition'
 	import { quintInOut } from 'svelte/easing'
+	import { cn } from '$lib/style-utils'
 
 	export let userId: string
 	export let players: ExtendedPlayer[] = []
@@ -15,67 +16,24 @@
 	export let blinkStage = false
 </script>
 
-<section in:scale={{ duration: 700, easing: quintInOut }}>
-	<div class="players medium-shadow-filter">
+<section
+	class="grid h-[calc(100vh-2rem)] max-h-[850px] w-full max-w-[950px] select-none grid-cols-[1fr] grid-rows-[fit-content(30%)_1fr_3rem] gap-4 [grid-template-areas:'players''stage''controls'] landscape:grid-cols-[1fr_3.5fr] landscape:grid-rows-[1fr_3rem] landscape:[grid-template-areas:'players_stage''players_controls']"
+	in:scale={{ duration: 700, easing: quintInOut }}
+>
+	<div class="relative overflow-scroll drop-shadow-md [grid-area:players]">
 		<PlayerList {players} />
 	</div>
-	<div class="stage medium-shadow" class:blink={blinkStage}>
+	<div
+		class={cn(
+			'overflow-scroll rounded-3xl  bg-background-darker transition-colors [grid-area:stage]',
+			blinkStage && 'bg-accent transition-none'
+		)}
+	>
 		<Stage {stage} {userId} {players} on:action />
 	</div>
-	<div class="controls">
+	<div class="[grid-area:controls]">
 		<Controls {stage} {userId} on:action />
 	</div>
 
 	<DisconnectedOverlay showOverlay={disconnected} />
 </section>
-
-<style>
-	section {
-		width: 100%;
-		height: calc(100dvh - 2rem);
-		max-width: 950px;
-		max-height: 850px;
-		display: grid;
-		grid-template-rows: fit-content(30%) 1fr 3rem;
-		grid-template-columns: 1fr;
-		grid-template-areas:
-			'players'
-			'stage'
-			'controls';
-		user-select: none;
-		gap: 1rem;
-	}
-
-	@media (orientation: landscape) {
-		section {
-			grid-template-rows: 1fr 3rem;
-			grid-template-columns: 1fr 3.5fr;
-			grid-template-areas:
-				'players stage'
-				'players controls';
-		}
-	}
-
-	.players {
-		grid-area: players;
-		position: relative;
-		overflow: scroll;
-	}
-
-	.stage {
-		grid-area: stage;
-		overflow: scroll;
-		background-color: var(--color-background-darker);
-		border-radius: 1.5rem;
-		transition: background-color 0.5s;
-	}
-
-	.blink {
-		background-color: var(--color-accent);
-		transition: none;
-	}
-
-	.controls {
-		grid-area: controls;
-	}
-</style>

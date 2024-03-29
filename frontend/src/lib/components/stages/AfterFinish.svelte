@@ -6,47 +6,18 @@
 	export let players: ExtendedPlayer[] = []
 </script>
 
-<section>
-	<div in:scale={{ duration: 300, easing: quintInOut }}>
-		<h1>Готово</h1>
+<section
+	class="align-center flex h-full flex-col justify-center-safe"
+	in:scale={{ duration: 300, easing: quintInOut }}
+>
+	<h1 class="text-center text-xl font-bold">Готово</h1>
 
-		<table>
-			{#each players as player (player.id)}
-				<tr>
-					<td>{player.score}</td>
-					<td>{player.name}</td>
-				</tr>
-			{/each}
-		</table>
-	</div>
+	<table class="mt-4 border-collapse">
+		{#each players as player (player.id)}
+			<tr>
+				<td class="border-2 border-neutral p-2 text-right">{player.score}</td>
+				<td class="border-2 border-neutral p-2">{player.name}</td>
+			</tr>
+		{/each}
+	</table>
 </section>
-
-<style>
-	section {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		height: 100%;
-	}
-
-	h1 {
-		font-size: 2rem;
-		text-align: center;
-		margin: 0;
-	}
-
-	table {
-		margin-top: 20px;
-		border-collapse: collapse;
-	}
-
-	td {
-		padding: 10px;
-		border: 1px solid var(--color-neutral);
-	}
-
-	td:first-child {
-		text-align: right;
-	}
-</style>

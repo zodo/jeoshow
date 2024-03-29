@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { ExtendedPlayer } from '$lib/models'
-	import { slide } from 'svelte/transition'
-	import { backInOut, cubicOut, quintOut } from 'svelte/easing'
+	import { cubicOut } from 'svelte/easing'
 	import { tweened } from 'svelte/motion'
+	import { cn } from '$lib/style-utils'
 
 	export let player: ExtendedPlayer
 
@@ -19,20 +19,30 @@
 </script>
 
 <div
-	class="badge"
-	class:disconnected={player.disconnected}
-	class:hit={player.pressedButton === 'hit'}
-	class:false-start={player.pressedButton === 'false-start'}
-	class:has-messages={player.messages.length > 0}
-	class:active={player.active}
+	class={cn(
+		'flex w-full justify-between rounded-2xl bg-neutral px-2 py-0.5 transition-colors duration-1000',
+		{
+			'text-slate-600 opacity-60': player.disconnected,
+			'bg-danger transition-none': player.pressedButton === 'hit',
+			'bg-warn transition-none': player.pressedButton === 'false-start',
+			'bg-accent': player.active,
+		}
+	)}
 >
-	<div title={player.name} class="name">{player.name}</div>
-	<div class="score">
+	<div class="inline-block overflow-ellipsis text-nowrap align-middle" title={player.id}>
+		{player.name}
+	</div>
+	<div class="ml-1 inline-block align-middle font-bold">
 		{$score.toFixed(0)}
 	</div>
 
 	{#if player.disconnected}
-		<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+		<svg
+			class="inline-block h-6 w-6 align-middle"
+			viewBox="0 0 28 28"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
 			<path
 				d="M22.7399 6.32717C24.3781 8.48282 24.2132 11.571 22.2453 13.5389L20.3007 15.4835C20.0078 15.7764 19.533 15.7764 19.2401 15.4835L12.5226 8.76595C12.2297 8.47306 12.2297 7.99818 12.5226 7.70529L14.4671 5.76075C16.4352 3.79268 19.5237 3.62792 21.6793 5.26646L24.7238 2.22166C25.0167 1.92875 25.4916 1.92873 25.7845 2.22161C26.0774 2.51449 26.0774 2.98936 25.7845 3.28227L22.7399 6.32717ZM19.7704 13.8925L21.1846 12.4783C22.7467 10.9162 22.7467 8.3835 21.1846 6.82141C19.6225 5.25931 17.0899 5.25931 15.5278 6.82141L14.1135 8.23562L19.7704 13.8925Z"
 				fill="#999"
@@ -43,93 +53,4 @@
 			/>
 		</svg>
 	{/if}
-
-	<div class="messages">
-		{#each player.messages as message}
-			<div
-				class="message"
-				transition:slide={{
-					delay: 0,
-					duration: 500,
-					easing: quintOut,
-					axis: 'y',
-				}}
-			>
-				{message}
-			</div>
-		{/each}
-	</div>
 </div>
-
-<style>
-	.badge {
-		width: 100%;
-		--badge-background: var(--color-neutral);
-		background-color: var(--badge-background);
-		padding: 0.3rem 0.5rem;
-		border-radius: 1.5rem;
-		transition: background-color 0.8s;
-		position: relative;
-		display: flex;
-		justify-content: space-between;
-	}
-
-	.score {
-		font-weight: bold;
-		margin-left: 0.2rem;
-		display: inline-block;
-		vertical-align: middle;
-	}
-
-	.name {
-		text-wrap: nowrap;
-		text-overflow: ellipsis;
-		overflow: hidden;
-		display: inline-block;
-		vertical-align: middle;
-	}
-
-	.disconnected {
-		color: #999;
-	}
-
-	.active {
-		--badge-background: var(--color-accent);
-	}
-
-	.hit {
-		--badge-background: var(--color-danger);
-		transition: none;
-	}
-
-	.false-start {
-		--badge-background: var(--color-warn);
-		transition: none;
-	}
-
-	svg {
-		display: inline-block;
-		width: 1lh;
-		height: 1lh;
-		vertical-align: middle;
-	}
-
-	.has-messages {
-		border-radius: 1.5rem 1.5rem 1.5rem 0;
-	}
-
-	.message {
-		background-color: #eee;
-		border-radius: 0 1rem 1rem 1rem;
-		padding: 0.3rem 0.5rem;
-		margin-top: 0.2rem;
-		width: fit-content;
-	}
-
-	.messages {
-		position: absolute;
-		left: 0rem;
-		top: 100%;
-		z-index: 2;
-	}
-</style>

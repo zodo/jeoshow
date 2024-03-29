@@ -27,61 +27,29 @@
 </script>
 
 {#if errorMessage}
-	<section>
+	<section class="flex max-w-full flex-col items-center">
 		<p>{errorMessage}</p>
 		<a href="/">Go home</a>
 	</section>
 {:else if joinedGame}
 	<InteractiveGame {gameCode} {userId} {playerName} />
 {:else}
-	<section>
-		<div class="text-to-copy">{$page.url}</div>
-		<form on:submit|preventDefault={handleJoin} class="medium-shadow-filter">
+	<section class="flex max-w-full flex-col items-center">
+		<div class="mb-4 font-mono">{$page.url}</div>
+		<form class="flex drop-shadow-md" on:submit|preventDefault={handleJoin}>
 			<input
+				class="rounded-l-2xl bg-neutral p-4"
 				name="somerandom"
 				type="text"
 				bind:value={playerName}
 				autocomplete="off"
 				placeholder={loadedFromLocalStorage ? 'Your name' : ''}
 			/>
-			<button type="submit" disabled={!isNameValid(playerName)}>Join</button>
+			<button
+				class="rounded-r-2xl bg-accent p-4"
+				type="submit"
+				disabled={!isNameValid(playerName)}>Join</button
+			>
 		</form>
 	</section>
 {/if}
-
-<style>
-	section {
-		max-width: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-	}
-
-	form {
-		display: flex;
-	}
-
-	button {
-		margin: 0;
-		padding: 1rem;
-		border: none;
-		border-radius: 0 1rem 1rem 0;
-		background-color: var(--color-accent);
-		font-size: 1rem;
-		cursor: pointer;
-	}
-
-	input {
-		font-size: 1rem;
-		margin: 0;
-		padding: 1rem;
-		border: none;
-		border-radius: 1rem 0 0 1rem;
-		background-color: var(--color-neutral);
-	}
-
-	.text-to-copy {
-		margin-bottom: 1rem;
-		font-family: var(--font-mono);
-	}
-</style>

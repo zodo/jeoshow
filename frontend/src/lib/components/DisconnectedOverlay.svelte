@@ -3,8 +3,15 @@
 </script>
 
 {#if showOverlay}
-	<div class="overlay shake-slow">
-		<svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+	<div
+		class="align-center fixed left-0 top-0 z-50 flex h-dvh w-screen justify-center bg-slate-200 bg-opacity-50 backdrop-blur-sm"
+	>
+		<svg
+			class="max-w-screen m-12 aspect-square w-72 animate-pulse drop-shadow-xl"
+			viewBox="0 0 28 28"
+			fill="none"
+			xmlns="http://www.w3.org/2000/svg"
+		>
 			<path
 				d="M22.7399 6.32717C24.3781 8.48282 24.2132 11.571 22.2453 13.5389L20.3007 15.4835C20.0078 15.7764 19.533 15.7764 19.2401 15.4835L12.5226 8.76595C12.2297 8.47306 12.2297 7.99818 12.5226 7.70529L14.4671 5.76075C16.4352 3.79268 19.5237 3.62792 21.6793 5.26646L24.7238 2.22166C25.0167 1.92875 25.4916 1.92873 25.7845 2.22161C26.0774 2.51449 26.0774 2.98936 25.7845 3.28227L22.7399 6.32717ZM19.7704 13.8925L21.1846 12.4783C22.7467 10.9162 22.7467 8.3835 21.1846 6.82141C19.6225 5.25931 17.0899 5.25931 15.5278 6.82141L14.1135 8.23562L19.7704 13.8925Z"
 				fill="#fff"
@@ -16,37 +23,3 @@
 		</svg>
 	</div>
 {/if}
-
-<style>
-	.overlay {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100vw;
-		height: 100dvh;
-		background-color: rgba(0, 0, 0, 0.5);
-		backdrop-filter: blur(5px);
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		z-index: 1000;
-	}
-
-	@keyframes pulse {
-		0%,
-		100% {
-			transform: scale(1); /* Original size */
-		}
-		50% {
-			transform: scale(0.9); /* Shrink to 80% of its size */
-		}
-	}
-
-	svg {
-		width: max(10rem, 20vw);
-		aspect-ratio: 1/1;
-		filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.7))
-			drop-shadow(0 0 12px rgba(0, 0, 0, 0.3));
-		animation: pulse 1s infinite ease-in-out;
-	}
-</style>

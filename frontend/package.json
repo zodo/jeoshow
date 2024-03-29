@@ -17,10 +17,14 @@
 		"@sveltejs/adapter-cloudflare": "^4.2.0",
 		"@sveltejs/kit": "^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
+		"autoprefixer": "^10.4.19",
 		"esbuild": "0.19.12",
+		"postcss": "^8.4.38",
 		"svelte": "^4.2.7",
 		"svelte-check": "^3.6.0",
 		"svelte-keydown": "^0.7.0",
+		"tailwind-safe-container": "^1.0.0",
+		"tailwindcss": "^3.4.3",
 		"tslib": "^2.4.1",
 		"typescript": "^5.0.0",
 		"vite": "^5.0.3",
@@ -29,6 +33,8 @@
 	"type": "module",
 	"license": "WTFPL",
 	"dependencies": {
+		"tailwind-merge": "^2.2.2",
+		"clsx": "^2.1.0",
 		"jszip": "^3.10.1",
 		"partysocket": "^1.0.1"
 	}

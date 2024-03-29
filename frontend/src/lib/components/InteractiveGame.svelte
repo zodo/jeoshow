@@ -58,17 +58,7 @@
 {#if stage}
 	<Game {userId} {players} {stage} {disconnected} {blinkStage} on:action={handleStageEvent} />
 {:else}
-	<section>
+	<section class="align-center flex h-dvh justify-center">
 		<p>Loading...</p>
 	</section>
 {/if}
-
-<style>
-	section {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
-		height: 100dvh;
-	}
-</style>

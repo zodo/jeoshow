@@ -22,37 +22,43 @@
 	const dispatch = createEventDispatcher<SvelteCustomEvent>()
 </script>
 
-<section in:scale={{ duration: 300, easing: quintInOut }}>
-	<div class="header">Appeal</div>
+<section
+	class="align-center flex h-full flex-col justify-center"
+	in:scale={{ duration: 300, easing: quintInOut }}
+>
+	<div class="font-xl text-center font-bold">Appeal</div>
 
-	<div class="content">
-		<div class="answers">
-			<p>{appealingUserName}: {appeal.answer}</p>
-			<p>Pack author: {appeal.model.answers.correct.join('. ')}</p>
+	<div class="mt-4">
+		<div>
+			<p>{appealingUserName}: <span class="font-bold">{appeal.answer}</span></p>
+			<p>
+				Pack author: <span class="font-bold">{appeal.model.answers.correct.join('; ')}</span
+				>
+			</p>
 		</div>
-		<div class="votes">
-			<div>
-				<div class="player-names">
+		<div class="flex">
+			<div class="flex flex-1 flex-col justify-between">
+				<div class="m-4">
 					{#each agreePlayerNames as player}
 						<div>{player}</div>
 					{/each}
 				</div>
 				<button
-					class="agree"
+					class="rounded-bl-2xl bg-warn px-4 py-2"
 					disabled={appeal.playerId === userId}
 					on:click={() =>
 						dispatch('action', { type: 'appeal-resolve', resolution: true })}
 					>Agree</button
 				>
 			</div>
-			<div>
-				<div class="player-names">
+			<div class="flex flex-1 flex-col justify-between">
+				<div class="m-4 text-right">
 					{#each disagreePlayerNames as player}
 						<div>{player}</div>
 					{/each}
 				</div>
 				<button
-					class="disagree"
+					class="rounded-br-2xl bg-danger px-4 py-2"
 					disabled={appeal.playerId === userId}
 					on:click={() =>
 						dispatch('action', { type: 'appeal-resolve', resolution: false })}
@@ -62,75 +68,7 @@
 		</div>
 	</div>
 
-	<div class="progress">
+	<div class="mt-4">
 		<Progress seconds={appeal.timeoutSeconds} />
 	</div>
 </section>
-
-<style>
-	.progress {
-		width: 100%;
-		height: 3.5rem;
-		padding: 1rem;
-	}
-
-	.header {
-		font-weight: bold;
-		font-size: 1.5rem;
-		text-align: center;
-	}
-
-	section {
-		height: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	.content {
-		width: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		font-size: 1.2rem;
-	}
-
-	.votes {
-		display: flex;
-		justify-content: space-around;
-	}
-
-	.votes > div {
-		flex: 1 1 50%;
-		display: flex;
-		flex-direction: column;
-		justify-content: space-between;
-	}
-
-	.player-names {
-		margin: 1rem;
-	}
-
-	.votes > div:last-child .player-names {
-		text-align: right;
-	}
-
-	button {
-		padding: 0.5rem 1rem;
-		font-size: 1rem;
-		border: none;
-		cursor: pointer;
-	}
-
-	button.agree {
-		background-color: var(--color-accent);
-		border-radius: 0 0 0 1rem;
-	}
-
-	button.disagree {
-		background-color: var(--color-danger);
-		border-radius: 0 0 1rem 0;
-	}
-</style>

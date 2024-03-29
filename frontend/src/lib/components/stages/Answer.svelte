@@ -5,28 +5,10 @@
 	export let answer: Extract<StageSnapshot, { type: 'answer' }>
 </script>
 
-<section>
-	<div class="theme">{answer.theme}</div>
+<section class="grid h-full grid-rows-[min-content_1fr_min-content]">
+	<div class="font-xl text-center font-bold">{answer.theme}</div>
 
-	<div class="fragments">
+	<div class="overflow-scroll">
 		<MediaFragment fragments={answer.model.content} on:action />
 	</div>
 </section>
-
-<style>
-	section {
-		display: grid;
-		grid-template-rows: min-content 1fr;
-		height: 100%;
-	}
-
-	.theme {
-		font-weight: bold;
-		font-size: 1.5rem;
-		text-align: center;
-	}
-
-	.fragments {
-		overflow: scroll;
-	}
-</style>
