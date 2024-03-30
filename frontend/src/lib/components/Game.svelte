@@ -17,7 +17,7 @@
 </script>
 
 <section
-	class="grid h-[calc(100vh-2rem)] max-h-[850px] w-full max-w-[950px] select-none grid-cols-[1fr] grid-rows-[fit-content(30%)_1fr_3rem] gap-4 [grid-template-areas:'players''stage''controls'] landscape:grid-cols-[1fr_3.5fr] landscape:grid-rows-[1fr_3rem] landscape:[grid-template-areas:'players_stage''players_controls']"
+	class="grid h-[calc(100dvh_-_2rem)] max-h-[850px] w-full max-w-[950px] select-none grid-cols-[1fr] grid-rows-[fit-content(30%)_1fr_3rem] gap-4 [grid-template-areas:'players''stage''controls'] landscape:grid-cols-[1fr_3.5fr] landscape:grid-rows-[1fr_3rem] landscape:[grid-template-areas:'players_stage''players_controls']"
 	in:scale={{ duration: 700, easing: quintInOut }}
 >
 	<div class="relative overflow-scroll drop-shadow-md [grid-area:players]">
