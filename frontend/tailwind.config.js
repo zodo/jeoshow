@@ -32,18 +32,14 @@ export default {
 		},
 		extend: {
 			colors: {
-				background: {
-					DEFAULT: '#fdf6e3',
-					darker: '#f3e0c3',
-				},
-				danger: '#ff6b6b',
-				warn: '#ffd166',
-				accent: {
-					DEFAULT: '#ffad5a',
-					dark: '#f57c00',
-				},
-				neutral: '#b8a398',
-				text: '#4e342e',
+				background: 'var(--color-background)',
+				'background-darker': 'var(--color-background-darker)',
+				danger: 'var(--color-danger)',
+				warn: 'var(--color-warn)',
+				accent: 'var(--color-accent)',
+				'accent-dark': 'var(--color-accent-dark)',
+				neutral: 'var(--color-neutral)',
+				text: 'var(--color-text)',
 			},
 		},
 	},

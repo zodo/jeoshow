@@ -521,6 +521,18 @@
     svelte-hmr "^0.15.3"
     vitefu "^0.2.5"
 
+"@twa-dev/sdk@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@twa-dev/sdk/-/sdk-7.0.0.tgz#6d4dafe856efbe188bd09e1bb286d5af8ec80d67"
+  integrity sha512-OZvqGGrdrgE0xU/IGjvsGKKouia5bTu6rA/BOOU6pJYLu776nQJs/HNFl7lwW16RONf1vvPqeV8XximsuzZ9Iw==
+  dependencies:
+    "@twa-dev/types" "^7.0.0"
+
+"@twa-dev/types@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@twa-dev/types/-/types-7.0.0.tgz#4bfa26472144704a12ec9a4bf91f90918afcaba0"
+  integrity sha512-LBnMklxORuXd/ypv9gFKcQVNJkCktkeuU+2V6B5Ww7dcxDCoYBAKkNnIwEQ3cShq+cxTi96jC/CqWhgDMQ7AXQ==
+
 "@types/cookie@^0.6.0":
   version "0.6.0"
   resolved "https://registry.yarnpkg.com/@types/cookie/-/cookie-0.6.0.tgz#eac397f28bf1d6ae0ae081363eca2f425bedf0d5"

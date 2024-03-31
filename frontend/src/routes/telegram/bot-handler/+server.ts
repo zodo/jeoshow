@@ -1,7 +1,8 @@
-import { TELEGRAM_BOT_API_SECRET_TOKEN, TELEGRAM_BOT_TOKEN } from '$env/static/private'
+import { TELEGRAM_BOT_API_SECRET_TOKEN } from '$env/static/private'
+import { TelegramClient } from '$lib/server/tg-client'
 import type { Update } from '@grammyjs/types'
 
-export const POST = async ({ request, params, platform }) => {
+export const POST = async ({ request }) => {
 	if (!isTelegramRequest(request.headers)) {
 		return new Response('Unauthorized', { status: 401 })
 	}
@@ -9,17 +10,11 @@ export const POST = async ({ request, params, platform }) => {
 	const update = (await request.json()) as Update
 	const message = update.message!! // only message updates enabled
 
-	if (message.text === '/start') {
-		await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				chat_id: message.chat.id,
-				text: "Hello, I'm working!",
-			}),
-		})
+	try {
+		await TelegramClient.sendMessage(message.chat.id, 'Hello! Open the menu')
+	} catch (e) {
+		console.error(e)
+		await TelegramClient.sendMessage(message.chat.id, 'Error occurred. Please try again later.')
 	}
 
 	return new Response('OK', { status: 200 })

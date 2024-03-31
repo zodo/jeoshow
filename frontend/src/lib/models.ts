@@ -12,3 +12,7 @@ export type ExtendedPlayer = {
 export type PlayerMessage = { playerId: string; text: string }
 
 export type PlayerButtonHit = { playerId: string; type: 'hit' | 'false-start' }
+
+export type FileUploaderEvent = {
+	'game-created': { gameId: string }
+}

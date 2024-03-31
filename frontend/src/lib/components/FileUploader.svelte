@@ -1,7 +1,11 @@
 <script lang="ts">
-	import type { ChangeEventHandler, EventHandler } from 'svelte/elements'
+	import type { ChangeEventHandler } from 'svelte/elements'
 	import { goto } from '$app/navigation'
 	import { createGame, uploadPack } from '$lib/pack-uploader'
+	import { createEventDispatcher } from 'svelte'
+	import type { FileUploaderEvent } from '$lib/models'
+
+	const dispatch = createEventDispatcher<FileUploaderEvent>()
 
 	let formLoading = false
 	let hasFiles = false
@@ -33,7 +37,7 @@
 			console.log(`Pack uploaded, creating game`)
 			const gameId = await createGame(packId)
 			console.log(`Game created: ${gameId}`)
-			goto(`/game/${gameId}`)
+			dispatch('game-created', { gameId })
 		} catch (e) {
 			console.error(e)
 			if (e instanceof Error) {
