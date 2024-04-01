@@ -7,6 +7,7 @@
 	let gameCode = $webApp.initDataUnsafe.start_param
 	let userId = $webApp.initDataUnsafe.user?.id?.toString()
 	let playerName = $webApp.initDataUnsafe.user?.first_name
+	let avatarUrl = `/telegram/user-photo/${userId}`
 </script>
 
 {#if !gameCode}
@@ -16,5 +17,5 @@
 {:else if !playerName}
 	<p>User name is not provided</p>
 {:else}
-	<InteractiveGame {gameCode} {userId} {playerName} />
+	<InteractiveGame {gameCode} {userId} {playerName} {avatarUrl} />
 {/if}

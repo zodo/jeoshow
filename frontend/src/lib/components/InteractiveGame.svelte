@@ -10,6 +10,7 @@
 	export let gameCode: string
 	export let userId: string
 	export let playerName: string
+	export let avatarUrl: string | undefined = undefined
 
 	let wsClient: WebSocketGameClient
 	let gameState: GameState
@@ -33,8 +34,8 @@
 		})
 
 		wsClient.onConnect(() => {
-			console.log('Connected to WS')
-			wsClient.sendMessage({ type: 'introduce', name: playerName })
+			console.log('Connected to WS', playerName, avatarUrl)
+			wsClient.sendMessage({ type: 'introduce', name: playerName, avatarUrl })
 		})
 
 		wsClient.onMessage((message: GameEvent) => {

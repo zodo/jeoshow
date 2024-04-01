@@ -20,7 +20,7 @@
 
 <div
 	class={cn(
-		'flex w-full justify-between rounded-2xl bg-neutral px-2 py-0.5 transition-colors duration-1000',
+		'flex min-w-0 max-w-full items-center justify-between gap-2 rounded-2xl bg-neutral px-2 py-0.5 transition-colors duration-1000',
 		{
 			'text-slate-600 opacity-60': player.disconnected,
 			'bg-danger transition-none': player.pressedButton === 'hit',
@@ -29,16 +29,22 @@
 		}
 	)}
 >
-	<div class="inline-block overflow-ellipsis text-nowrap align-middle" title={player.id}>
+	{#if player.avatarUrl}
+		<img src={player.avatarUrl} alt="Player avatar" class="h-5 w-5 flex-none rounded-full" />
+	{/if}
+	<div
+		class="w-12 flex-1 overflow-hidden overflow-ellipsis whitespace-nowrap"
+		title={player.name}
+	>
 		{player.name}
 	</div>
-	<div class="ml-1 inline-block align-middle font-bold">
+	<div class="flex-none font-bold">
 		{$score.toFixed(0)}
 	</div>
 
 	{#if player.disconnected}
 		<svg
-			class="inline-block h-6 w-6 align-middle"
+			class="h-5 w-5 flex-none"
 			viewBox="0 0 28 28"
 			fill="none"
 			xmlns="http://www.w3.org/2000/svg"

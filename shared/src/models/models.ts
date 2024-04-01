@@ -3,6 +3,7 @@ import type { PackModel } from './siq'
 export interface Player {
 	id: string
 	name: string
+	avatarUrl?: string
 	score: number
 	disconnected: boolean
 }

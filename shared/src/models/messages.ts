@@ -1,7 +1,7 @@
 import type { Player, StageSnapshot } from './models'
 
 export type ClientAction =
-	| { type: 'introduce'; name: string }
+	| { type: 'introduce'; name: string; avatarUrl?: string }
 	| { type: 'game-start' }
 	| { type: 'question-select'; questionId: string }
 	| { type: 'button-hit' }

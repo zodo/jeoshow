@@ -26,7 +26,8 @@
 		let tmpPlayers: ExtendedPlayer[] = [
 			{
 				id: 'userId',
-				name: 'Player 1 long name very',
+				name: 'Player 1 long name very, I mean, really long name',
+				avatarUrl: '/telegram/user-photo/5000362861',
 				score: 0,
 				disconnected: false,
 				pressedButton: $randomBoolean ? 'hit' : null,
