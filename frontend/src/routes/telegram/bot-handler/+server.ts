@@ -11,10 +11,9 @@ export const POST = async ({ request }) => {
 	const update = (await request.json()) as Update
 
 	try {
-		const message = update.message!! // only message updates enabled
-		if (message.text === '/start' || message.text === '/join') {
+		if (update.message && update.message.text === '/start') {
 			const response = await TelegramClient.sendMessage(
-				message.chat.id,
+				update.message.chat.id,
 				'Hello! Upload siq pack. Download packs from https://sigame.xyz/',
 				{
 					inline_keyboard: [
