@@ -64,9 +64,11 @@
 	}
 </script>
 
-<h1 class="mb-4 text-2xl text-text">Choose siq file</h1>
-<input class="text-text" type="file" name="pack" on:change={handleInputChange} />
-<pre>{$webApp.initDataUnsafe?.query_id}</pre>
+<h1 class="mb-4 text-xl text-text">Загрузи пак</h1>
+
+<div class="bg-bg-secondary rounded-lg p-4">
+	<input class="text-text" type="file" name="pack" on:change={handleInputChange} />
+</div>
 {#if message}
 	<p class="text-center text-danger">{message}</p>
 {/if}

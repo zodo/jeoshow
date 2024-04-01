@@ -4,7 +4,7 @@
 
 <style lang="postcss">
 	:global(body) {
-		@apply m-0 h-full w-full overflow-hidden overscroll-none bg-background font-sans text-text;
+		@apply bg-bg-main text-text-normal m-0 h-full w-full overflow-hidden overscroll-none font-sans;
 	}
 
 	:global(html) {
@@ -12,13 +12,16 @@
 	}
 
 	:global(:root) {
-		--color-background: #fdf6e3;
-		--color-background-darker: #f3e0c3;
+		--color-bg-main: #fdf6e3;
+		--color-bg-secondary: #f3e0c3;
+		--color-bg-section: #f3e0c3;
 		--color-danger: #ff6b6b;
 		--color-warn: #ffd166;
-		--color-accent: #ffad5a;
-		--color-accent-dark: #f57c00;
-		--color-neutral: #b8a398;
-		--color-text: #4e342e;
+		--color-bg-accent: #ffad5a;
+		--color-text-accent: #fff;
+		--color-text-neutral: #b8a398;
+		--color-text-normal: #4e342e;
+		--color-text-section-header: #4e342e;
+		--height: min(850px, 100dvh);
 	}
 </style>

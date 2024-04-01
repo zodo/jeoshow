@@ -1,7 +1,10 @@
 import type { ClientAction } from 'shared/models/messages'
 import type { Player } from 'shared/models/models'
 
-export type SvelteCustomEvent = { action: ClientAction }
+export type SvelteCustomEvent = {
+	action: ClientAction
+	haptic: 'light' | 'medium' | 'success' | 'warning'
+}
 
 export type ExtendedPlayer = {
 	pressedButton: 'hit' | 'false-start' | null

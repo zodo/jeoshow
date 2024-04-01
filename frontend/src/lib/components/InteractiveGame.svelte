@@ -1,16 +1,19 @@
 <script lang="ts">
-	import { onMount } from 'svelte'
+	import { createEventDispatcher, onMount } from 'svelte'
 	import { WebSocketGameClient } from '$lib/ws-client'
 	import Game from './Game.svelte'
 	import { GameState } from '$lib/game-state'
 	import type { ClientAction, GameEvent } from 'shared/models/messages'
 	import type { StageSnapshot } from 'shared/models/models'
-	import type { ExtendedPlayer } from '$lib/models'
+	import type { ExtendedPlayer, SvelteCustomEvent } from '$lib/models'
 
 	export let gameCode: string
 	export let userId: string
 	export let playerName: string
 	export let avatarUrl: string | undefined = undefined
+	export let showPlayers = true
+
+	const dispatch = createEventDispatcher<SvelteCustomEvent>()
 
 	let wsClient: WebSocketGameClient
 	let gameState: GameState
@@ -31,6 +34,9 @@
 		})
 		gameState.stageBlink.subscribe((blink) => {
 			blinkStage = blink
+			if (blink) {
+				dispatch('haptic', 'medium')
+			}
 		})
 
 		wsClient.onConnect(() => {
@@ -53,13 +59,24 @@
 
 	const handleStageEvent = (event: CustomEvent<ClientAction>) => {
 		wsClient.sendMessage(event.detail)
+		if (event.detail.type === 'button-hit') {
+			dispatch('haptic', 'light')
+		}
 	}
 </script>
 
 {#if stage}
-	<Game {userId} {players} {stage} {disconnected} {blinkStage} on:action={handleStageEvent} />
+	<Game
+		{userId}
+		{players}
+		{stage}
+		{disconnected}
+		{blinkStage}
+		{showPlayers}
+		on:action={handleStageEvent}
+	/>
 {:else}
-	<section class="align-center flex h-dvh justify-center">
+	<section class="align-center flex h-[var(--height)] justify-center">
 		<p>Loading...</p>
 	</section>
 {/if}

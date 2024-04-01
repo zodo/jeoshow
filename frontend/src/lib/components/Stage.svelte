@@ -14,7 +14,7 @@
 	export let userId: string
 </script>
 
-<section class="h-full w-full p-4">
+<section class="h-full w-full p-2">
 	{#if stage.type === 'before-start'}
 		<BeforeStart on:action />
 	{:else if stage.type === 'round'}

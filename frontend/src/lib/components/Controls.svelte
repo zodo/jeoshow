@@ -63,9 +63,9 @@
 	{#if showHitButton}
 		<button
 			class={cn(
-				'h-12 w-full cursor-pointer rounded-3xl border-none bg-neutral text-2xl  shadow-md transition-colors duration-1000  active:bg-danger active:transition-none',
+				'bg-bg-secondary h-10 w-full cursor-pointer rounded-lg border-none text-xl transition-colors duration-1000  active:bg-danger active:transition-none',
 				{
-					'bg-accent': buttonReadyForHit,
+					'bg-bg-accent text-text-accent': buttonReadyForHit,
 				},
 				{
 					'bg-danger transition-none': buttonActive,
@@ -78,37 +78,46 @@
 			in:scale={{ duration: 300, easing: quintInOut }}
 			bind:this={hitButton}
 		>
-			Hit
+			ЖМИ!
 		</button>
 	{/if}
 	{#if showAppealButton}
 		<button
-			class="h-12 w-full cursor-pointer rounded-3xl border-none bg-warn text-2xl shadow-md"
+			class="h-10 w-full cursor-pointer rounded-lg border-none bg-warn text-xl shadow-md"
 			on:click={() => dispatch('action', { type: 'appeal-start' })}
 			in:scale={{ duration: 300, easing: quintInOut }}
 		>
-			Appeal!
+			Я БЫЛ ПРАВ!
 		</button>
 	{/if}
 	{#if showAnswerInput}
-		<div class="w-full drop-shadow-md" in:scale={{ duration: 300, easing: quintInOut }}>
+		<div class="relative w-full" in:scale={{ duration: 300, easing: quintInOut }}>
 			<form
-				class="flex h-12"
+				class="flex h-10"
 				on:submit|preventDefault={() =>
 					dispatch('action', { type: 'answer-give', value: answer })}
 			>
 				<input
-					class="h-full flex-1 rounded-l-3xl p-2 text-center font-serif text-xl"
+					class="bg-bg-secondary text-text-normal h-full flex-1 rounded-lg p-2 pr-12 text-center font-serif"
 					type="text"
-					placeholder="Your answer"
+					placeholder="Пиши ответ"
 					bind:value={answer}
 					bind:this={answerInput}
 				/>
-				<button
-					class="rounded-r-3xl bg-warn px-4 py-2 transition-colors hover:bg-accent"
-					disabled={!answer}
-				>
-					Give answer
+				<button class="absolute right-0 px-2 py-1" disabled={!answer}>
+					<svg
+						class="text-text-normal h-8 w-8 rotate-90"
+						aria-hidden="true"
+						xmlns="http://www.w3.org/2000/svg"
+						fill="currentColor"
+						viewBox="0 0 24 24"
+					>
+						<path
+							fill-rule="evenodd"
+							d="M12 2a1 1 0 0 1 .932.638l7 18a1 1 0 0 1-1.326 1.281L13 19.517V13a1 1 0 1 0-2 0v6.517l-5.606 2.402a1 1 0 0 1-1.326-1.281l7-18A1 1 0 0 1 12 2Z"
+							clip-rule="evenodd"
+						/>
+					</svg>
 				</button>
 			</form>
 		</div>

@@ -6,7 +6,7 @@
 	export let question: Extract<StageSnapshot, { type: 'question' }>
 </script>
 
-<section class="grid h-full grid-rows-[min-content_1fr_min-content]">
+<section class="grid h-full grid-rows-[min-content_1fr_min-content] gap-2">
 	<div class="text-center">
 		<div class="text-xl font-bold">{question.theme}</div>
 		{#if question.themeComment}

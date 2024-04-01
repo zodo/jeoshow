@@ -30,7 +30,7 @@ const handlePlayerDisconnect = (
 					type: 'server',
 					action: { type: 'state-cleanup' },
 				},
-				delaySeconds: 60,
+				delaySeconds: 3600,
 			},
 		],
 	}

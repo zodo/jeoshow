@@ -9,7 +9,7 @@
 
 <section class="flex h-full items-center justify-center">
 	<button
-		class="rounded-xl bg-accent px-8 py-4 text-lg shadow-md transition-colors hover:bg-accent-dark"
+		class="bg-bg-accent text-text-accent rounded-lg px-8 py-2 text-lg shadow-md transition-colors"
 		in:scale={{ duration: 300, easing: quintInOut }}
 		on:click={() => dispatch('action', { type: 'game-start' })}
 	>

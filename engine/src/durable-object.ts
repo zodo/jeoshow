@@ -48,7 +48,8 @@ class GameDurableObject {
 	}
 
 	async webSocketClose(ws: WebSocket, code: number, reason: string, wasClean: boolean) {
-		ws.close(code, 'Durable Object is closing WebSocket')
+		const closeCode = code === 1005 ? 1000 : code
+		ws.close(closeCode, 'Durable Object is closing WebSocket')
 		const userId = this.state.getTags(ws)[0]
 		const command: ServerCommand.OfType<'player-disconnect'> = {
 			type: 'server',

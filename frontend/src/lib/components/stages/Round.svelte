@@ -20,36 +20,35 @@
 </script>
 
 <section
-	class="flex h-full select-none items-center justify-center"
+	class="grid h-full w-full select-none grid-rows-[min-content_1fr] gap-2"
 	in:scale={{ duration: 300, easing: quintInOut }}
 >
-	<div class="w-full overflow-x-auto">
-		<div class="text-center">
-			<div class="text-xl font-bold">{round.name}</div>
-			{#if round.comments}
-				<div class="mt-2 text-sm italic">{round.comments}</div>
-			{/if}
-		</div>
-		<table class="mx-auto my-4 w-full border-collapse">
-			<tbody>
-				{#each round.themes as { name, questions }}
-					<tr class="border-b-2 border-b-neutral last:border-none">
-						<td class="max-w-40 px-3 py-2 text-left transition-colors">{name}</td>
-						{#each questions as { id, price, available }}
-							<td
-								class={cn(
-									'px-2 py-2 text-center transition-colors',
-									available && isActiveUser && 'cursor-pointer hover:bg-accent',
-									!available && 'text-neutral'
-								)}
-								on:click={() => selectQuestion(id)}
-							>
-								{price}
-							</td>
-						{/each}
-					</tr>
+	<div class="text-center">
+		<div class="text-sm font-bold">{round.name}</div>
+		{#if round.comments}
+			<div class="mt-2 text-sm italic">{round.comments}</div>
+		{/if}
+	</div>
+	<div class="flex flex-col items-center overflow-x-auto px-2 justify-center-safe">
+		{#each round.themes as { name, questions }}
+			<h3 class="text-text-header text-xs font-bold">{name}</h3>
+			<div class="flex flex-wrap">
+				{#each questions as { id, price, available }}
+					<button
+						type="button"
+						class={cn(
+							'text-text-normal w-15 px-2 py-2 transition-colors',
+							available &&
+								isActiveUser &&
+								'hover:bg-bg-accent hover:text-text-accent cursor-pointer',
+							!available && 'text-text-neutral opacity-30'
+						)}
+						on:click={() => selectQuestion(id)}
+					>
+						{price}
+					</button>
 				{/each}
-			</tbody>
-		</table>
+			</div>
+		{/each}
 	</div>
 </section>

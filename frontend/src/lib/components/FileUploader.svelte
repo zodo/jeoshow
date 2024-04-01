@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { ChangeEventHandler } from 'svelte/elements'
-	import { goto } from '$app/navigation'
 	import { createGame, uploadPack } from '$lib/pack-uploader'
 	import { createEventDispatcher } from 'svelte'
 	import type { FileUploaderEvent } from '$lib/models'

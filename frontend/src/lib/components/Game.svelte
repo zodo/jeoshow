@@ -14,24 +14,27 @@
 	export let stage: StageSnapshot
 	export let disconnected = false
 	export let blinkStage = false
+	export let showPlayers = true
 </script>
 
 <section
-	class="grid h-[calc(100dvh_-_2rem)] max-h-[850px] w-full max-w-[950px] select-none grid-cols-[1fr] grid-rows-[fit-content(30%)_1fr_3rem] gap-4 [grid-template-areas:'players''stage''controls'] landscape:grid-cols-[1fr_3.5fr] landscape:grid-rows-[1fr_3rem] landscape:[grid-template-areas:'players_stage''players_controls']"
+	class="grid h-[var(--height)] w-full select-none grid-cols-[1fr] grid-rows-[fit-content(30%)_1fr_2.5rem] gap-2 px-1 py-2"
 	in:scale={{ duration: 700, easing: quintInOut }}
 >
-	<div class="relative overflow-scroll drop-shadow-md [grid-area:players]">
-		<PlayerList {players} />
+	<div class="relative overflow-scroll">
+		{#if showPlayers}
+			<PlayerList {players} />
+		{/if}
 	</div>
 	<div
 		class={cn(
-			'overflow-scroll rounded-3xl  bg-background-darker transition-colors [grid-area:stage]',
-			blinkStage && 'bg-accent transition-none'
+			'bg-bg-secondary h-full overflow-hidden rounded-lg transition-colors',
+			blinkStage && 'bg-bg-accent transition-none'
 		)}
 	>
 		<Stage {stage} {userId} {players} on:action />
 	</div>
-	<div class="[grid-area:controls]">
+	<div>
 		<Controls {stage} {userId} on:action />
 	</div>
 

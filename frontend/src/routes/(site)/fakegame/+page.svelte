@@ -105,7 +105,7 @@
 							{ id: '2db8d6c0-0', price: 100, available: true },
 							{ id: '2db8d6c0-1', price: 200, available: false },
 							{ id: '2db8d6c0-2', price: 300, available: true },
-							{ id: '2db8d6c0-3', price: 400, available: true },
+							{ id: '2db8d6c0-3', price: 100500, available: true },
 							{ id: '2db8d6c0-4', price: 500, available: true },
 						],
 					},
