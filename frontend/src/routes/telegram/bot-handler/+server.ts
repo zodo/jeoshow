@@ -1,6 +1,7 @@
 import { TELEGRAM_BOT_API_SECRET_TOKEN } from '$env/static/private'
+import { PUBLIC_FRONTEND_ROOT_URL } from '$env/static/public'
 import { TelegramClient } from '$lib/server/tg-client'
-import type { Update, WebAppInfo } from '@grammyjs/types'
+import type { Update } from '@grammyjs/types'
 
 export const POST = async ({ request }) => {
 	if (!isTelegramRequest(request.headers)) {
@@ -21,7 +22,7 @@ export const POST = async ({ request }) => {
 							{
 								text: 'Upload pack',
 								web_app: {
-									url: 'https://jeoshow.220400.xyz/telegram',
+									url: `${PUBLIC_FRONTEND_ROOT_URL}/telegram`,
 								},
 							},
 						],

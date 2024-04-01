@@ -8,13 +8,16 @@ export const POST = async ({ request }) => {
 
 	console.log('receceived', body)
 
+	const webappUrl = `https://t.me/jeoshow_bot/game?startapp=${body.gameId}`
+
 	const response = await TelegramClient.answerWebAppQuery(body.queryId, {
 		type: 'article',
 		id: crypto.randomUUID(),
 		title: 'Game created!',
+		url: webappUrl,
 		input_message_content: {
 			parse_mode: 'MarkdownV2',
-			message_text: `Game created for sure\\! Here is your [game link](https://t.me/jeoshow_bot/game?startapp=${body.gameId})`,
+			message_text: `Game created for sure\\! Here is your [game link](${webappUrl})`,
 		},
 	})
 

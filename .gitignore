@@ -174,3 +174,4 @@ dist
 .svelte-kit
 
 .env.production
+.env.cf-dev

@@ -1,5 +1,12 @@
-import 'dotenv/config'
 import nodeFetch from 'node-fetch'
+import dotenv from 'dotenv'
+import { argv } from 'process'
+import { existsSync } from 'fs'
+
+const env = argv[2] || ''
+const envFilePath = existsSync(`.env.${env}`) ? `.env.${env}` : '.env'
+console.log(`Using env file: ${envFilePath}`)
+dotenv.config({ path: envFilePath })
 
 const { TELEGRAM_BOT_TOKEN, TELEGRAM_BOT_API_SECRET_TOKEN, TELEGRAM_WEBHOOK_URL } = process.env
 
