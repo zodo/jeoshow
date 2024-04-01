@@ -6,8 +6,6 @@
 
 	const webApp = getWebapp()
 
-	let gameLink = ''
-
 	const handleFileUpload = async () => {
 		if (!file) {
 			return
@@ -18,7 +16,16 @@
 			console.log(`Pack uploaded, creating game`)
 			const gameId = await createGame(packId)
 			console.log(`Game created: ${gameId}`)
-			gameLink = `https://jeoshow.220400.xyz/game/${gameId}`
+			await fetch('/telegram/bot-handler/notify-upload-complete', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					queryId: $webApp.initDataUnsafe.query_id,
+					gameId,
+				}),
+			})
 		} catch (e) {
 			console.error(e)
 			if (e instanceof Error) {
@@ -58,15 +65,8 @@
 </script>
 
 <h1 class="mb-4 text-2xl text-text">Choose siq file</h1>
-<input type="file" name="pack" on:change={handleInputChange} />
-
+<input class="text-text" type="file" name="pack" on:change={handleInputChange} />
+<pre>{$webApp.initDataUnsafe?.query_id}</pre>
 {#if message}
 	<p class="text-center text-danger">{message}</p>
-{/if}
-
-{#if gameLink}
-	<p class="text-center text-accent-dark">
-		Game
-		<a href={gameLink} target="_blank" rel="noopener noreferrer" class="underline">link</a>
-	</p>
 {/if}

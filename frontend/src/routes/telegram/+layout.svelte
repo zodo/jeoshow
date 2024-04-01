@@ -42,5 +42,8 @@
 		--color-text: var(--tg-theme-text-color, #333);
 
 		--height: var(--tg-viewport-stable-height, 100dvh);
+
+		color: var(--color-text);
+		background-color: var(--color-background);
 	}
 </style>

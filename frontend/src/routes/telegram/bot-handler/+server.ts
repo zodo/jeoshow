@@ -1,6 +1,6 @@
 import { TELEGRAM_BOT_API_SECRET_TOKEN } from '$env/static/private'
 import { TelegramClient } from '$lib/server/tg-client'
-import type { Update } from '@grammyjs/types'
+import type { Update, WebAppInfo } from '@grammyjs/types'
 
 export const POST = async ({ request }) => {
 	if (!isTelegramRequest(request.headers)) {
@@ -8,13 +8,32 @@ export const POST = async ({ request }) => {
 	}
 
 	const update = (await request.json()) as Update
-	const message = update.message!! // only message updates enabled
 
 	try {
-		await TelegramClient.sendMessage(message.chat.id, 'Hello! Open the menu')
+		const message = update.message!! // only message updates enabled
+		if (message.text === '/start' || message.text === '/join') {
+			const response = await TelegramClient.sendMessage(
+				message.chat.id,
+				'Hello! Upload siq pack. Download packs from https://sigame.xyz/',
+				{
+					inline_keyboard: [
+						[
+							{
+								text: 'Upload pack',
+								web_app: {
+									url: 'https://jeoshow.220400.xyz/telegram',
+								},
+							},
+						],
+					],
+				}
+			)
+
+			console.log('response', await response.text())
+		}
 	} catch (e) {
 		console.error(e)
-		await TelegramClient.sendMessage(message.chat.id, 'Error occurred. Please try again later.')
+		// await TelegramClient.sendMessage(message.chat.id, 'Error occurred. Please try again later.')
 	}
 
 	return new Response('OK', { status: 200 })

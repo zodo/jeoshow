@@ -11,6 +11,15 @@ const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setWebhook`
 
 const execute = async () => {
 	try {
+		await nodeFetch(url, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				url: '',
+			}),
+		})
 		const response = await nodeFetch(url, {
 			method: 'POST',
 			headers: {
