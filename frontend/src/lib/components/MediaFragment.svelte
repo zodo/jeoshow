@@ -5,6 +5,7 @@
 	import { scale } from 'svelte/transition'
 	import { quintInOut } from 'svelte/easing'
 	import { cn } from '$lib/style-utils'
+	import { dev } from '$app/environment'
 
 	export let fragments: PackModel.FragmentGroup[]
 
@@ -35,7 +36,11 @@
 		if (url.startsWith('http')) {
 			return url
 		}
-		return `/resources/packs/${url}`
+		if (dev) {
+			return `/resources/packs/${url}`
+		}
+		const encodedPath = encodeURIComponent(`packs/${url}`)
+		return `https://content.jeoshow.220400.xyz/${encodedPath}`
 	}
 
 	let animateSong = false
