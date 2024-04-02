@@ -36,6 +36,7 @@ const execute = async () => {
 				url: TELEGRAM_WEBHOOK_URL,
 				allowed_updates: ['message'],
 				secret_token: TELEGRAM_BOT_API_SECRET_TOKEN,
+				drop_pending_updates: true,
 			}),
 		})
 		const data = await response.text()

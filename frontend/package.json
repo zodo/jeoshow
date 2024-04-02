@@ -39,6 +39,7 @@
 	"dependencies": {
 		"@twa-dev/sdk": "^7.0.0",
 		"clsx": "^2.1.0",
+		"eruda": "^3.0.1",
 		"jszip": "^3.10.1",
 		"partysocket": "^1.0.1",
 		"tailwind-merge": "^2.2.2"
