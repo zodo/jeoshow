@@ -1,20 +1,18 @@
 <script lang="ts">
 	import type { ViewState } from '$lib/models'
-	import { cubicOut } from 'svelte/easing'
+	import { cubicInOut } from 'svelte/easing'
 	import { tweened } from 'svelte/motion'
 	import { cn } from '$lib/style-utils'
 
 	export let player: ViewState.ExtendedPlayer
 
 	const score = tweened(player.score, {
-		duration: 3000,
-		easing: cubicOut,
+		duration: 2000,
+		easing: cubicInOut,
 	})
 
 	$: {
-		if ($score !== player.score) {
-			score.set(player.score)
-		}
+		$score = player.score
 	}
 </script>
 

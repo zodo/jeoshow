@@ -10,12 +10,17 @@
 
 	const dispatch = createEventDispatcher<SvelteCustomEvent>()
 
-	$: {
-		dispatch('action', {
-			type: 'answer-typing',
-			value: answer,
-		})
+	let timeout: NodeJS.Timeout | undefined
+	const dispatchDebounced = () => {
+		if (!timeout) {
+			timeout = setTimeout(() => {
+				dispatch('action', { type: 'answer-typing', value: answer })
+				timeout = undefined
+			}, 500)
+		}
 	}
+
+	$: answer, dispatchDebounced()
 
 	$: {
 		if (controls.mode === 'answer') {
@@ -99,6 +104,7 @@
 					placeholder="Пиши ответ"
 					bind:value={answer}
 					bind:this={answerInput}
+					on:paste={(e) => e.preventDefault()}
 				/>
 				<button class="absolute right-0 px-2 py-1" disabled={!answer}>
 					<svg

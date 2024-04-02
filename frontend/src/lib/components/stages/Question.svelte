@@ -2,8 +2,29 @@
 	import Progress from '../Progress.svelte'
 	import MediaFragment from '../MediaFragment.svelte'
 	import type { ViewState } from '$lib/models'
+	import { linear } from 'svelte/easing'
+	import { tweened } from 'svelte/motion'
 
 	export let question: ViewState.QuestionStage
+
+	const typingIndex = tweened(0, {
+		duration: 500,
+		easing: linear,
+	})
+
+	$: anotherPlayerAnswer =
+		question.awaitingAnswer?.awaiting && !question.awaitingAnswer.isMe
+			? question.awaitingAnswer.answer
+			: ''
+
+	$: {
+		$typingIndex = anotherPlayerAnswer.length
+	}
+
+	$: slicedAnswer =
+		$typingIndex > anotherPlayerAnswer.length - 1
+			? anotherPlayerAnswer
+			: anotherPlayerAnswer.slice(0, Math.ceil($typingIndex))
 </script>
 
 <section class="grid h-full grid-rows-[min-content_1fr_min-content] gap-2">
@@ -23,8 +44,10 @@
 			<div class="mr-2">
 				Отвечает {question.awaitingAnswer.playerName}:
 			</div>
-			<div class="after:animate-blink-cursor font-serif after:font-bold after:content-['|']">
-				{question.awaitingAnswer.answer}
+			<div
+				class="relative font-serif after:absolute after:-right-1 after:animate-blink-cursor after:content-['|']"
+			>
+				{slicedAnswer}
 			</div>
 		</div>
 	{/if}
