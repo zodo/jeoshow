@@ -6,6 +6,7 @@ export namespace Timeouts {
 	export const awaitingAnswer = 30
 	export const appealTimeout = 25
 	export const appealResult = 2
+	export const answerAttemptShow = 4
 }
 
 export const getFragmentsTime = (fragments: PackModel.FragmentGroup[]): number => {

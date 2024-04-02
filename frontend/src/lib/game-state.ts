@@ -170,13 +170,23 @@ export class GameState {
 						const activePlayer = serverStage.substate.activePlayerId
 						const player = getPlayer(activePlayer)
 						awaitingAnswer = {
-							awaiting: true,
 							type: 'in-progress',
 							playerName: player?.name ?? 'Unknown',
 							avatarUrl: player?.avatarUrl,
 							answer: $playerAnswerTyping ?? '',
 							isMe: activePlayer === this.userId,
 							timeoutSeconds: serverStage.substate.timeoutSeconds,
+						}
+					} else if (serverStage.substate.type === 'answer-attempt') {
+						const activePlayer = serverStage.substate.activePlayerId
+						const player = getPlayer(activePlayer)
+						awaitingAnswer = {
+							type: serverStage.substate.correct ? 'correct' : 'incorrect',
+							playerName: player?.name ?? 'Unknown',
+							avatarUrl: player?.avatarUrl,
+							answer: serverStage.substate.answer,
+							isMe: activePlayer === this.userId,
+							timeoutSeconds: 4,
 						}
 					}
 
@@ -253,6 +263,12 @@ export class GameState {
 				break
 			case 'stage-updated':
 				this.stage.set(event.stage)
+				if (
+					event.stage.type !== 'question' ||
+					event.stage.substate.type !== 'awaiting-answer'
+				) {
+					this.playerAnswerTyping.set(null)
+				}
 				break
 			case 'player-hit-the-button':
 			case 'player-false-start': {
@@ -265,11 +281,6 @@ export class GameState {
 				}, 100)
 				break
 			}
-			case 'player-answered':
-				// this.lastPlayerAnswer.set(event)
-				// setTimeout(() => this.lastPlayerAnswer.set(null), 3000)
-				this.playerAnswerTyping.set(null)
-				break
 			case 'player-typing':
 				this.playerAnswerTyping.set(event.value)
 		}

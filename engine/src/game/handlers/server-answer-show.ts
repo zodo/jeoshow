@@ -12,7 +12,8 @@ const handleServerAnswerShow = (
 	if (
 		state.stage.type !== 'ready-for-hit' &&
 		state.stage.type !== 'question' &&
-		state.stage.type !== 'awaiting-answer'
+		state.stage.type !== 'awaiting-answer' &&
+		state.stage.type !== 'answer-attempt'
 	) {
 		return { state, effects: [] }
 	}

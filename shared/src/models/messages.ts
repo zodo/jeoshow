@@ -14,7 +14,6 @@ export type ClientAction =
 export type GameEvent =
 	| { type: 'player-hit-the-button'; playerId: string }
 	| { type: 'player-false-start'; playerId: string }
-	| { type: 'player-answered'; playerId: string; text: string; correct: boolean }
 	| { type: 'players-updated'; players: Player[] }
 	| { type: 'stage-updated'; stage: StageSnapshot }
 	| { type: 'player-typing'; playerId: string; value: string }

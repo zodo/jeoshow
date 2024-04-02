@@ -21,14 +21,15 @@
 			type: 'question',
 			fragments: [],
 			theme: 'Theme',
-			awaitingAnswer: {
-				type: 'in-progress',
-				awaiting: true,
-				isMe: false,
-				playerName: 'Player',
-				answer: answer,
-				timeoutSeconds: 60,
-			},
+			awaitingAnswer: $changingBoolean
+				? {
+						type: 'in-progress',
+						isMe: false,
+						playerName: 'Player',
+						answer: answer,
+						timeoutSeconds: 60,
+					}
+				: undefined,
 		},
 		players: [
 			{
@@ -43,8 +44,6 @@
 		disconnected: false,
 		controls: {
 			mode: 'answer',
-			ready: true,
-			falselyStart: true,
 		},
 		stageBlink: false,
 		showPlayers: true,

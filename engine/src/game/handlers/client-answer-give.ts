@@ -21,9 +21,12 @@ const handleClientAnswerGive = (
 		const players = state.players.map((p) =>
 			p.id === command.playerId ? { ...p, score: p.score + questionModel.price } : p
 		)
-		const stage: Extract<Stage, { type: 'awaiting-answer' }> = {
+		const stage: Extract<Stage, { type: 'answer-attempt' }> = {
 			...state.stage,
+			type: 'answer-attempt',
 			activePlayer: command.playerId,
+			answer: command.action.value,
+			correct: true,
 			previousAnswers: {
 				...state.stage.previousAnswers,
 				answers: [
@@ -44,15 +47,6 @@ const handleClientAnswerGive = (
 				{
 					type: 'client-broadcast',
 					event: {
-						type: 'player-answered',
-						playerId: command.playerId,
-						text: command.action.value,
-						correct: true,
-					},
-				},
-				{
-					type: 'client-broadcast',
-					event: {
 						type: 'players-updated',
 						players,
 					},
@@ -62,11 +56,12 @@ const handleClientAnswerGive = (
 					event: { type: 'stage-updated', stage: toSnapshot(stage, ctx) },
 				},
 				{
-					type: 'trigger',
+					type: 'schedule',
 					command: {
 						type: 'server',
 						action: { type: 'answer-show', questionId: questionModel.id },
 					},
+					delaySeconds: Timeouts.answerAttemptShow,
 				},
 			],
 		}
@@ -75,9 +70,11 @@ const handleClientAnswerGive = (
 			p.id === command.playerId ? { ...p, score: p.score - questionModel.price } : p
 		)
 		const callbackId = Math.random().toString(36).substring(7)
-		const stage: Extract<Stage, { type: 'ready-for-hit' }> = {
+		const stage: Extract<Stage, { type: 'answer-attempt' }> = {
 			...state.stage,
-			type: 'ready-for-hit',
+			type: 'answer-attempt',
+			answer: command.action.value,
+			correct: false,
 			previousAnswers: {
 				...state.stage.previousAnswers,
 				answers: [
@@ -91,21 +88,11 @@ const handleClientAnswerGive = (
 				],
 			},
 			callbackId,
-			callbackTimeout: Timeouts.awaitingHit,
 		}
 
 		return {
 			state: { ...state, players, stage },
 			effects: [
-				{
-					type: 'client-broadcast',
-					event: {
-						type: 'player-answered',
-						playerId: command.playerId,
-						text: command.action.value,
-						correct: false,
-					},
-				},
 				{
 					type: 'client-broadcast',
 					event: {
@@ -121,9 +108,9 @@ const handleClientAnswerGive = (
 					type: 'schedule',
 					command: {
 						type: 'server',
-						action: { type: 'button-hit-timeout', callbackId },
+						action: { type: 'button-ready', callbackId },
 					},
-					delaySeconds: Timeouts.awaitingHit,
+					delaySeconds: Timeouts.answerAttemptShow,
 				},
 			],
 		}

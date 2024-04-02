@@ -2,13 +2,14 @@ import type { GameState, Stage } from '../models/state'
 import type { ServerCommand } from '../models/state-commands'
 import type { CommandContext, UpdateResult } from '../models/state-machine'
 import { toSnapshot } from '../state-utils'
+import { Timeouts } from '../timeouts'
 
 const handleServerButtonReady = (
 	state: GameState,
 	command: ServerCommand.OfType<'button-ready'>,
 	ctx: CommandContext
 ): UpdateResult => {
-	if (state.stage.type !== 'question') {
+	if (state.stage.type !== 'question' && state.stage.type !== 'answer-attempt') {
 		return { state, effects: [] }
 	}
 
@@ -18,10 +19,14 @@ const handleServerButtonReady = (
 
 	const callbackId: string = Math.random().toString(36).substring(7)
 
-	const callbackTimeout = Math.floor(state.stage.questionReadTime / 2)
+	const callbackTimeout =
+		state.stage.type === 'question'
+			? Math.floor(state.stage.questionReadTime / 2)
+			: Timeouts.awaitingHit
 	const newStage: Extract<Stage, { type: 'ready-for-hit' }> = {
 		...state.stage,
 		type: 'ready-for-hit',
+		falseStartPlayers: [],
 		callbackId,
 		callbackTimeout,
 	}

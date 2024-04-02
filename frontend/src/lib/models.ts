@@ -43,7 +43,6 @@ export namespace ViewState {
 	}
 
 	export type QuestionAwaitingAnswer = {
-		awaiting: true
 		type: 'in-progress' | 'correct' | 'incorrect'
 		playerName: string
 		avatarUrl?: string

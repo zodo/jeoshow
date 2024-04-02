@@ -42,8 +42,16 @@ type RoundStageType =
 	| {
 			type: 'awaiting-answer'
 			questionId: string
-			answeringPlayer: string
+			answeringPlayer: PlayerId
 			falseStartPlayers: PlayerId[]
+	  }
+	| {
+			type: 'answer-attempt'
+			questionId: string
+			answeringPlayer: PlayerId
+			falseStartPlayers: PlayerId[]
+			answer: string
+			correct: boolean
 	  }
 	| {
 			type: 'answer'
