@@ -1,24 +1,11 @@
 <script lang="ts">
-	import type { ExtendedPlayer, SvelteCustomEvent } from '$lib/models'
-	import type { StageSnapshot } from 'shared/models/models'
+	import type { SvelteCustomEvent, ViewState } from '$lib/models'
 	import { createEventDispatcher } from 'svelte'
 	import Progress from '../Progress.svelte'
 	import { quintInOut } from 'svelte/easing'
 	import { scale } from 'svelte/transition'
 
-	export let userId: string
-	export let appeal: Extract<StageSnapshot, { type: 'appeal' }>
-	export let players: ExtendedPlayer[] = []
-
-	$: appealingUserName = players.find((p) => p.id === appeal.playerId)?.name
-
-	$: agreePlayerNames = appeal.resolutions
-		.filter((r) => r.resolution)
-		.map((r) => players.find((p) => p.id === r.playerId)?.name)
-	$: disagreePlayerNames = appeal.resolutions
-		.filter((r) => !r.resolution)
-		.map((r) => players.find((p) => p.id === r.playerId)?.name)
-
+	export let appeal: ViewState.AppealStage
 	const dispatch = createEventDispatcher<SvelteCustomEvent>()
 </script>
 
@@ -30,7 +17,7 @@
 
 	<div class="mt-4">
 		<div>
-			<p>{appealingUserName}: <span class="font-bold">{appeal.answer}</span></p>
+			<p>{appeal.playerName}: <span class="font-bold">{appeal.answer}</span></p>
 			<p>
 				Pack author: <span class="font-bold">{appeal.model.answers.correct.join('; ')}</span
 				>
@@ -39,13 +26,13 @@
 		<div class="flex">
 			<div class="flex flex-1 flex-col justify-between">
 				<div class="m-4">
-					{#each agreePlayerNames as player}
+					{#each appeal.agreePlayers as player}
 						<div>{player}</div>
 					{/each}
 				</div>
 				<button
 					class="rounded-bl-2xl bg-warn px-4 py-2"
-					disabled={appeal.playerId === userId}
+					disabled={appeal.isMe}
 					on:click={() =>
 						dispatch('action', { type: 'appeal-resolve', resolution: true })}
 					>Agree</button
@@ -53,13 +40,13 @@
 			</div>
 			<div class="flex flex-1 flex-col justify-between">
 				<div class="m-4 text-right">
-					{#each disagreePlayerNames as player}
+					{#each appeal.disagreePlayers as player}
 						<div>{player}</div>
 					{/each}
 				</div>
 				<button
 					class="rounded-br-2xl bg-danger px-4 py-2"
-					disabled={appeal.playerId === userId}
+					disabled={appeal.isMe}
 					on:click={() =>
 						dispatch('action', { type: 'appeal-resolve', resolution: false })}
 					>Disagree</button

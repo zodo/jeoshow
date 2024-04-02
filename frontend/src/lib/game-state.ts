@@ -1,7 +1,7 @@
 import type { GameEvent } from 'shared/models/messages'
 import type { Player, StageSnapshot } from 'shared/models/models'
-import { derived, readable, writable } from 'svelte/store'
-import type { PlayerButtonHit, PlayerMessage } from './models'
+import { derived, readable, writable, type Readable } from 'svelte/store'
+import type { HapticType, PlayerButtonHit, ViewState } from './models'
 
 export class GameState {
 	userId: string
@@ -10,11 +10,14 @@ export class GameState {
 		this.userId = userId
 	}
 
-	players = writable<Player[]>([])
-	stage = writable<StageSnapshot | null>(null)
-	hitButton = writable<PlayerButtonHit[]>([])
-	playerMessages = writable<PlayerMessage[]>([])
-	activePlayerId = derived(this.stage, ($stage) => {
+	private players = writable<Player[]>([])
+	private stage = writable<StageSnapshot | null>(null)
+	private hitButton = writable<PlayerButtonHit[]>([])
+	private playerAnswerTyping = writable<string | null>(null)
+	private connected = writable(true)
+	private showPlayers = writable(false)
+
+	private activePlayerId = derived(this.stage, ($stage) => {
 		if ($stage?.type === 'round') {
 			return $stage.activePlayerId
 		} else if ($stage?.type === 'question' && $stage.substate.type === 'awaiting-answer') {
@@ -24,17 +27,15 @@ export class GameState {
 		}
 		return null
 	})
-	extendedPlayers = derived(
-		[this.players, this.activePlayerId, this.hitButton, this.playerMessages],
-		([$players, $activePlayerId, $hitButton, $playerMessages]) => {
+
+	private extendedPlayers = derived(
+		[this.players, this.activePlayerId, this.hitButton],
+		([$players, $activePlayerId, $hitButton]) => {
 			return $players
 				.map((player) => ({
 					...player,
 					pressedButton: $hitButton.find((b) => b.playerId === player.id)?.type ?? null,
 					active: $activePlayerId === player.id,
-					messages: $playerMessages
-						.filter((m) => m.playerId === player.id)
-						.map((m) => m.text),
 				}))
 				.sort((a, b) => {
 					if (a.active && !b.active) return -1
@@ -44,7 +45,44 @@ export class GameState {
 		}
 	)
 
-	stageBlink = readable(false, (set) => {
+	private falselyStartedThisQuestion = readable(false, (set) => {
+		this.stage.subscribe((stage) => {
+			if (stage?.type !== 'question' || stage.substate.type !== 'idle') {
+				set(false)
+			}
+		})
+		this.hitButton.subscribe((hitButton) => {
+			if (hitButton.some((b) => b.type === 'false-start' && b.playerId === this.userId)) {
+				set(true)
+			}
+		})
+	})
+
+	private controls: Readable<ViewState.Controls> = derived(
+		[this.stage, this.falselyStartedThisQuestion],
+		([$stage, $falselyStartedThisQuestion]) => {
+			if (
+				$stage?.type === 'question' &&
+				$stage.substate.type === 'awaiting-answer' &&
+				$stage.substate.activePlayerId === this.userId
+			) {
+				return { mode: 'answer' } as const
+			} else if (
+				$stage?.type === 'round' &&
+				$stage.playerIdsCanAppeal.includes(this.userId)
+			) {
+				return { mode: 'appeal' } as const
+			} else {
+				return {
+					mode: 'hit',
+					ready: $stage?.type === 'question' && $stage.substate.type === 'ready-for-hit',
+					falselyStart: $falselyStartedThisQuestion,
+				} as const
+			}
+		}
+	)
+
+	private stageBlink = readable(false, (set) => {
 		let readyForBlinkOnReady = false
 		let blinkOnRoundAndActivePlayerInterval: NodeJS.Timeout | undefined
 		this.stage.subscribe((stage) => {
@@ -75,6 +113,139 @@ export class GameState {
 		})
 	})
 
+	viewState: Readable<ViewState.View> = derived(
+		[
+			this.extendedPlayers,
+			this.stage,
+			this.playerAnswerTyping,
+			this.connected,
+			this.showPlayers,
+			this.activePlayerId,
+			this.controls,
+			this.stageBlink,
+		],
+		([
+			$extendedPlayers,
+			$stage,
+			$playerAnswerTyping,
+			$connected,
+			$showPlayers,
+			$activePlayerId,
+			$controls,
+			$stageBlink,
+		]) => {
+			const getPlayer = (playerId: string) => $extendedPlayers.find((p) => p.id === playerId)
+
+			let stage: ViewState.View['stage']
+			const serverStage = $stage ?? { type: 'connecting' }
+			switch (serverStage.type) {
+				case 'connecting': {
+					stage = { type: 'connecting' }
+					break
+				}
+				case 'before-start': {
+					stage = { type: 'before-start' }
+					break
+				}
+				case 'round': {
+					stage = {
+						type: 'round',
+						name: serverStage.name,
+						comments: serverStage.comments,
+						themes: serverStage.themes.map((theme) => ({
+							name: theme.name,
+							questions: theme.questions.map((question) => ({
+								id: question.id,
+								price: question.price,
+								available: question.available,
+							})),
+						})),
+						meActive: $activePlayerId === this.userId,
+					}
+					break
+				}
+				case 'question': {
+					let awaitingAnswer: ViewState.QuestionAwaitingAnswer | undefined = undefined
+					if (serverStage.substate.type === 'awaiting-answer') {
+						const activePlayer = serverStage.substate.activePlayerId
+						const player = getPlayer(activePlayer)
+						awaitingAnswer = {
+							awaiting: true,
+							type: 'in-progress',
+							playerName: player?.name ?? 'Unknown',
+							avatarUrl: player?.avatarUrl,
+							answer: $playerAnswerTyping ?? '',
+							isMe: activePlayer === this.userId,
+							timeoutSeconds: serverStage.substate.timeoutSeconds,
+						}
+					}
+
+					stage = {
+						type: 'question',
+						fragments: serverStage.fragments,
+						theme: serverStage.theme,
+						themeComment: serverStage.themeComment,
+						readyForHit:
+							serverStage.substate.type === 'ready-for-hit'
+								? {
+										ready: true,
+										timeoutSeconds: serverStage.substate.timeoutSeconds,
+									}
+								: undefined,
+						awaitingAnswer: awaitingAnswer,
+					}
+					break
+				}
+				case 'answer': {
+					stage = {
+						type: 'answer',
+						theme: serverStage.theme,
+						model: serverStage.model,
+					}
+					break
+				}
+				case 'appeal': {
+					stage = {
+						type: 'appeal',
+						model: serverStage.model,
+						answer: serverStage.answer,
+						playerName: getPlayer(serverStage.playerId)?.name ?? 'Unknown',
+						agreePlayers: serverStage.resolutions
+							.filter((r) => r.resolution)
+							.map((r) => getPlayer(r.playerId)?.name ?? 'Unknown'),
+						disagreePlayers: serverStage.resolutions
+							.filter((r) => !r.resolution)
+							.map((r) => getPlayer(r.playerId)?.name ?? 'Unknown'),
+						timeoutSeconds: serverStage.timeoutSeconds,
+						isMe: serverStage.playerId === this.userId,
+					}
+					break
+				}
+				case 'appeal-result': {
+					stage = {
+						type: 'appeal-result',
+						resolution: serverStage.resolution,
+					}
+					break
+				}
+				case 'after-finish': {
+					stage = { type: 'after-finish' }
+					break
+				}
+			}
+
+			const result: ViewState.View = {
+				disconnected: !$connected,
+				showPlayers: $showPlayers,
+				players: $extendedPlayers,
+				controls: $controls,
+				stageBlink: $stageBlink,
+				stage: stage,
+			}
+			return result
+		}
+	)
+
 	handleGameEvent = (event: GameEvent) => {
 		switch (event.type) {
 			case 'players-updated':
@@ -94,19 +265,29 @@ export class GameState {
 				}, 100)
 				break
 			}
-			case 'player-texted':
-				this.playerMessages.update((messages) => [
-					...messages,
-					{ playerId: event.playerId, text: event.text },
-				])
-				setTimeout(() => {
-					this.playerMessages.update((messages) =>
-						messages.filter(
-							(m) => !(m.playerId === event.playerId && m.text === event.text)
-						)
-					)
-				}, 3500)
+			case 'player-answered':
+				// this.lastPlayerAnswer.set(event)
+				// setTimeout(() => this.lastPlayerAnswer.set(null), 3000)
+				this.playerAnswerTyping.set(null)
 				break
+			case 'player-typing':
+				this.playerAnswerTyping.set(event.value)
 		}
+	}
+
+	addHapticListener = (listener: (haptic: HapticType) => void) => {
+		this.stageBlink.subscribe((blink) => {
+			if (blink) {
+				listener('medium')
+			}
+		})
+	}
+
+	setConnected = (connected: boolean) => {
+		this.connected.set(connected)
+	}
+
+	setShowPlayers = (showPlayers: boolean) => {
+		this.showPlayers.set(showPlayers)
 	}
 }

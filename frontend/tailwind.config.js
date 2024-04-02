@@ -43,6 +43,15 @@ export default {
 				'text-normal': 'var(--color-text-normal)',
 				'text-header': 'var(--color-text-section-header)',
 			},
+			animation: {
+				'blink-cursor': 'blink-cursor 1s infinite',
+			},
+			keyframes: {
+				'blink-cursor': {
+					'0%, 100%': { opacity: 0 },
+					'50%': { opacity: 1 },
+				},
+			},
 		},
 	},
 	plugins: [require('tailwind-safe-container')],

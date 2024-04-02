@@ -1,8 +1,8 @@
 <script lang="ts">
-	import type { StageSnapshot } from 'shared/models/models'
 	import MediaFragment from '../MediaFragment.svelte'
+	import type { ViewState } from '$lib/models'
 
-	export let answer: Extract<StageSnapshot, { type: 'answer' }>
+	export let answer: ViewState.AnswerStage
 </script>
 
 <section class="grid h-full grid-rows-[min-content_1fr_min-content]">

@@ -1,19 +1,15 @@
 <script lang="ts">
-	import type { SvelteCustomEvent } from '$lib/models'
-	import type { StageSnapshot } from 'shared/models/models'
+	import type { SvelteCustomEvent, ViewState } from '$lib/models'
 	import { createEventDispatcher } from 'svelte'
 	import { scale } from 'svelte/transition'
 	import { quintInOut } from 'svelte/easing'
 	import { cn } from '$lib/style-utils'
 
-	export let userId: string
-	export let round: Extract<StageSnapshot, { type: 'round' }>
-
-	const isActiveUser = userId === round.activePlayerId
+	export let round: ViewState.RoundStage
 
 	const dispatch = createEventDispatcher<SvelteCustomEvent>()
 	const selectQuestion = (questionId: string) => {
-		if (isActiveUser) {
+		if (round.meActive) {
 			dispatch('action', { type: 'question-select', questionId })
 		}
 	}
@@ -31,16 +27,16 @@
 	</div>
 	<div class="flex flex-col items-center overflow-x-auto px-2 justify-center-safe">
 		{#each round.themes as { name, questions }}
-			<h3 class="text-text-header text-xs font-bold">{name}</h3>
+			<h3 class="text-xs font-bold text-text-header">{name}</h3>
 			<div class="flex flex-wrap">
 				{#each questions as { id, price, available }}
 					<button
 						type="button"
 						class={cn(
-							'text-text-normal w-15 px-2 py-2 transition-colors',
+							'w-15 px-2 py-2 text-text-normal transition-colors',
 							available &&
-								isActiveUser &&
-								'hover:bg-bg-accent hover:text-text-accent cursor-pointer',
+								round.meActive &&
+								'cursor-pointer hover:bg-bg-accent hover:text-text-accent',
 							!available && 'text-text-neutral opacity-30'
 						)}
 						on:click={() => selectQuestion(id)}

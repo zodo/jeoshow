@@ -23,7 +23,7 @@ export class WebSocketGameClient {
 			}
 		}, 5000)
 
-		this.isConnectedStore = writable(false)
+		this.isConnectedStore = writable(true)
 	}
 
 	onConnect(callback: () => void) {

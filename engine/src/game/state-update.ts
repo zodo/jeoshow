@@ -18,11 +18,12 @@ import handleServerAnswerShow from './handlers/server-answer-show'
 import handleServerQuestionRandom from './handlers/server-question-random'
 import handleServerRoundReturn from './handlers/server-round-return'
 import handleServerButtonHitTimeout from './handlers/server-button-hit-timeout'
-import handleClientGiveAnswer from './handlers/client-answer-give'
+import handleClientAnswerGive from './handlers/client-answer-give'
 import handleServerAnswerTimeout from './handlers/server-answer-timeout'
 import handleClientMediaFinished from './handlers/client-media-finished'
 import handleClientAppealStart from './handlers/client-appeal-start'
 import handleClientAppealResolve from './handlers/client-appeal-resolve'
+import handleClientAnswerTyping from './handlers/client-answer-typing'
 
 export const updateState = (
 	state: GameState,
@@ -48,7 +49,8 @@ const clientCommandHandlers: {
 	'game-start': handleClientGameStart,
 	'button-hit': handleClientButtonHit,
 	'question-select': handleClientQuestionSelect,
-	'answer-give': handleClientGiveAnswer,
+	'answer-give': handleClientAnswerGive,
+	'answer-typing': handleClientAnswerTyping,
 	'media-finished': handleClientMediaFinished,
 	'appeal-start': handleClientAppealStart,
 	'appeal-resolve': handleClientAppealResolve,

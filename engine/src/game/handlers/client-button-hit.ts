@@ -31,10 +31,6 @@ const handleClientButtonHit = (
 			effects: [
 				{
 					type: 'client-broadcast',
-					event: { type: 'player-texted', playerId: command.playerId, text: 'РАНО' },
-				},
-				{
-					type: 'client-broadcast',
 					event: { type: 'player-false-start', playerId: command.playerId },
 				},
 			],

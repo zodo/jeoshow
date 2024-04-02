@@ -6,27 +6,30 @@
 	import Answer from './stages/Answer.svelte'
 	import Appeal from './stages/Appeal.svelte'
 	import AppealResult from './stages/AppealResult.svelte'
-	import type { ExtendedPlayer } from '$lib/models'
-	import type { StageSnapshot } from 'shared/models/models'
+	import type { ViewState } from '$lib/models'
 
-	export let players: ExtendedPlayer[] = []
-	export let stage: StageSnapshot
-	export let userId: string
+	export let state: ViewState.View
+
+	$: stage = state.stage
 </script>
 
 <section class="h-full w-full p-2">
 	{#if stage.type === 'before-start'}
 		<BeforeStart on:action />
+	{:else if stage.type === 'connecting'}
+		<section class="flex h-full items-center justify-center">
+			<div class="animate-bounce text-xl">Connecting...</div>
+		</section>
 	{:else if stage.type === 'round'}
-		<Round round={stage} {userId} on:action />
+		<Round round={stage} on:action />
 	{:else if stage.type === 'question'}
 		<Question question={stage} on:action />
 	{:else if stage.type === 'answer'}
 		<Answer answer={stage} on:action />
 	{:else if stage.type === 'after-finish'}
-		<AfterFinish {players} />
+		<AfterFinish players={state.players} />
 	{:else if stage.type === 'appeal'}
-		<Appeal appeal={stage} {userId} {players} on:action />
+		<Appeal appeal={stage} on:action />
 	{:else if stage.type === 'appeal-result'}
 		<AppealResult resolution={stage.resolution} />
 	{:else}

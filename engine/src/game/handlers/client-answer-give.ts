@@ -5,7 +5,7 @@ import type { CommandContext, UpdateResult } from '../models/state-machine'
 import { getQuestion, toSnapshot } from '../state-utils'
 import { Timeouts } from '../timeouts'
 
-const handleClientGiveAnswer = (
+const handleClientAnswerGive = (
 	state: GameState,
 	command: ClientCommand.OfType<'answer-give'>,
 	ctx: CommandContext
@@ -44,9 +44,10 @@ const handleClientGiveAnswer = (
 				{
 					type: 'client-broadcast',
 					event: {
-						type: 'player-texted',
+						type: 'player-answered',
 						playerId: command.playerId,
 						text: command.action.value,
+						correct: true,
 					},
 				},
 				{
@@ -99,9 +100,10 @@ const handleClientGiveAnswer = (
 				{
 					type: 'client-broadcast',
 					event: {
-						type: 'player-texted',
+						type: 'player-answered',
 						playerId: command.playerId,
 						text: command.action.value,
+						correct: false,
 					},
 				},
 				{
@@ -136,4 +138,4 @@ const isCorrect = (correctAnswer: PackModel.Answers, actualAnswer: string) => {
 	return correctAnswer.correct.map(sanitize).includes(sanitize(actualAnswer))
 }
 
-export default handleClientGiveAnswer
+export default handleClientAnswerGive

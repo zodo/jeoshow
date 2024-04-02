@@ -2,9 +2,9 @@
 	import type { ChangeEventHandler } from 'svelte/elements'
 	import { createGame, uploadPack } from '$lib/pack-uploader'
 	import { createEventDispatcher } from 'svelte'
-	import type { FileUploaderEvent } from '$lib/models'
+	import type { SvelteCustomEvent } from '$lib/models'
 
-	const dispatch = createEventDispatcher<FileUploaderEvent>()
+	const dispatch = createEventDispatcher<SvelteCustomEvent>()
 
 	let formLoading = false
 	let hasFiles = false
@@ -52,14 +52,14 @@
 
 <form class="flex max-w-full drop-shadow-md" on:submit={handleFormSubmit}>
 	<input
-		class="inline-block h-14 flex-1 rounded-l-2xl bg-neutral p-4 transition-colors hover:bg-accent-dark"
+		class="inline-block h-14 flex-1 rounded-l-2xl bg-bg-secondary p-4 transition-colors"
 		id="pack"
 		type="file"
 		name="pack"
 		on:change={handleInputChange}
 	/>
 	<button
-		class="min-w-20 rounded-r-2xl bg-accent p-4 transition-colors hover:bg-accent-dark"
+		class="min-w-20 rounded-r-2xl bg-bg-accent p-4 text-text-accent transition-colors"
 		type="submit"
 		disabled={formLoading || !hasFiles}
 	>

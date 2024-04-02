@@ -6,6 +6,7 @@ export type ClientAction =
 	| { type: 'question-select'; questionId: string }
 	| { type: 'button-hit' }
 	| { type: 'answer-give'; value: string }
+	| { type: 'answer-typing'; value: string }
 	| { type: 'media-finished' }
 	| { type: 'appeal-start' }
 	| { type: 'appeal-resolve'; resolution: boolean }
@@ -13,6 +14,7 @@ export type ClientAction =
 export type GameEvent =
 	| { type: 'player-hit-the-button'; playerId: string }
 	| { type: 'player-false-start'; playerId: string }
-	| { type: 'player-texted'; playerId: string; text: string }
+	| { type: 'player-answered'; playerId: string; text: string; correct: boolean }
 	| { type: 'players-updated'; players: Player[] }
 	| { type: 'stage-updated'; stage: StageSnapshot }
+	| { type: 'player-typing'; playerId: string; value: string }

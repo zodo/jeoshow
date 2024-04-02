@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { ExtendedPlayer } from '$lib/models'
+	import type { ViewState } from '$lib/models'
 	import { cubicOut } from 'svelte/easing'
 	import { tweened } from 'svelte/motion'
 	import { cn } from '$lib/style-utils'
 
-	export let player: ExtendedPlayer
+	export let player: ViewState.ExtendedPlayer
 
 	const score = tweened(player.score, {
 		duration: 3000,
@@ -20,7 +20,7 @@
 
 <div
 	class={cn(
-		'bg-bg-secondary flex min-w-0 max-w-full items-center justify-between gap-2 rounded-lg px-2 py-0.5 transition-colors duration-1000',
+		'flex min-w-0 max-w-full items-center justify-between gap-2 rounded-lg bg-bg-secondary px-2 py-0.5 transition-colors duration-1000',
 		{
 			'bg-bg-accent text-text-accent': player.active,
 			'text-slate-600 opacity-60': player.disconnected,

@@ -38,7 +38,7 @@
 		<div class="mb-4 font-mono">{$page.url}</div>
 		<form class="flex drop-shadow-md" on:submit|preventDefault={handleJoin}>
 			<input
-				class="rounded-l-2xl bg-neutral p-4"
+				class="bg-neutral rounded-l-2xl p-4"
 				name="somerandom"
 				type="text"
 				bind:value={playerName}
@@ -46,7 +46,7 @@
 				placeholder={loadedFromLocalStorage ? 'Your name' : ''}
 			/>
 			<button
-				class="rounded-r-2xl bg-accent p-4"
+				class="rounded-r-2xl bg-bg-accent p-4 text-text-accent"
 				type="submit"
 				disabled={!isNameValid(playerName)}>Join</button
 			>

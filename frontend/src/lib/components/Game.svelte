@@ -1,20 +1,14 @@
 <script lang="ts">
-	import type { StageSnapshot } from 'shared/models/models'
 	import PlayerList from '$lib/components/PlayerList.svelte'
 	import Stage from '$lib/components/Stage.svelte'
 	import DisconnectedOverlay from './DisconnectedOverlay.svelte'
-	import type { ExtendedPlayer } from '$lib/models'
+	import type { ViewState } from '$lib/models'
 	import Controls from './Controls.svelte'
 	import { scale } from 'svelte/transition'
 	import { quintInOut } from 'svelte/easing'
 	import { cn } from '$lib/style-utils'
 
-	export let userId: string
-	export let players: ExtendedPlayer[] = []
-	export let stage: StageSnapshot
-	export let disconnected = false
-	export let blinkStage = false
-	export let showPlayers = true
+	export let state: ViewState.View
 </script>
 
 <section
@@ -22,21 +16,21 @@
 	in:scale={{ duration: 700, easing: quintInOut }}
 >
 	<div class="relative overflow-scroll">
-		{#if showPlayers}
-			<PlayerList {players} />
+		{#if state.showPlayers}
+			<PlayerList players={state.players} />
 		{/if}
 	</div>
 	<div
 		class={cn(
-			'bg-bg-secondary h-full overflow-hidden rounded-lg transition-colors',
-			blinkStage && 'bg-bg-accent transition-none'
+			'h-full overflow-hidden rounded-lg bg-bg-secondary transition-colors',
+			state.stageBlink && 'bg-bg-accent transition-none'
 		)}
 	>
-		<Stage {stage} {userId} {players} on:action />
+		<Stage {state} on:action />
 	</div>
 	<div>
-		<Controls {stage} {userId} on:action />
+		<Controls controls={state.controls} on:action />
 	</div>
 
-	<DisconnectedOverlay showOverlay={disconnected} />
+	<DisconnectedOverlay showOverlay={state.disconnected} />
 </section>

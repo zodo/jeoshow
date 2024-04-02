@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { scale } from 'svelte/transition'
 	import { quintInOut } from 'svelte/easing'
-	import type { ExtendedPlayer } from '$lib/models'
+	import type { ViewState } from '$lib/models'
 
-	export let players: ExtendedPlayer[] = []
+	export let players: ViewState.ExtendedPlayer[] = []
 </script>
 
 <section
@@ -15,8 +15,8 @@
 	<table class="mt-4 border-collapse">
 		{#each players as player (player.id)}
 			<tr>
-				<td class="border-2 border-neutral p-2 text-right">{player.score}</td>
-				<td class="border-2 border-neutral p-2">{player.name}</td>
+				<td class="border-neutral border-2 p-2 text-right">{player.score}</td>
+				<td class="border-neutral border-2 p-2">{player.name}</td>
 			</tr>
 		{/each}
 	</table>
