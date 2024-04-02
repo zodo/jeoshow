@@ -207,7 +207,7 @@
 				price: 100,
 				theme: 'Игротека',
 				themeComment: 'Выбери итд',
-				substate: { type: 'ready-for-hit', timeoutSeconds: 8 },
+				substate: { type: 'ready-for-hit', timeoutSeconds: 80 },
 			},
 			{
 				type: 'question',

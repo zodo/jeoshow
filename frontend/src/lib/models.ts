@@ -4,6 +4,7 @@ import type { Player } from 'shared/models/models'
 export type SvelteCustomEvent = {
 	action: ClientAction
 	haptic: 'light' | 'medium' | 'success' | 'warning'
+	media: 'started' | 'stopped'
 }
 
 export type ExtendedPlayer = {
