@@ -7,7 +7,6 @@ export interface GameState {
 	packId: string
 	players: Player[]
 	stage: Stage
-	scheduledCommands: ScheduledCommand[]
 }
 
 export type Stage =

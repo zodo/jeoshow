@@ -29,7 +29,6 @@ export const createState = async (
 			packId,
 			players: [],
 			stage: { type: 'before-start' },
-			scheduledCommands: [],
 		},
 		model: packModel,
 	}

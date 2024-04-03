@@ -107,6 +107,12 @@ class GameDurableObject {
 		const packId = body.packId
 		const { state, model } = await createState(this.env, packId)
 		await this.state.storage.put('state', state)
+		await this.modifyScheduledCommands(Date.now(), () => [
+			{
+				command: { type: 'server', action: { type: 'state-cleanup' } },
+				time: Date.now() + 60 * 60 * 1000,
+			},
+		])
 		return new Response(
 			JSON.stringify({
 				packName: model.name,

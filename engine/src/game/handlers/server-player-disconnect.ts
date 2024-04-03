@@ -17,22 +17,31 @@ const handlePlayerDisconnect = (
 		}
 		return p
 	})
-	return {
-		state: { ...state, players: newPlayers },
-		effects: [
-			{
-				type: 'client-broadcast',
-				event: { type: 'players-updated', players: newPlayers },
-			},
-			{
-				type: 'schedule',
-				command: {
-					type: 'server',
-					action: { type: 'state-cleanup' },
+	const noPlayersLeft = newPlayers.every((p) => p.disconnected)
+
+	if (noPlayersLeft) {
+		return {
+			effects: [
+				{
+					type: 'schedule',
+					command: {
+						type: 'server',
+						action: { type: 'state-cleanup' },
+					},
+					delaySeconds: 60 * 60,
 				},
-				delaySeconds: 3600,
-			},
-		],
+			],
+		}
+	} else {
+		return {
+			state: { ...state, players: newPlayers },
+			effects: [
+				{
+					type: 'client-broadcast',
+					event: { type: 'players-updated', players: newPlayers },
+				},
+			],
+		}
 	}
 }
 
