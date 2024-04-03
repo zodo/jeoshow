@@ -5,7 +5,8 @@
 		"check": "concurrently \"cd engine && yarn run check\" \"cd frontend && yarn run check\"",
 		"deploy": "concurrently \"cd engine && yarn run deploy\" \"cd frontend && yarn run deploy\"",
 		"format": "prettier --write .",
-		"cf-dev": "concurrently \"cd engine && yarn run dev\" \"cd frontend && yarn run dev --mode cf-dev\" \"cloudflared tunnel run\""
+		"cf-dev": "concurrently \"cd engine && yarn run dev\" \"cd frontend && yarn run dev --mode cf-dev\" \"cloudflared tunnel run\"",
+		"dev": "concurrently \"cd engine && yarn dev\" \"cd frontend && yarn dev\""
 	},
 	"devDependencies": {
 		"concurrently": "^8.2.2",
