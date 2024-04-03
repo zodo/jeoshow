@@ -26,10 +26,16 @@
 						type: 'in-progress',
 						isMe: false,
 						playerName: 'Player',
-						answer: answer,
+						answer: 'My answer',
 						timeoutSeconds: 60,
 					}
-				: undefined,
+				: {
+						type: 'correct',
+						isMe: false,
+						playerName: 'Player',
+						answer: 'My answer',
+						timeoutSeconds: 60,
+					},
 		},
 		players: [
 			{
@@ -42,9 +48,11 @@
 			},
 		],
 		disconnected: false,
-		controls: {
-			mode: 'answer',
-		},
+		controls: $changingBoolean
+			? {
+					mode: 'answer',
+				}
+			: { mode: 'answer-attempt', correct: true },
 		stageBlink: false,
 		showPlayers: true,
 	}}

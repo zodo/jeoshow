@@ -4,8 +4,9 @@
 	import type { ViewState } from '$lib/models'
 	import { linear, quintInOut } from 'svelte/easing'
 	import { tweened } from 'svelte/motion'
-	import { scale, slide } from 'svelte/transition'
+	import { scale } from 'svelte/transition'
 	import { Confetti } from 'svelte-confetti'
+	import { cn } from '$lib/style-utils'
 
 	export let question: ViewState.QuestionStage
 
@@ -33,10 +34,7 @@
 			? question.awaitingAnswer.timeoutSeconds
 			: undefined
 
-	$: showAnswerPopup =
-		question.awaitingAnswer?.type === 'correct' ||
-		question.awaitingAnswer?.type === 'incorrect' ||
-		(question.awaitingAnswer && !question.awaitingAnswer.isMe)
+	$: showAnswerPopup = question.awaitingAnswer && !question.awaitingAnswer.isMe
 </script>
 
 <section class="relative grid h-full grid-rows-[min-content_1fr_min-content] gap-2">
@@ -53,8 +51,12 @@
 
 	{#if showAnswerPopup}
 		<div
-			transition:slide={{ duration: 500, easing: quintInOut }}
-			class="relative z-10 flex max-w-full flex-wrap rounded-2xl bg-bg-accent p-2 text-text-accent shadow-md"
+			transition:scale={{ duration: 500, easing: quintInOut }}
+			class={cn(
+				'relative z-10 flex flex-wrap rounded-md bg-bg-accent p-2 text-text-accent shadow-md transition-colors duration-1000',
+				question.awaitingAnswer?.type === 'correct' && 'bg-green-500',
+				question.awaitingAnswer?.type === 'incorrect' && 'bg-danger'
+			)}
 		>
 			{#if question.awaitingAnswer?.type === 'in-progress'}
 				<div class="mr-2">
@@ -68,29 +70,9 @@
 				</div>
 			{/if}
 
-			{#if question.awaitingAnswer?.type === 'correct'}
-				<div
-					in:scale={{ duration: 500, easing: quintInOut }}
-					class="relative w-full text-center font-serif font-bold"
-				>
-					{#if question.awaitingAnswer.isMe}
-						Верно!
-					{:else}
-						{playerAnswer}
-					{/if}
-				</div>
-			{/if}
-
-			{#if question.awaitingAnswer?.type === 'incorrect'}
-				<div
-					in:scale={{ duration: 500, easing: quintInOut }}
-					class="relative w-full text-center font-serif font-bold"
-				>
-					{#if question.awaitingAnswer.isMe}
-						Неправильно!
-					{:else}
-						{playerAnswer}
-					{/if}
+			{#if question.awaitingAnswer?.type === 'correct' || question.awaitingAnswer?.type === 'incorrect'}
+				<div in:scale={{ duration: 500, easing: quintInOut }} class="w-full text-center">
+					{playerAnswer}
 				</div>
 			{/if}
 		</div>

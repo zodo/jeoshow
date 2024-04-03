@@ -26,6 +26,7 @@ export namespace ViewState {
 		| { mode: 'hit'; ready: boolean; falselyStart: boolean }
 		| { mode: 'appeal' }
 		| { mode: 'answer' }
+		| { mode: 'answer-attempt'; correct: boolean }
 
 	export type RoundStage = {
 		type: 'round'

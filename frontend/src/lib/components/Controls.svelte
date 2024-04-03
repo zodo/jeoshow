@@ -124,4 +124,21 @@
 			</form>
 		</div>
 	{/if}
+
+	{#if controls.mode === 'answer-attempt'}
+		<div
+			in:scale={{ duration: 300, easing: quintInOut }}
+			class={cn(
+				'h-10 rounded-md bg-bg-accent p-2 text-center text-text-accent shadow-md',
+				controls.correct && 'bg-green-500',
+				!controls.correct && 'bg-danger'
+			)}
+		>
+			{#if controls.correct}
+				Верно!
+			{:else}
+				Неправильно
+			{/if}
+		</div>
+	{/if}
 </section>

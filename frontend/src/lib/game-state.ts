@@ -68,6 +68,12 @@ export class GameState {
 			) {
 				return { mode: 'answer' } as const
 			} else if (
+				$stage?.type === 'question' &&
+				$stage.substate.type === 'answer-attempt' &&
+				$stage.substate.activePlayerId === this.userId
+			) {
+				return { mode: 'answer-attempt', correct: $stage.substate.correct } as const
+			} else if (
 				$stage?.type === 'round' &&
 				$stage.playerIdsCanAppeal.includes(this.userId)
 			) {
