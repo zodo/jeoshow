@@ -48,7 +48,7 @@
 {#if autoplayPrevented}
 	<button on:click={manualPlay}>
 		<svg
-			class="text-bg-accent h-24 w-24"
+			class="h-24 w-24 text-bg-accent"
 			aria-hidden="true"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"

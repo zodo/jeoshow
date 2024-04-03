@@ -23,7 +23,7 @@
 
 <div class="flex w-full justify-center" in:fade={{ duration: 1000, easing: quintInOut }}>
 	<div
-		class="bg-bg-accent h-3 w-full rounded-3xl shadow-md"
+		class="h-3 w-full rounded-3xl bg-bg-accent shadow-md"
 		style="width: {$width}%; opacity: {$opacity}"
 	></div>
 </div>

@@ -43,7 +43,7 @@
 	{#if autoplayPrevented}
 		<button class="absolute inset-0 z-10 backdrop-blur-3xl" on:click={manualPlay}>
 			<svg
-				class="text-bg-accent m-auto h-24 w-24"
+				class="m-auto h-24 w-24 text-bg-accent"
 				aria-hidden="true"
 				xmlns="http://www.w3.org/2000/svg"
 				width="24"

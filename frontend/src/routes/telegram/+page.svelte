@@ -64,9 +64,9 @@
 	}
 </script>
 
-<h1 class="mb-4 text-xl text-text">Загрузи пак</h1>
+<h1 class="text-text mb-4 text-xl">Загрузи пак</h1>
 
-<div class="bg-bg-secondary rounded-lg p-4">
+<div class="rounded-lg bg-bg-secondary p-4">
 	<input class="text-text" type="file" name="pack" on:change={handleInputChange} />
 </div>
 {#if message}

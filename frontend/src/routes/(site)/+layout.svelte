@@ -4,7 +4,7 @@
 
 <style lang="postcss">
 	:global(body) {
-		@apply bg-bg-main text-text-normal m-0 h-full w-full overflow-hidden overscroll-none font-sans;
+		@apply m-0 h-full w-full overflow-hidden overscroll-none bg-bg-main font-sans text-text-normal;
 	}
 
 	:global(html) {
