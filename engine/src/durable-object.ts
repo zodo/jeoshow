@@ -263,13 +263,11 @@ class GameDurableObject {
 	private async getGameInfo(request: Request): Promise<Response> {
 		const body = (await request.json()) as any
 		const userId = body.userId
-		if (!userId) {
-			return new Response('userId is required', { status: 400 })
-		}
-
 		const currentState: GameState | undefined = await this.storage.get('state')
 		const gameExists = !!currentState
-		const playerName = currentState?.players?.find((p) => p.id === userId)?.name
+		const playerName = userId
+			? currentState?.players?.find((p) => p.id === userId)?.name
+			: undefined
 		return new Response(
 			JSON.stringify({
 				playerName,

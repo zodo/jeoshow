@@ -4,6 +4,9 @@
 	import { getWebapp } from '$lib/tg-webapp-context'
 	import type { EventParams } from '@twa-dev/types'
 	import { onMount } from 'svelte'
+	import type { PageData } from './$types'
+
+	export let data: PageData
 
 	const webApp = getWebapp()
 
@@ -21,7 +24,9 @@
 	}
 
 	onMount(() => {
-		$webApp.enableClosingConfirmation()
+		if (data.gameExists) {
+			$webApp.enableClosingConfirmation()
+		}
 		$webApp.onEvent('viewportChanged', handleViewportChanged)
 
 		return () => {
@@ -42,12 +47,13 @@
 	}
 </script>
 
-{#if !gameCode}
-	<p>Game code is not provided</p>
-{:else if !userId}
-	<p>User ID is not provided</p>
-{:else if !playerName}
-	<p>User name is not provided</p>
+{#if !gameCode || !userId || !playerName}
+	<p class="text-danger">Что-то прям пошло не так</p>
+{:else if !data.gameExists}
+	<div class="text-center">
+		Игра кончилась или не начиналась. Создай новую тут
+		<a class="text-bg-accent" href="https://t.me/jeoshow_bot">@jeoshow_bot</a>
+	</div>
 {:else}
 	<InteractiveGame
 		{gameCode}
