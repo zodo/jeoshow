@@ -20,7 +20,6 @@
 			tgWebApp.ready()
 			$webapp = tgWebApp
 			hasMounted = true
-			await (await import('eruda')).default.init()
 		}
 	})
 </script>

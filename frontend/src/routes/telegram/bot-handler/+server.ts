@@ -14,19 +14,20 @@ export const POST = async ({ request }) => {
 		if (update.message && update.message.text === '/start') {
 			const response = await TelegramClient.sendMessage(
 				update.message.chat.id,
-				'Hello! Upload siq pack. Download packs from https://sigame.xyz/',
+				'Привет! Загружай siq пак. Скачивай паки с https://sigame.xyz/',
 				{
 					inline_keyboard: [
 						[
 							{
-								text: 'Upload pack',
+								text: 'Загрузить',
 								web_app: {
 									url: `${PUBLIC_FRONTEND_ROOT_URL}/telegram`,
 								},
 							},
 						],
 					],
-				}
+				},
+				{ is_disabled: true }
 			)
 
 			console.log('response', await response.text())

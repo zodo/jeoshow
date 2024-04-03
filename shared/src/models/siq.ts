@@ -1,5 +1,6 @@
 export namespace PackModel {
 	export interface Pack {
+		name: string
 		rounds: Round[]
 	}
 

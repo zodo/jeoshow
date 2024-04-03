@@ -14,8 +14,8 @@
 			$webApp.MainButton.showProgress(false)
 			const packId = await uploadPack(file)
 			console.log(`Pack uploaded, creating game`)
-			const gameId = await createGame(packId)
-			console.log(`Game created: ${gameId}`)
+			const { gameCode, packName } = await createGame(packId)
+			console.log(`Game created: ${gameCode} with pack ${packName}`)
 			await fetch('/telegram/bot-handler/notify-upload-complete', {
 				method: 'POST',
 				headers: {
@@ -23,7 +23,8 @@
 				},
 				body: JSON.stringify({
 					queryId: $webApp.initDataUnsafe.query_id,
-					gameId,
+					gameCode,
+					packName,
 				}),
 			})
 		} catch (e) {

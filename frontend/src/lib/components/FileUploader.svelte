@@ -34,9 +34,9 @@
 			formLoading = true
 			const packId = await uploadPack(file, reportUploadProgress)
 			console.log(`Pack uploaded, creating game`)
-			const gameId = await createGame(packId)
-			console.log(`Game created: ${gameId}`)
-			dispatch('game-created', { gameId })
+			const { gameCode, packName } = await createGame(packId)
+			console.log(`Game created: ${gameCode} with pack ${packName}`)
+			dispatch('game-created', { gameId: gameCode })
 		} catch (e) {
 			console.error(e)
 			if (e instanceof Error) {

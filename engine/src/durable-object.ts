@@ -105,14 +105,19 @@ class GameDurableObject {
 	private async createGame(request: Request) {
 		const body = (await request.json()) as any
 		const packId = body.packId
-		const state = await createState(this.env, packId)
+		const { state, model } = await createState(this.env, packId)
 		await this.state.storage.put('state', state)
-		return new Response(null, {
-			status: 201,
-			headers: {
-				'Content-Type': 'application/json',
-			},
-		})
+		return new Response(
+			JSON.stringify({
+				packName: model.name,
+			}),
+			{
+				status: 201,
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			}
+		)
 	}
 
 	private async broadcast(event: any) {

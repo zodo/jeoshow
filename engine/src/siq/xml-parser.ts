@@ -34,7 +34,10 @@ export class SiqXmlContentParser {
 			.map((round: any) => this.convertRound(round))
 			.filter((r) => r !== undefined)
 			.map((r, idx) => ({ ...r!!, id: idx.toString() }))
-		return { rounds }
+		return {
+			name: xml.package.$?.name ?? 'no name',
+			rounds,
+		}
 	}
 
 	private convertRound(r: any): Omit<PackModel.Round, 'id'> | undefined {

@@ -1,8 +1,15 @@
 import { SiqXmlContentParser } from 'src/siq/xml-parser'
 import { saveMetadata } from './metadata'
 import type { GameState } from './models/state'
+import type { PackModel } from 'shared/models/siq'
 
-export const createState = async (env: CfEnv, packId: string): Promise<GameState> => {
+export const createState = async (
+	env: CfEnv,
+	packId: string
+): Promise<{
+	state: GameState
+	model: PackModel.Pack
+}> => {
 	const contentObject = await env.JEOSHOW_PACKS.get('packs/' + packId + '/content.xml')
 	if (!contentObject) {
 		throw new Error('Pack not found')
@@ -18,9 +25,12 @@ export const createState = async (env: CfEnv, packId: string): Promise<GameState
 	await saveMetadata(kv, { id: packId, model: packModel, mediaMapping: mediaMappingJson })
 
 	return {
-		packId,
-		players: [],
-		stage: { type: 'before-start' },
-		scheduledCommands: [],
+		state: {
+			packId,
+			players: [],
+			stage: { type: 'before-start' },
+			scheduledCommands: [],
+		},
+		model: packModel,
 	}
 }

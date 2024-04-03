@@ -1,11 +1,17 @@
 import { TELEGRAM_BOT_TOKEN } from '$env/static/private'
-import type { InlineKeyboardMarkup, InlineQueryResult, UserProfilePhotos } from '@grammyjs/types'
+import type {
+	InlineKeyboardMarkup,
+	InlineQueryResult,
+	LinkPreviewOptions,
+	UserProfilePhotos,
+} from '@grammyjs/types'
 
 export namespace TelegramClient {
 	export const sendMessage = async (
 		chatId: number,
 		text: string,
-		replyMarkup?: InlineKeyboardMarkup
+		replyMarkup?: InlineKeyboardMarkup,
+		linkPreviewOptions?: LinkPreviewOptions
 	) => {
 		return fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
 			method: 'POST',
@@ -16,6 +22,7 @@ export namespace TelegramClient {
 				chat_id: chatId,
 				text,
 				reply_markup: replyMarkup,
+				link_preview_options: linkPreviewOptions,
 			}),
 		})
 	}

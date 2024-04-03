@@ -18,9 +18,10 @@ export default {
 			const gameId = env.JEOSHOW_GAME_STATE.idFromName(gameCode)
 			const game = env.JEOSHOW_GAME_STATE.get(gameId)
 
-			await game.fetch(request)
+			const createResponse = await game.fetch(request)
+			const createJson = (await createResponse.json()) as any
 
-			return new Response(JSON.stringify({ gameCode }), {
+			return new Response(JSON.stringify({ gameCode, ...createJson }), {
 				headers: {
 					'Content-Type': 'application/json',
 					'Access-Control-Allow-Origin': '*',

@@ -53,7 +53,12 @@ export const uploadPack = async (
 	return hash
 }
 
-export const createGame = async (packId: string): Promise<string> => {
+export const createGame = async (
+	packId: string
+): Promise<{
+	gameCode: string
+	packName: string
+}> => {
 	const res = await fetch(`${PUBLIC_ENGINE_URL}/create-game`, {
 		method: 'POST',
 		headers: {
@@ -64,7 +69,7 @@ export const createGame = async (packId: string): Promise<string> => {
 		}),
 	})
 	const data = (await res.json()) as any
-	return data.gameCode
+	return data
 }
 
 const calculateHash = async (file: ArrayBuffer): Promise<string> => {
