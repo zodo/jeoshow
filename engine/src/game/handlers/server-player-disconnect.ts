@@ -19,29 +19,23 @@ const handlePlayerDisconnect = (
 	})
 	const noPlayersLeft = newPlayers.every((p) => p.disconnected)
 
-	if (noPlayersLeft) {
-		return {
-			effects: [
-				{
-					type: 'schedule',
-					command: {
-						type: 'server',
-						action: { type: 'state-cleanup' },
+	return {
+		state: { ...state, players: newPlayers },
+		effects: [
+			noPlayersLeft
+				? {
+						type: 'schedule',
+						command: {
+							type: 'server',
+							action: { type: 'state-cleanup' },
+						},
+						delaySeconds: 60 * 60,
+					}
+				: {
+						type: 'client-broadcast',
+						event: { type: 'players-updated', players: newPlayers },
 					},
-					delaySeconds: 60 * 60,
-				},
-			],
-		}
-	} else {
-		return {
-			state: { ...state, players: newPlayers },
-			effects: [
-				{
-					type: 'client-broadcast',
-					event: { type: 'players-updated', players: newPlayers },
-				},
-			],
-		}
+		],
 	}
 }
 

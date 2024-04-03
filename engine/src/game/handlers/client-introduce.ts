@@ -19,8 +19,14 @@ const handleClientIntroduce = (
 	}
 	const newPlayers = [...state.players.filter((p) => p.id !== command.playerId), player]
 
+	let newStage = state.stage
+	if (state.stage.type === 'round' && state.stage.paused) {
+		console.log('Resuming paused round...')
+		newStage = { ...state.stage, paused: false, activePlayer: player.id }
+	}
+
 	return {
-		state: { ...state, players: newPlayers },
+		state: { ...state, stage: newStage, players: newPlayers },
 		effects: [
 			{
 				type: 'client-broadcast',

@@ -1,3 +1,4 @@
+import { a } from 'vitest/dist/suite-a18diDsI'
 import type { GameState, Stage } from '../models/state'
 import type { ServerCommand } from '../models/state-commands'
 import type { CommandContext, UpdateResult } from '../models/state-machine'
@@ -31,12 +32,18 @@ const handleServerRoundReturn = (
 		}
 	}
 
+	const noPlayersLeft = state.players.every((p) => p.disconnected)
+	if (noPlayersLeft) {
+		console.log('All players disconnected, pausing...')
+	}
+
 	if (hasMoreQuestions || hasMoreRounds) {
 		let newStage: Extract<Stage, { type: 'round' }>
 		if (hasMoreQuestions) {
 			newStage = {
 				...state.stage,
 				type: 'round',
+				paused: noPlayersLeft,
 				activePlayer,
 				callbackId,
 				callbackTimeout: Timeouts.selectQuestion,
@@ -51,6 +58,7 @@ const handleServerRoundReturn = (
 			newStage = {
 				...state.stage,
 				type: 'round',
+				paused: noPlayersLeft,
 				activePlayer,
 				roundId: newRoundModel.id,
 				takenQuestions: [],
@@ -66,14 +74,18 @@ const handleServerRoundReturn = (
 					type: 'client-broadcast',
 					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
 				},
-				{
-					type: 'schedule',
-					command: {
-						type: 'server',
-						action: { type: 'question-random', callbackId },
-					},
-					delaySeconds: Timeouts.selectQuestion,
-				},
+				...(noPlayersLeft
+					? []
+					: [
+							{
+								type: 'schedule',
+								command: {
+									type: 'server',
+									action: { type: 'question-random', callbackId },
+								},
+								delaySeconds: Timeouts.selectQuestion,
+							} as const,
+						]),
 			],
 		}
 	} else {

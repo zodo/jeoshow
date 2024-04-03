@@ -26,6 +26,7 @@ export interface RoundStageBase {
 type RoundStageType =
 	| {
 			type: 'round'
+			paused: boolean
 	  }
 	| {
 			type: 'question'
