@@ -16,7 +16,7 @@
 			timeout = setTimeout(() => {
 				dispatch('action', { type: 'answer-typing', value: answer })
 				timeout = undefined
-			}, 500)
+			}, 100)
 		}
 	}
 
