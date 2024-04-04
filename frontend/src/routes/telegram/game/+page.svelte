@@ -19,7 +19,7 @@
 
 	const handleViewportChanged = (e: EventParams['viewportChanged']) => {
 		if (e.isStateStable) {
-			expanded = $webApp.isExpanded
+			expanded = $webApp.isExpanded || $webApp.viewportHeight > 600
 		}
 	}
 
