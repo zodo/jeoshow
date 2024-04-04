@@ -1,4 +1,4 @@
-<div class="flex h-full w-full flex-col items-center justify-center p-4">
+<div class="flex h-full w-full flex-col items-center justify-center">
 	<slot />
 </div>
 
@@ -22,6 +22,21 @@
 		--color-text-neutral: #b8a398;
 		--color-text-normal: #4e342e;
 		--color-text-section-header: #4e342e;
-		--height: min(850px, 100dvh);
+		--height: min(1000px, 100dvh);
+	}
+
+	@media (prefers-color-scheme: dark) {
+		:global(:root) {
+			--color-bg-main: #000;
+			--color-bg-secondary: #272822;
+			--color-bg-section: #272822;
+			--color-danger: #bd1b36;
+			--color-warn: #e2b476;
+			--color-bg-accent: #d6801e;
+			--color-text-accent: #ffffff;
+			--color-text-neutral: #c0c0c0;
+			--color-text-normal: #eceff1;
+			--color-text-section-header: #fafafa;
+		}
 	}
 </style>

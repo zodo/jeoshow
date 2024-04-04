@@ -63,7 +63,7 @@
 			{:else if fragment.type === 'image'}
 				<div
 					class={cn(
-						'w-full',
+						'w-11/12',
 						fragmentHeight === 'full' && 'max-h-full',
 						fragmentHeight === '1/2' && 'max-h-[65%]',
 						fragmentHeight === '1/3' && 'max-h-[45%]'

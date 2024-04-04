@@ -54,7 +54,7 @@
 			transition:scale={{ duration: 500, easing: quintInOut }}
 			class={cn(
 				'relative z-10 flex flex-wrap rounded-md bg-bg-accent p-2 text-text-accent shadow-md transition-colors duration-1000',
-				question.awaitingAnswer?.type === 'correct' && 'bg-green-500',
+				question.awaitingAnswer?.type === 'correct' && 'bg-green-600',
 				question.awaitingAnswer?.type === 'incorrect' && 'bg-danger'
 			)}
 		>

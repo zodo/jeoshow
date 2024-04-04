@@ -43,7 +43,7 @@
 		<div class="mb-4 font-mono">{$page.url}</div>
 		<form class="flex drop-shadow-md" on:submit|preventDefault={handleJoin}>
 			<input
-				class="bg-neutral rounded-l-2xl p-4"
+				class="rounded-l-2xl bg-bg-secondary p-4"
 				name="somerandom"
 				type="text"
 				bind:value={playerName}

@@ -57,7 +57,7 @@
 
 <Keydown pauseOnInput on:Space={clickHit} on:keyup={releaseHit} />
 
-<section class="mx-auto w-full">
+<section in:scale={{ duration: 800, easing: quintInOut }} class="mx-auto w-full">
 	{#if controls.mode === 'hit'}
 		<button
 			class={cn(
@@ -130,7 +130,7 @@
 			in:scale={{ duration: 300, easing: quintInOut }}
 			class={cn(
 				'h-10 rounded-md bg-bg-accent p-2 text-center text-text-accent shadow-md',
-				controls.correct && 'bg-green-500',
+				controls.correct && 'bg-green-600',
 				!controls.correct && 'bg-danger'
 			)}
 		>
