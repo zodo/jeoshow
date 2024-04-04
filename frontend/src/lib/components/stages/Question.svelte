@@ -96,6 +96,7 @@
 					delay={[0, 500]}
 					colorArray={['url(/poop.png)']}
 					size={20}
+					amount={10}
 				/>
 			</div>
 			<div class="absolute bottom-0 right-0 h-2 w-1">
@@ -106,6 +107,7 @@
 					delay={[0, 500]}
 					colorArray={['url(/poop.png)']}
 					size={20}
+					amount={10}
 				/>
 			</div>
 		{/if}

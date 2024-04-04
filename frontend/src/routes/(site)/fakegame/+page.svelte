@@ -30,7 +30,7 @@
 						timeoutSeconds: 60,
 					}
 				: {
-						type: 'correct',
+						type: 'incorrect',
 						isMe: false,
 						playerName: 'Player',
 						answer: 'My answer',
