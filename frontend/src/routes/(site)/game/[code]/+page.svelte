@@ -3,15 +3,20 @@
 	import InteractiveGame from '$lib/components/InteractiveGame.svelte'
 	import { onMount } from 'svelte'
 
-	const errorMessage: string = $page.data.errorMessage
+	const gameExists: boolean = $page.data.gameExists
 	const gameCode: string = $page.data.gameCode
 	const userId: string = $page.data.userId
+	const avatarUrl: string = $page.data.avatarUrl
 	const existingPlayerName: string = $page.data.playerName
 
 	onMount(() => {
-		const initValue = localStorage.getItem('userName') ?? ''
-		playerName = initValue
-		loadedFromLocalStorage = true
+		if (!existingPlayerName) {
+			const initValue = localStorage.getItem('userName') ?? ''
+			playerName = initValue
+			loadedFromLocalStorage = true
+		}
+
+		history.replaceState({}, '', window.location.pathname)
 	})
 
 	let loadedFromLocalStorage = false
@@ -26,13 +31,13 @@
 	}
 </script>
 
-{#if errorMessage}
+{#if !gameExists}
 	<section class="flex max-w-full flex-col items-center">
-		<p>{errorMessage}</p>
+		<p>Game not found</p>
 		<a href="/">Go home</a>
 	</section>
 {:else if joinedGame}
-	<InteractiveGame {gameCode} {userId} {playerName} />
+	<InteractiveGame {gameCode} {userId} {playerName} {avatarUrl} />
 {:else}
 	<section class="flex max-w-full flex-col items-center">
 		<div class="mb-4 font-mono">{$page.url}</div>

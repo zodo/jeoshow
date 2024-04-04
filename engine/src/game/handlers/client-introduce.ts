@@ -13,7 +13,7 @@ const handleClientIntroduce = (
 	const player: Player = {
 		id: command.playerId,
 		name: command.action.name,
-		avatarUrl: command.action.avatarUrl,
+		avatarUrl: command.action.avatarUrl ?? existingPlayer?.avatarUrl,
 		score: existingPlayer?.score || 0,
 		disconnected: false,
 	}
