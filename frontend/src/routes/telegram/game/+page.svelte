@@ -5,7 +5,7 @@
 	import type { EventParams } from '@twa-dev/types'
 	import { onMount } from 'svelte'
 	import type { PageData } from './$types'
-	import { fly, scale, slide } from 'svelte/transition'
+	import { fly } from 'svelte/transition'
 	import { quintInOut } from 'svelte/easing'
 	import { PUBLIC_FRONTEND_ROOT_URL } from '$env/static/public'
 
@@ -44,6 +44,7 @@
 	onMount(() => {
 		if (data.gameExists) {
 			$webApp.enableClosingConfirmation()
+			$webApp.expand()
 		}
 		$webApp.onEvent('viewportChanged', handleViewportChanged)
 
