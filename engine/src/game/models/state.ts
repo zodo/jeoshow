@@ -38,6 +38,8 @@ type RoundStageType =
 			type: 'ready-for-hit'
 			questionId: string
 			falseStartPlayers: PlayerId[]
+			randomizeHits: boolean
+			playersWhoHit: PlayerId[]
 	  }
 	| {
 			type: 'awaiting-answer'

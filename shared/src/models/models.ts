@@ -6,6 +6,7 @@ export interface Player {
 	avatarUrl?: string
 	score: number
 	disconnected: boolean
+	answerAttemts: number
 }
 
 export type QuestionState =

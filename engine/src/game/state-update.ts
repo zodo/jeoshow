@@ -24,6 +24,7 @@ import handleClientMediaFinished from './handlers/client-media-finished'
 import handleClientAppealStart from './handlers/client-appeal-start'
 import handleClientAppealResolve from './handlers/client-appeal-resolve'
 import handleClientAnswerTyping from './handlers/client-answer-typing'
+import handleServerButtonHitChoose from './handlers/server-button-hit-choose'
 
 export const updateState = (
 	state: GameState,
@@ -69,6 +70,7 @@ const serverCommandHandlers: {
 	'question-random': handleServerQuestionRandom,
 	'round-return': handleServerRoundReturn,
 	'button-hit-timeout': handleServerButtonHitTimeout,
+	'button-hit-choose': handleServerButtonHitChoose,
 	'answer-timeout': handleServerAnswerTimeout,
 	'state-cleanup': () => ({}), // handled by caller code
 }

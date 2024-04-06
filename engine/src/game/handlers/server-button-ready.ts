@@ -27,6 +27,8 @@ const handleServerButtonReady = (
 		...state.stage,
 		type: 'ready-for-hit',
 		falseStartPlayers: [],
+		randomizeHits: true,
+		playersWhoHit: [],
 		callbackId,
 		callbackTimeout,
 	}
@@ -37,6 +39,14 @@ const handleServerButtonReady = (
 			{
 				type: 'client-broadcast',
 				event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
+			},
+			{
+				type: 'schedule',
+				command: {
+					type: 'server',
+					action: { type: 'button-hit-choose' },
+				},
+				delaySeconds: Timeouts.hitRandomizationInterval,
 			},
 			{
 				type: 'schedule',

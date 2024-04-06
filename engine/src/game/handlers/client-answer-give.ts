@@ -30,7 +30,13 @@ const handleClientAnswerGive = (
 	}
 	if (isCorrect(questionModel.answers, command.action.value)) {
 		const players = state.players.map((p) =>
-			p.id === command.playerId ? { ...p, score: p.score + questionModel.price } : p
+			p.id === command.playerId
+				? {
+						...p,
+						score: p.score + questionModel.price,
+						answerAttemts: p.answerAttemts + 1,
+					}
+				: p
 		)
 		const stage: Extract<Stage, { type: 'answer-attempt' }> = {
 			...state.stage,

@@ -15,6 +15,7 @@ const handleClientIntroduce = (
 		name: command.action.name,
 		avatarUrl: command.action.avatarUrl ?? existingPlayer?.avatarUrl,
 		score: existingPlayer?.score || 0,
+		answerAttemts: existingPlayer?.answerAttemts || 0,
 		disconnected: false,
 	}
 	const newPlayers = [...state.players.filter((p) => p.id !== command.playerId), player]
