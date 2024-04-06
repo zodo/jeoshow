@@ -1,7 +1,7 @@
 name = "engine"
 main = "src/entrypoint.ts"
 compatibility_date = "2024-03-04"
-
+logpush = true
 
 [[durable_objects.bindings]]
 name = "JEOSHOW_GAME_STATE"

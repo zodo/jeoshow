@@ -1,5 +1,6 @@
 name = "frontend"
 compatibility_date = "2024-03-14"
+logpush = true
 
 # Bind a KV Namespace. Use KV as persistent storage for small key-value pairs.
 # Docs: https://developers.cloudflare.com/workers/runtime-apis/kv
