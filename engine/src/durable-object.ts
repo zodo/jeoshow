@@ -176,13 +176,31 @@ class GameDurableObject {
 			await this.storage.put('state', state)
 		}
 
-		for (const event of events ?? []) {
-			if (event.type === 'client-broadcast') {
-				console.log('-> broadcast:', event.type, event.event.type)
-				await this.broadcast(JSON.stringify(event.event))
-			} else if (event.type === 'client-reply' && ws) {
+		const replyEvents =
+			events
+				?.filter(
+					(e): e is Extract<UpdateEffect, { type: 'client-reply' }> =>
+						e.type === 'client-reply'
+				)
+				.map((e) => e.event) ?? []
+		if (replyEvents.length > 0 && ws) {
+			ws.send(JSON.stringify(replyEvents))
+			for (const event of replyEvents) {
 				console.log('-> reply:', event.type)
-				ws.send(JSON.stringify(event.event))
+			}
+		}
+
+		const broadcastEvents =
+			events
+				?.filter(
+					(e): e is Extract<UpdateEffect, { type: 'client-broadcast' }> =>
+						e.type === 'client-broadcast'
+				)
+				.map((e) => e.event) ?? []
+		if (broadcastEvents.length > 0) {
+			await this.broadcast(JSON.stringify(broadcastEvents))
+			for (const event of broadcastEvents) {
+				console.log('-> broadcast:', event.type)
 			}
 		}
 

@@ -37,8 +37,10 @@ export class WebSocketGameClient {
 		this.ws.onmessage = (event) => {
 			if (event.data !== 'pong') {
 				console.log('Received message:', event.data)
-				const gameEvent = JSON.parse(event.data) as GameEvent
-				callback(gameEvent)
+				const gameEvents = JSON.parse(event.data) as GameEvent[]
+				for (const gameEvent of gameEvents) {
+					callback(gameEvent)
+				}
 			}
 		}
 	}
