@@ -23,12 +23,23 @@
 	$: answer, dispatchDebounced()
 
 	$: {
-		if (controls.mode === 'answer') {
+		if (controls.mode === 'answer-text') {
 			if (answerInput) {
 				answerInput.focus()
 			}
 		} else {
 			answer = ''
+		}
+	}
+
+	let selectAnswersEnabled = false
+	$: {
+		if (controls.mode === 'answer-select') {
+			setTimeout(() => {
+				selectAnswersEnabled = true
+			}, 1000)
+		} else {
+			selectAnswersEnabled = false
 		}
 	}
 
@@ -91,7 +102,7 @@
 			Я БЫЛ ПРАВ!
 		</button>
 	{/if}
-	{#if controls.mode === 'answer'}
+	{#if controls.mode === 'answer-text'}
 		<div class="relative w-full" in:scale={{ duration: 300, easing: quintInOut }}>
 			<form
 				class="flex h-10"
@@ -122,6 +133,23 @@
 					</svg>
 				</button>
 			</form>
+		</div>
+	{/if}
+
+	{#if controls.mode === 'answer-select'}
+		<div class="relative h-10 w-full" in:scale={{ duration: 300, easing: quintInOut }}>
+			<div class="flex gap-2">
+				{#each controls.options as option}
+					<button
+						class="h-full flex-1 rounded-lg bg-bg-accent p-2 text-center text-text-accent transition-colors disabled:bg-bg-secondary disabled:text-text-normal"
+						on:click={() =>
+							dispatch('action', { type: 'answer-give', value: option.name })}
+						disabled={!selectAnswersEnabled}
+					>
+						{option.name}
+					</button>
+				{/each}
+			</div>
 		</div>
 	{/if}
 

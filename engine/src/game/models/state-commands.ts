@@ -6,7 +6,7 @@ export type ServerAction =
 	| { type: 'button-hit-timeout'; callbackId: string }
 	| { type: 'answer-show'; questionId?: string }
 	| { type: 'answer-timeout'; callbackId: string }
-	| { type: 'round-return' }
+	| { type: 'round-return'; callbackId: string }
 	| { type: 'question-random'; callbackId: string }
 	| { type: 'state-cleanup' }
 

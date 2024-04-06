@@ -117,8 +117,55 @@ const xml = `<?xml version="1.0" encoding="utf-8"?>
                                 <answer>Росприроднадзор, минприроды и другие </answer>
                             </right>
                         </question>
+						<question price="800">
+							<params>
+								<param name="question" type="content">
+									<item></item>
+								</param>
+							</params>
+							<right>
+								<answer />
+							</right>
+						</question>
+						<question price="200">
+						<info>
+							<comments>Он был завершен 31 марта 1889 г.</comments>
+						</info>
+						<params>
+							<param name="question" type="content">
+								<item>Строительство Эйфелевой башни было завершено 31 марта 1887
+									года.</item>
+							</param>
+							<param name="answerType">select</param>
+							<param name="answerOptions" type="group">
+								<param name="A" type="content">
+									<item>Правда</item>
+								</param>
+								<param name="B" type="content">
+									<item>Ложь</item>
+								</param>
+							</param>
+						</params>
+						<right>
+							<answer>B</answer>
+						</right>
+					</question>
                     </questions>
                 </theme>
+				<theme name="">
+				<questions>
+					<question price="100">
+						<params>
+							<param name="question" type="content">
+								<item></item>
+							</param>
+						</params>
+						<right>
+							<answer />
+						</right>
+					</question>
+				</questions>
+			</theme>
             </themes>
         </round>
     </rounds>

@@ -27,11 +27,23 @@ export namespace PackModel {
 		price: number
 	}
 
-	export interface Answers {
-		correct: string[]
-		incorrect?: string[]
-		content: FragmentGroup[]
+	export type SelectAnswerOption = {
+		name: string
+		text: string
 	}
+
+	export type Answers =
+		| {
+				type: 'regular'
+				correct: string[]
+				incorrect?: string[]
+				content: FragmentGroup[]
+		  }
+		| {
+				type: 'select'
+				options: SelectAnswerOption[]
+				correctName: string
+		  }
 
 	export type FragmentGroup = Fragment[]
 

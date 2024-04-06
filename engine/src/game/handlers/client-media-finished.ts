@@ -20,13 +20,15 @@ const handleClientMediaFinished = (
 			],
 		}
 	} else if (state.stage.type === 'answer') {
+		const callbackId: string = Math.random().toString(36).substring(7)
 		return {
+			state: { ...state, stage: { ...state.stage, callbackId } },
 			effects: [
 				{
 					type: 'trigger',
 					command: {
 						type: 'server',
-						action: { type: 'round-return' },
+						action: { type: 'round-return', callbackId },
 					},
 				},
 			],

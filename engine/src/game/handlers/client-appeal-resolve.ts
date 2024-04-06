@@ -13,6 +13,8 @@ const handleClientAppealResolve = (
 		return {}
 	}
 
+	const callbackId: string = Math.random().toString(36).substring(7)
+
 	const resolutions = {
 		...state.stage.resolutions,
 		[command.playerId]: command.action.resolution,
@@ -48,6 +50,7 @@ const handleClientAppealResolve = (
 				answers: [],
 				triedToAppeal: [],
 			},
+			callbackId,
 		}
 
 		return {
@@ -65,7 +68,7 @@ const handleClientAppealResolve = (
 					type: 'schedule',
 					command: {
 						type: 'server',
-						action: { type: 'round-return' },
+						action: { type: 'round-return', callbackId },
 					},
 					delaySeconds: Timeouts.appealResult,
 				},
@@ -76,6 +79,7 @@ const handleClientAppealResolve = (
 			...state.stage,
 			type: 'appeal-result',
 			resolution: false,
+			callbackId,
 		}
 
 		return {
@@ -89,7 +93,7 @@ const handleClientAppealResolve = (
 					type: 'schedule',
 					command: {
 						type: 'server',
-						action: { type: 'round-return' },
+						action: { type: 'round-return', callbackId },
 					},
 					delaySeconds: Timeouts.appealResult,
 				},

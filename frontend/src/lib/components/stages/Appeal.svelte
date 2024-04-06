@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { SvelteCustomEvent, ViewState } from '$lib/models'
+	import { assertNever } from 'shared/utils/assert-never'
 	import { createEventDispatcher } from 'svelte'
 	import Progress from '../Progress.svelte'
 	import { quintInOut } from 'svelte/easing'
@@ -7,6 +8,20 @@
 
 	export let appeal: ViewState.AppealStage
 	const dispatch = createEventDispatcher<SvelteCustomEvent>()
+
+	let playerAnswer: string
+	let authorAnswer: string
+	$: {
+		const answers = appeal.model.answers
+		if (answers.type === 'regular') {
+			playerAnswer = appeal.answer
+			authorAnswer = answers.correct.join('; ')
+		} else if (answers.type === 'select') {
+			// no appeals available for select answers
+		} else {
+			assertNever(answers)
+		}
+	}
 </script>
 
 <section
@@ -17,10 +32,9 @@
 
 	<div class="mt-4">
 		<div>
-			<p>{appeal.playerName}: <span class="font-bold">{appeal.answer}</span></p>
+			<p>{appeal.playerName}: <span class="font-bold">{playerAnswer}</span></p>
 			<p>
-				Pack author: <span class="font-bold">{appeal.model.answers.correct.join('; ')}</span
-				>
+				Pack author: <span class="font-bold">{authorAnswer}</span>
 			</p>
 		</div>
 		<div class="flex">

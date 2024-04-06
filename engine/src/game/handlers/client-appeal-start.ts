@@ -17,6 +17,8 @@ const handleClientAppealStart = (
 		return {}
 	}
 
+	const callbackId: string = Math.random().toString(36).substring(7)
+
 	const playerAnswer = state.stage.previousAnswers.answers.find(
 		(a) => a.playerId === command.playerId
 	)?.text
@@ -33,6 +35,7 @@ const handleClientAppealStart = (
 			...state.stage.previousAnswers,
 			triedToAppeal: [...state.stage.previousAnswers.triedToAppeal, command.playerId],
 		},
+		callbackId,
 	}
 
 	return {
@@ -46,7 +49,7 @@ const handleClientAppealStart = (
 				type: 'schedule',
 				command: {
 					type: 'server',
-					action: { type: 'round-return' },
+					action: { type: 'round-return', callbackId },
 				},
 				delaySeconds: Timeouts.appealTimeout,
 			},

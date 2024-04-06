@@ -50,7 +50,11 @@
 		disconnected: false,
 		controls: $changingBoolean
 			? {
-					mode: 'answer',
+					mode: 'answer-select',
+					options: [
+						{ name: 'A', text: 'Один' },
+						{ name: 'B', text: 'Два' },
+					],
 				}
 			: { mode: 'answer-attempt', correct: true },
 		stageBlink: false,

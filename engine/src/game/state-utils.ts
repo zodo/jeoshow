@@ -27,10 +27,16 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 		}
 		case 'round': {
 			const round = getRound(ctx, stage.roundId)
-			const playerIdsCanAppeal = stage.previousAnswers.answers
+			let playerIdsCanAppeal = stage.previousAnswers.answers
 				.filter((a) => !a.isCorrect)
 				.map((a) => a.playerId)
 				.filter((p) => !stage.previousAnswers.triedToAppeal.includes(p))
+			if (
+				stage.previousAnswers.questionId &&
+				getQuestion(ctx, stage.previousAnswers.questionId).answers.type === 'select'
+			) {
+				playerIdsCanAppeal = []
+			}
 
 			return {
 				type: 'round',
@@ -91,6 +97,8 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 				theme: theme?.name ?? '',
 				themeComment: theme?.comments,
 				substate: substate,
+				selectAnswerOptions:
+					question.answers.type === 'select' ? question.answers.options : undefined,
 			}
 		}
 		case 'answer': {

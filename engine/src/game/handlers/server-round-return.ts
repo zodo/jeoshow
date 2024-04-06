@@ -1,4 +1,3 @@
-import { a } from 'vitest/dist/suite-a18diDsI'
 import type { GameState, Stage } from '../models/state'
 import type { ServerCommand } from '../models/state-commands'
 import type { CommandContext, UpdateResult } from '../models/state-machine'
@@ -11,9 +10,10 @@ const handleServerRoundReturn = (
 	ctx: CommandContext
 ): UpdateResult => {
 	if (
-		state.stage.type !== 'answer' &&
-		state.stage.type !== 'appeal-result' &&
-		state.stage.type !== 'appeal'
+		(state.stage.type !== 'answer' &&
+			state.stage.type !== 'appeal-result' &&
+			state.stage.type !== 'appeal') ||
+		state.stage.callbackId !== command.action.callbackId
 	) {
 		return { state, effects: [] }
 	}

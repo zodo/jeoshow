@@ -1,5 +1,6 @@
 import type { GameEvent } from 'shared/models/messages'
 import type { Player, StageSnapshot } from 'shared/models/models'
+import type { PackModel } from 'shared/models/siq'
 import { derived, readable, writable, type Readable } from 'svelte/store'
 import type { HapticType, PlayerButtonHit, ViewState } from './models'
 
@@ -66,7 +67,11 @@ export class GameState {
 				$stage.substate.type === 'awaiting-answer' &&
 				$stage.substate.activePlayerId === this.userId
 			) {
-				return { mode: 'answer' } as const
+				if ($stage.selectAnswerOptions) {
+					return { mode: 'answer-select', options: $stage.selectAnswerOptions } as const
+				} else {
+					return { mode: 'answer-text' } as const
+				}
 			} else if (
 				$stage?.type === 'question' &&
 				$stage.substate.type === 'answer-attempt' &&
@@ -196,9 +201,21 @@ export class GameState {
 						}
 					}
 
+					let fragments: PackModel.FragmentGroup[] = serverStage.fragments
+					if (serverStage.selectAnswerOptions) {
+						fragments = [
+							...fragments,
+
+							serverStage.selectAnswerOptions.map((option) => ({
+								type: 'text',
+								value: `${option.name}. ${option.text}`,
+							})),
+						]
+					}
+
 					stage = {
 						type: 'question',
-						fragments: serverStage.fragments,
+						fragments: fragments,
 						theme: serverStage.theme,
 						themeComment: serverStage.themeComment,
 						readyForHit:

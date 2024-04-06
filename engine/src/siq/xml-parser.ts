@@ -81,7 +81,19 @@ export class SiqXmlContentParser {
 			return undefined
 		}
 
-		return this.getLegacyQuestion(q, id) ?? this.getNewQuestion(q, id)
+		const question = this.getLegacyQuestion(q, id) ?? this.getNewQuestion(q, id)
+
+		if (
+			!question ||
+			!question.answers.type ||
+			(question.answers.type === 'regular' &&
+				question.answers.correct.length === 1 &&
+				question.answers.correct[0] === '')
+		) {
+			return undefined
+		}
+
+		return question
 	}
 
 	private getLegacyQuestion(q: any, id: string): PackModel.Question | undefined {
@@ -113,6 +125,7 @@ export class SiqXmlContentParser {
 			id: id,
 			fragments: questions.map((f: PackModel.Fragment) => [f]),
 			answers: {
+				type: 'regular',
 				correct: q.right?.answer,
 				incorrect: q.wrong?.answer,
 				content: mediaAnswers.map((f: PackModel.Fragment) => [f]),
@@ -134,24 +147,42 @@ export class SiqXmlContentParser {
 				return this.mapQuestionParam(p.item)
 			})
 
-		let answerMedia: PackModel.FragmentGroup[] = params
-			.filter((p: any) => p.$.name === 'answer')
-			.map((p: any) => {
-				return this.mapQuestionParam(p.item)
-			})
-		if (answerMedia.flatMap((x) => x).filter((x) => x.type === 'text').length === 0) {
-			const text: string = q.right.answer[0]
-			answerMedia = [[{ type: 'text', value: text }], ...answerMedia]
+		let answers: PackModel.Answers
+		const answerType = params.find((p: any) => p.$.name === 'answerType')?._ ?? 'regular'
+		if (answerType === 'select') {
+			const options = (
+				params.find((p: any) => p.$.name === 'answerOptions')?.param as any[]
+			).map((p: any) => ({
+				name: p.$.name,
+				text: this.mapQuestionParam(p.item)
+					.map((x) => (x.type === 'text' ? x.value : undefined))
+					.filter((x) => x !== undefined)
+					.reduceRight((acc: string, x) => x + acc, ''),
+			}))
+			const correct = q.right.answer[0]
+			answers = { type: 'select', options, correctName: correct }
+		} else {
+			let answerMedia: PackModel.FragmentGroup[] = params
+				.filter((p: any) => p.$.name === 'answer')
+				.map((p: any) => {
+					return this.mapQuestionParam(p.item)
+				})
+			if (answerMedia.flatMap((x) => x).filter((x) => x.type === 'text').length === 0) {
+				const text: string = q.right.answer[0]
+				answerMedia = [[{ type: 'text', value: text }], ...answerMedia]
+			}
+			answers = {
+				type: 'regular',
+				correct: q.right.answer,
+				incorrect: q.wrong?.answer,
+				content: answerMedia,
+			}
 		}
 
 		return {
 			id: id,
 			fragments: questions,
-			answers: {
-				correct: q.right.answer,
-				incorrect: q.wrong?.answer,
-				content: answerMedia,
-			},
+			answers,
 			price: parseInt(q.$.price, 10),
 		}
 	}

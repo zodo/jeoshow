@@ -15,6 +15,7 @@ const handleClientGameStart = (
 	const firstRoundId = ctx.pack.rounds[0].id
 	const newStage: Stage = {
 		type: 'round',
+		paused: false,
 		roundId: firstRoundId,
 		takenQuestions: [],
 		activePlayer: randomActivePlayer.id,

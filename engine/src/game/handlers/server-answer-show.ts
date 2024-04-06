@@ -1,8 +1,9 @@
+import { assertNever } from 'shared/utils/assert-never'
 import type { GameState, Stage } from '../models/state'
 import type { ServerCommand } from '../models/state-commands'
 import type { CommandContext, UpdateResult } from '../models/state-machine'
 import { getQuestion, toSnapshot } from '../state-utils'
-import { getFragmentsTime } from '../timeouts'
+import { Timeouts, getFragmentsTime } from '../timeouts'
 
 const handleServerAnswerShow = (
 	state: GameState,
@@ -22,13 +23,22 @@ const handleServerAnswerShow = (
 		return { state, effects: [] }
 	}
 
+	const callbackId: string = Math.random().toString(36).substring(7)
 	const stage: Extract<Stage, { type: 'answer' }> = {
 		...state.stage,
 		type: 'answer',
+		callbackId,
 	}
 
 	const questionModel = getQuestion(ctx, state.stage.questionId)
-	const answerShowTime = Math.ceil(getFragmentsTime(questionModel.answers.content) * 0.7)
+	let answerShowTime: number
+	if (questionModel.answers.type === 'regular') {
+		answerShowTime = Math.ceil(getFragmentsTime(questionModel.answers.content) * 0.7)
+	} else if (questionModel.answers.type === 'select') {
+		answerShowTime = Timeouts.selectAnswerShow
+	} else {
+		assertNever(questionModel.answers)
+	}
 
 	return {
 		state: { ...state, stage },
@@ -43,6 +53,7 @@ const handleServerAnswerShow = (
 					type: 'server',
 					action: {
 						type: 'round-return',
+						callbackId,
 					},
 				},
 				delaySeconds: answerShowTime,

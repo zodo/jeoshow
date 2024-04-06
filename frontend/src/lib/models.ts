@@ -25,7 +25,8 @@ export namespace ViewState {
 	export type Controls =
 		| { mode: 'hit'; ready: boolean; falselyStart: boolean }
 		| { mode: 'appeal' }
-		| { mode: 'answer' }
+		| { mode: 'answer-text' }
+		| { mode: 'answer-select'; options: PackModel.SelectAnswerOption[] }
 		| { mode: 'answer-attempt'; correct: boolean }
 
 	export type RoundStage = {
