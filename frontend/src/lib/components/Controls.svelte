@@ -14,7 +14,9 @@
 	const dispatchDebounced = () => {
 		if (!timeout) {
 			timeout = setTimeout(() => {
-				dispatch('action', { type: 'answer-typing', value: answer })
+				if (answer) {
+					dispatch('action', { type: 'answer-typing', value: answer })
+				}
 				timeout = undefined
 			}, 100)
 		}

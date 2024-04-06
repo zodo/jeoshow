@@ -44,13 +44,12 @@ export namespace ViewState {
 		meActive: boolean
 	}
 
-	export type QuestionAwaitingAnswer = {
+	export type AnswerAttempt = {
 		type: 'in-progress' | 'correct' | 'incorrect'
 		playerName: string
 		avatarUrl?: string
 		answer: string
 		isMe: boolean
-		timeoutSeconds: number
 	}
 
 	export type QuestionStage = {
@@ -62,7 +61,7 @@ export namespace ViewState {
 			ready: true
 			timeoutSeconds: number
 		}
-		awaitingAnswer?: QuestionAwaitingAnswer
+		awaitingAnswerTimeoutSeconds?: number
 	}
 
 	export type AnswerStage = {
@@ -93,6 +92,7 @@ export namespace ViewState {
 		players: ExtendedPlayer[]
 		controls: Controls
 		stageBlink: boolean
+		answerAttempt?: AnswerAttempt
 		stage:
 			| { type: 'connecting' }
 			| { type: 'before-start' }

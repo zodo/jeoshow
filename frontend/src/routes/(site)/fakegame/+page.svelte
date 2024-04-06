@@ -21,21 +21,6 @@
 			type: 'question',
 			fragments: [],
 			theme: 'Theme',
-			awaitingAnswer: $changingBoolean
-				? {
-						type: 'in-progress',
-						isMe: false,
-						playerName: 'Player',
-						answer: 'My answer',
-						timeoutSeconds: 60,
-					}
-				: {
-						type: 'incorrect',
-						isMe: false,
-						playerName: 'Player',
-						answer: 'My answer',
-						timeoutSeconds: 60,
-					},
 		},
 		players: [
 			{
@@ -54,6 +39,19 @@
 			ready: false,
 			falselyStart: false,
 		},
+		answerAttempt: $changingBoolean
+			? {
+					type: 'in-progress',
+					playerName: 'Player',
+					answer: 'My answer',
+					isMe: false,
+				}
+			: {
+					type: 'incorrect',
+					playerName: 'Player',
+					answer: 'My answer',
+					isMe: false,
+				},
 		stageBlink: false,
 		showPlayers: true,
 	}}

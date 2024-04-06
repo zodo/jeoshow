@@ -7,13 +7,15 @@
 	import Appeal from './stages/Appeal.svelte'
 	import AppealResult from './stages/AppealResult.svelte'
 	import type { ViewState } from '$lib/models'
+	import AnswerAttempt from './AnswerAttempt.svelte'
+	import AnswerAttemptEffects from './AnswerAttemptEffects.svelte'
 
 	export let state: ViewState.View
 
 	$: stage = state.stage
 </script>
 
-<section class="h-full w-full p-2">
+<section class="relative h-full w-full p-2">
 	{#if stage.type === 'before-start'}
 		<BeforeStart on:action />
 	{:else if stage.type === 'connecting'}
@@ -35,5 +37,15 @@
 	{:else}
 		<p>Unknown stage</p>
 		<pre>{JSON.stringify(stage, null, 2)}</pre>
+	{/if}
+
+	{#if state.answerAttempt}
+		<div class="absolute bottom-0 left-0 w-full p-2">
+			<AnswerAttempt answerAttempt={state.answerAttempt} />
+		</div>
+
+		{#if state.answerAttempt.type !== 'in-progress'}
+			<AnswerAttemptEffects type={state.answerAttempt.type} />
+		{/if}
 	{/if}
 </section>

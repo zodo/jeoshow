@@ -50,10 +50,6 @@ type RoundStageType =
 	| {
 			type: 'answer-attempt'
 			questionId: string
-			answeringPlayer: PlayerId
-			falseStartPlayers: PlayerId[]
-			answer: string
-			correct: boolean
 	  }
 	| {
 			type: 'answer'

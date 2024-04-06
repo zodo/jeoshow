@@ -79,9 +79,6 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 				case 'answer-attempt':
 					substate = {
 						type: 'answer-attempt',
-						activePlayerId: stage.answeringPlayer,
-						answer: stage.answer,
-						correct: stage.correct,
 					}
 					break
 			}

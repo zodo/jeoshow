@@ -17,3 +17,9 @@ export type GameEvent =
 	| { type: 'players-updated'; players: Player[] }
 	| { type: 'stage-updated'; stage: StageSnapshot }
 	| { type: 'player-typing'; playerId: string; value: string }
+	| {
+			type: 'answer-attempt'
+			playerId: string
+			answer: string
+			correct: boolean
+	  }

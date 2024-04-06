@@ -17,6 +17,11 @@ export class GameState {
 	private playerAnswerTyping = writable<string | null>(null)
 	private connected = writable(true)
 	private showPlayers = writable(false)
+	private playerAnswerAttempt = writable<{
+		playerId: string
+		answer: string
+		correct: boolean
+	} | null>(null)
 
 	private activePlayerId = derived(this.stage, ($stage) => {
 		if ($stage?.type === 'round') {
@@ -60,9 +65,11 @@ export class GameState {
 	})
 
 	private controls: Readable<ViewState.Controls> = derived(
-		[this.stage, this.falselyStartedThisQuestion],
-		([$stage, $falselyStartedThisQuestion]) => {
-			if (
+		[this.stage, this.falselyStartedThisQuestion, this.playerAnswerAttempt],
+		([$stage, $falselyStartedThisQuestion, $playerAnswerAttempt]) => {
+			if ($playerAnswerAttempt && $playerAnswerAttempt.playerId === this.userId) {
+				return { mode: 'answer-attempt', correct: $playerAnswerAttempt.correct } as const
+			} else if (
 				$stage?.type === 'question' &&
 				$stage.substate.type === 'awaiting-answer' &&
 				$stage.substate.activePlayerId === this.userId
@@ -72,12 +79,6 @@ export class GameState {
 				} else {
 					return { mode: 'answer-text' } as const
 				}
-			} else if (
-				$stage?.type === 'question' &&
-				$stage.substate.type === 'answer-attempt' &&
-				$stage.substate.activePlayerId === this.userId
-			) {
-				return { mode: 'answer-attempt', correct: $stage.substate.correct } as const
 			} else if (
 				$stage?.type === 'round' &&
 				$stage.playerIdsCanAppeal.includes(this.userId)
@@ -134,6 +135,7 @@ export class GameState {
 			this.activePlayerId,
 			this.controls,
 			this.stageBlink,
+			this.playerAnswerAttempt,
 		],
 		([
 			$extendedPlayers,
@@ -144,6 +146,7 @@ export class GameState {
 			$activePlayerId,
 			$controls,
 			$stageBlink,
+			$playerAnswerAttempt,
 		]) => {
 			const getPlayer = (playerId: string) => $extendedPlayers.find((p) => p.id === playerId)
 
@@ -176,31 +179,6 @@ export class GameState {
 					break
 				}
 				case 'question': {
-					let awaitingAnswer: ViewState.QuestionAwaitingAnswer | undefined = undefined
-					if (serverStage.substate.type === 'awaiting-answer') {
-						const activePlayer = serverStage.substate.activePlayerId
-						const player = getPlayer(activePlayer)
-						awaitingAnswer = {
-							type: 'in-progress',
-							playerName: player?.name ?? 'Unknown',
-							avatarUrl: player?.avatarUrl,
-							answer: $playerAnswerTyping ?? '',
-							isMe: activePlayer === this.userId,
-							timeoutSeconds: serverStage.substate.timeoutSeconds,
-						}
-					} else if (serverStage.substate.type === 'answer-attempt') {
-						const activePlayer = serverStage.substate.activePlayerId
-						const player = getPlayer(activePlayer)
-						awaitingAnswer = {
-							type: serverStage.substate.correct ? 'correct' : 'incorrect',
-							playerName: player?.name ?? 'Unknown',
-							avatarUrl: player?.avatarUrl,
-							answer: serverStage.substate.answer,
-							isMe: activePlayer === this.userId,
-							timeoutSeconds: 4,
-						}
-					}
-
 					let fragments: PackModel.FragmentGroup[] = serverStage.fragments
 					if (serverStage.selectAnswerOptions) {
 						fragments = [
@@ -225,7 +203,11 @@ export class GameState {
 										timeoutSeconds: serverStage.substate.timeoutSeconds,
 									}
 								: undefined,
-						awaitingAnswer: awaitingAnswer,
+						awaitingAnswerTimeoutSeconds:
+							serverStage.substate.type === 'awaiting-answer' &&
+							serverStage.substate.activePlayerId === this.userId
+								? serverStage.substate.timeoutSeconds
+								: undefined,
 					}
 					break
 				}
@@ -267,6 +249,32 @@ export class GameState {
 				}
 			}
 
+			let answerAttempt: ViewState.AnswerAttempt | undefined = undefined
+			if ($playerAnswerAttempt) {
+				const activePlayer = $playerAnswerAttempt.playerId
+				const player = getPlayer(activePlayer)
+				answerAttempt = {
+					type: $playerAnswerAttempt.correct ? 'correct' : 'incorrect',
+					playerName: player?.name ?? 'Unknown',
+					avatarUrl: player?.avatarUrl,
+					answer: $playerAnswerAttempt.answer,
+					isMe: $playerAnswerAttempt.playerId === this.userId,
+				}
+			} else if (
+				serverStage.type === 'question' &&
+				serverStage.substate.type === 'awaiting-answer'
+			) {
+				const activePlayer = serverStage.substate.activePlayerId
+				const player = getPlayer(activePlayer)
+				answerAttempt = {
+					type: 'in-progress',
+					playerName: player?.name ?? 'Unknown',
+					avatarUrl: player?.avatarUrl,
+					answer: $playerAnswerTyping ?? '',
+					isMe: serverStage.substate.activePlayerId === this.userId,
+				}
+			}
+
 			const result: ViewState.View = {
 				disconnected: !$connected,
 				showPlayers: $showPlayers,
@@ -274,6 +282,7 @@ export class GameState {
 				controls: $controls,
 				stageBlink: $stageBlink,
 				stage: stage,
+				answerAttempt,
 			}
 			return result
 		}
@@ -306,6 +315,15 @@ export class GameState {
 			}
 			case 'player-typing':
 				this.playerAnswerTyping.set(event.value)
+				break
+			case 'answer-attempt':
+				this.playerAnswerAttempt.set({
+					playerId: event.playerId,
+					answer: event.answer,
+					correct: event.correct,
+				})
+				setTimeout(() => this.playerAnswerAttempt.set(null), 2500)
+				break
 		}
 	}
 

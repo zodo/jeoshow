@@ -1,7 +1,7 @@
 import type { PackModel } from 'shared/models/siq'
-import type { GameState, Stage } from '../models/state'
+import type { AnswersSummary, GameState, Stage } from '../models/state'
 import type { ClientCommand } from '../models/state-commands'
-import type { CommandContext, UpdateResult } from '../models/state-machine'
+import type { CommandContext, UpdateEffect, UpdateResult } from '../models/state-machine'
 import { getQuestion, toSnapshot } from '../state-utils'
 import { Timeouts } from '../timeouts'
 import { assertNever } from 'shared/utils/assert-never'
@@ -28,126 +28,103 @@ const handleClientAnswerGive = (
 	} else {
 		assertNever(questionModel.answers)
 	}
-	if (isCorrect(questionModel.answers, command.action.value)) {
-		const players = state.players.map((p) =>
-			p.id === command.playerId
+
+	const isCorrectAnswer = isCorrect(questionModel.answers, command.action.value)
+	const players = state.players.map((p) =>
+		p.id === command.playerId
+			? {
+					...p,
+					answerAttemts: p.answerAttemts + 1,
+					score: isCorrectAnswer
+						? p.score + questionModel.price
+						: p.score - questionModel.price,
+				}
+			: p
+	)
+
+	const previousAnswers: AnswersSummary = {
+		...state.stage.previousAnswers,
+		answers: [
+			...state.stage.previousAnswers.answers,
+			{
+				playerId: command.playerId,
+				text: playerAnswerText,
+				isCorrect: isCorrectAnswer,
+				scoreDiff: isCorrectAnswer ? questionModel.price : -questionModel.price,
+			},
+		],
+	}
+
+	const callbackId = Math.random().toString(36).substring(7)
+
+	const allowAnswersFromOtherPlayers =
+		!isCorrectAnswer &&
+		((answerType === 'select' &&
+			previousAnswers.answers.length < questionModel.answers.options.length - 1) ||
+			answerType === 'regular') &&
+		previousAnswers.answers.length < state.players.filter((p) => !p.disconnected).length
+	console.log(
+		JSON.stringify(
+			{
+				allowAnswersFromOtherPlayers,
+				isCorrectAnswer,
+				answerType,
+				answersLength: previousAnswers.answers.length,
+				playersLength: state.players.filter((p) => !p.disconnected).length,
+			},
+			null,
+			2
+		)
+	)
+
+	const stage: Extract<Stage, { type: 'answer-attempt' }> = {
+		...state.stage,
+		type: 'answer-attempt',
+		previousAnswers,
+		callbackId,
+		activePlayer: isCorrectAnswer ? command.playerId : state.stage.activePlayer,
+	}
+
+	return {
+		state: { ...state, players, stage },
+		effects: [
+			{
+				type: 'client-broadcast',
+				event: {
+					type: 'players-updated',
+					players,
+				},
+			},
+			{
+				type: 'client-broadcast',
+				event: { type: 'stage-updated', stage: toSnapshot(stage, ctx) },
+			},
+			{
+				type: 'client-broadcast',
+				event: {
+					type: 'answer-attempt',
+					playerId: command.playerId,
+					answer: playerAnswerText,
+					correct: isCorrectAnswer,
+				},
+			},
+			allowAnswersFromOtherPlayers
 				? {
-						...p,
-						score: p.score + questionModel.price,
-						answerAttemts: p.answerAttemts + 1,
-					}
-				: p
-		)
-		const stage: Extract<Stage, { type: 'answer-attempt' }> = {
-			...state.stage,
-			type: 'answer-attempt',
-			activePlayer: command.playerId,
-			answer: playerAnswerText,
-			correct: true,
-			previousAnswers: {
-				...state.stage.previousAnswers,
-				answers: [
-					...state.stage.previousAnswers.answers,
-					{
-						playerId: command.playerId,
-						text: playerAnswerText,
-						isCorrect: true,
-						scoreDiff: questionModel.price,
-					},
-				],
-			},
-		}
-
-		return {
-			state: { ...state, players, stage },
-			effects: [
-				{
-					type: 'client-broadcast',
-					event: {
-						type: 'players-updated',
-						players,
-					},
-				},
-				{
-					type: 'client-broadcast',
-					event: { type: 'stage-updated', stage: toSnapshot(stage, ctx) },
-				},
-				{
-					type: 'schedule',
-					command: {
-						type: 'server',
-						action: { type: 'answer-show', questionId: questionModel.id },
-					},
-					delaySeconds: Timeouts.answerAttemptShow,
-				},
-			],
-		}
-	} else {
-		const players = state.players.map((p) =>
-			p.id === command.playerId ? { ...p, score: p.score - questionModel.price } : p
-		)
-		const callbackId = Math.random().toString(36).substring(7)
-		const stage: Extract<Stage, { type: 'answer-attempt' }> = {
-			...state.stage,
-			type: 'answer-attempt',
-			answer: playerAnswerText,
-			correct: false,
-			previousAnswers: {
-				...state.stage.previousAnswers,
-				answers: [
-					...state.stage.previousAnswers.answers,
-					{
-						playerId: command.playerId,
-						text: playerAnswerText,
-						isCorrect: false,
-						scoreDiff: -questionModel.price,
-					},
-				],
-			},
-			callbackId,
-		}
-
-		const showButtonOneMoreTime =
-			((answerType === 'select' &&
-				state.stage.previousAnswers.answers.length <
-					questionModel.answers.options.length - 2) ||
-				answerType === 'regular') &&
-			state.stage.previousAnswers.answers.length <
-				state.players.filter((p) => !p.disconnected).length - 1
-
-		return {
-			state: { ...state, players, stage },
-			effects: [
-				{
-					type: 'client-broadcast',
-					event: {
-						type: 'players-updated',
-						players,
-					},
-				},
-				{
-					type: 'client-broadcast',
-					event: { type: 'stage-updated', stage: toSnapshot(stage, ctx) },
-				},
-				showButtonOneMoreTime
-					? {
-							type: 'schedule',
-							command: {
-								type: 'server',
-								action: { type: 'button-ready', callbackId },
-							},
-							delaySeconds: Timeouts.answerAttemptShow,
-						}
-					: {
-							type: 'schedule',
-							command: {
-								type: 'server',
-								action: { type: 'answer-show', questionId: questionModel.id },
-							},
-							delaySeconds: Timeouts.answerAttemptShow,
+						type: 'schedule',
+						command: {
+							type: 'server',
+							action: { type: 'button-ready', callbackId },
 						},
-			],
-		}
+						delaySeconds: Timeouts.answerAttemptShow,
+					}
+				: {
+						type: 'trigger',
+						command: {
+							type: 'server',
+							action: { type: 'answer-show', questionId: questionModel.id },
+						},
+					},
+		],
 	}
 }
 
