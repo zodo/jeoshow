@@ -45,18 +45,15 @@
 				active: true,
 				disconnected: false,
 				pressedButton: null,
+				answerAttemts: 123,
 			},
 		],
 		disconnected: false,
-		controls: $changingBoolean
-			? {
-					mode: 'answer-select',
-					options: [
-						{ name: 'A', text: 'Один' },
-						{ name: 'B', text: 'Два' },
-					],
-				}
-			: { mode: 'answer-attempt', correct: true },
+		controls: {
+			mode: 'hit',
+			ready: false,
+			falselyStart: false,
+		},
 		stageBlink: false,
 		showPlayers: true,
 	}}

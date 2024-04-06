@@ -144,6 +144,7 @@
 						class="h-full flex-1 rounded-lg bg-bg-accent p-2 text-center text-text-accent transition-colors disabled:bg-bg-secondary disabled:text-text-normal"
 						on:click={() =>
 							dispatch('action', { type: 'answer-give', value: option.name })}
+						on:focus={(e) => e.preventDefault()}
 						disabled={!selectAnswersEnabled}
 					>
 						{option.name}
