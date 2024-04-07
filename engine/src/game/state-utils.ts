@@ -55,6 +55,7 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 				activePlayerId: stage.activePlayer,
 				timeoutSeconds: stage.callbackTimeout ?? 0,
 				playerIdsCanAppeal,
+				skipRoundVoting: stage.skipRoundVoting,
 			}
 		}
 		case 'question':

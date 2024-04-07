@@ -7,7 +7,7 @@ export type ServerAction =
 	| { type: 'button-hit-choose' }
 	| { type: 'answer-show'; questionId?: string }
 	| { type: 'answer-timeout'; callbackId: string }
-	| { type: 'round-return'; callbackId: string }
+	| { type: 'round-return'; callbackId: string; forceNextRound?: boolean }
 	| { type: 'question-random'; callbackId: string }
 	| { type: 'state-cleanup' }
 

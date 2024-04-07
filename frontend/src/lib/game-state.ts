@@ -191,6 +191,20 @@ export class GameState {
 							})),
 						})),
 						meActive: $activePlayerId === this.userId,
+						skipRoundVoting: serverStage.skipRoundVoting
+							? {
+									yes: serverStage.skipRoundVoting.yes.map(
+										(playerId) => getPlayer(playerId)?.name ?? 'Unknown'
+									),
+									no: serverStage.skipRoundVoting.no.map(
+										(playerId) => getPlayer(playerId)?.name ?? 'Unknown'
+									),
+									timeoutSeconds: serverStage.skipRoundVoting.timeoutSeconds,
+									meVoted:
+										serverStage.skipRoundVoting.yes.includes(this.userId) ||
+										serverStage.skipRoundVoting.no.includes(this.userId),
+								}
+							: undefined,
 					}
 					break
 				}

@@ -32,6 +32,11 @@ export type StageSnapshot =
 			activePlayerId: string
 			timeoutSeconds: number
 			playerIdsCanAppeal: string[]
+			skipRoundVoting?: {
+				yes: string[]
+				no: string[]
+				timeoutSeconds: number
+			}
 	  }
 	| {
 			type: 'question'

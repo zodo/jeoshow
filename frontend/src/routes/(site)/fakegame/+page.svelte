@@ -18,11 +18,18 @@
 <Game
 	state={{
 		stage: {
-			type: 'question',
-			fragments: [],
-			theme: 'Theme',
-			price: 100,
-			showIntroduction: false,
+			type: 'round',
+			name: 'Round 1',
+			themes: [],
+			meActive: true,
+			skipRoundVoting: $changingBoolean
+				? {
+						timeoutSeconds: 2,
+						yes: ['asdas'],
+						no: ['asdas'],
+						meVoted: true,
+					}
+				: undefined,
 		},
 		players: [
 			{
@@ -35,25 +42,13 @@
 				answerAttemts: 123,
 			},
 		],
-		disconnected: $changingBoolean,
+		disconnected: false,
 		controls: {
 			mode: 'hit',
 			ready: false,
 			falselyStart: false,
 		},
-		answerAttempt: $changingBoolean
-			? {
-					type: 'in-progress',
-					playerName: 'Player',
-					answer: 'My answer',
-					isMe: false,
-				}
-			: {
-					type: 'incorrect',
-					playerName: 'Player',
-					answer: 'My answer',
-					isMe: false,
-				},
+		answerAttempt: undefined,
 		stageBlink: false,
 		showPlayers: true,
 	}}

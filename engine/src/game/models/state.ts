@@ -1,5 +1,4 @@
 import type { Player } from 'shared/models/models'
-import type { ScheduledCommand } from './state-commands'
 
 type PlayerId = string
 
@@ -27,6 +26,11 @@ type RoundStageType =
 	| {
 			type: 'round'
 			paused: boolean
+			skipRoundVoting?: {
+				yes: PlayerId[]
+				no: PlayerId[]
+				timeoutSeconds: number
+			}
 	  }
 	| {
 			type: 'question'

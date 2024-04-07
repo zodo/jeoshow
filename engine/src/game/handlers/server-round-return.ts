@@ -12,7 +12,8 @@ const handleServerRoundReturn = (
 	if (
 		(state.stage.type !== 'answer' &&
 			state.stage.type !== 'appeal-result' &&
-			state.stage.type !== 'appeal') ||
+			state.stage.type !== 'appeal' &&
+			state.stage.type != 'round') ||
 		state.stage.callbackId !== command.action.callbackId
 	) {
 		return { state, effects: [] }
@@ -20,7 +21,9 @@ const handleServerRoundReturn = (
 	const roundModel = getRound(ctx, state.stage.roundId)
 
 	const hasMoreQuestions =
-		roundModel.themes.flatMap((t) => t.questions).length > state.stage.takenQuestions.length
+		roundModel.themes.flatMap((t) => t.questions).length > state.stage.takenQuestions.length &&
+		!command.action.forceNextRound
+
 	const hasMoreRounds = ctx.pack.rounds[ctx.pack.rounds.length - 1].id !== state.stage.roundId
 	const callbackId: string = Math.random().toString(36).substring(7)
 
@@ -45,6 +48,7 @@ const handleServerRoundReturn = (
 				type: 'round',
 				paused: noPlayersLeft,
 				activePlayer,
+				skipRoundVoting: undefined,
 				callbackId,
 				callbackTimeout: Timeouts.selectQuestion,
 			}
@@ -62,6 +66,7 @@ const handleServerRoundReturn = (
 				activePlayer,
 				roundId: newRoundModel.id,
 				takenQuestions: [],
+				skipRoundVoting: undefined,
 				callbackId,
 				callbackTimeout: Timeouts.selectQuestion,
 			}

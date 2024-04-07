@@ -10,6 +10,7 @@ export namespace Timeouts {
 	export const answerAttemptShow = 3
 	export const selectAnswerShow = 4
 	export const mediaTimeout = 45
+	export const roundSkipVoting = 10
 }
 
 export type FragmentsTime = {

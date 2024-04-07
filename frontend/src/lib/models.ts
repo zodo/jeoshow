@@ -42,6 +42,12 @@ export namespace ViewState {
 			}[]
 		}[]
 		meActive: boolean
+		skipRoundVoting?: {
+			timeoutSeconds: number
+			meVoted: boolean
+			yes: string[]
+			no: string[]
+		}
 	}
 
 	export type AnswerAttempt = {

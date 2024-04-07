@@ -25,6 +25,7 @@ import handleClientAppealStart from './handlers/client-appeal-start'
 import handleClientAppealResolve from './handlers/client-appeal-resolve'
 import handleClientAnswerTyping from './handlers/client-answer-typing'
 import handleServerButtonHitChoose from './handlers/server-button-hit-choose'
+import handleRoundSkip from './handlers/client-round-skip'
 
 export const updateState = (
 	state: GameState,
@@ -55,6 +56,7 @@ const clientCommandHandlers: {
 	'media-finished': handleClientMediaFinished,
 	'appeal-start': handleClientAppealStart,
 	'appeal-resolve': handleClientAppealResolve,
+	'round-skip': handleRoundSkip,
 }
 
 const serverCommandHandlers: {
