@@ -37,6 +37,15 @@ export type StageSnapshot =
 				no: string[]
 				timeoutSeconds: number
 			}
+			appealVoting?: {
+				question: PackModel.Question
+				answer: string
+				playerId: string
+				agree: string[]
+				disagree: string[]
+				timeoutSeconds: number
+			}
+			appealResolution?: 'approved' | 'rejected'
 	  }
 	| {
 			type: 'question'
@@ -52,13 +61,4 @@ export type StageSnapshot =
 			theme: string
 			model: PackModel.Answers
 	  }
-	| {
-			type: 'appeal'
-			model: PackModel.Question
-			answer: string
-			playerId: string
-			resolutions: { playerId: string; resolution: boolean }[]
-			timeoutSeconds: number
-	  }
-	| { type: 'appeal-result'; resolution: boolean }
 	| { type: 'after-finish' }

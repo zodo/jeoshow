@@ -10,10 +10,7 @@ const handleServerRoundReturn = (
 	ctx: CommandContext
 ): UpdateResult => {
 	if (
-		(state.stage.type !== 'answer' &&
-			state.stage.type !== 'appeal-result' &&
-			state.stage.type !== 'appeal' &&
-			state.stage.type != 'round') ||
+		(state.stage.type !== 'answer' && state.stage.type != 'round') ||
 		state.stage.callbackId !== command.action.callbackId
 	) {
 		return { state, effects: [] }
@@ -49,6 +46,8 @@ const handleServerRoundReturn = (
 				paused: noPlayersLeft,
 				activePlayer,
 				skipRoundVoting: undefined,
+				appealResolution: undefined,
+				appealVoting: undefined,
 				callbackId,
 				callbackTimeout: Timeouts.selectQuestion,
 			}
@@ -67,6 +66,8 @@ const handleServerRoundReturn = (
 				roundId: newRoundModel.id,
 				takenQuestions: [],
 				skipRoundVoting: undefined,
+				appealResolution: undefined,
+				appealVoting: undefined,
 				callbackId,
 				callbackTimeout: Timeouts.selectQuestion,
 			}

@@ -22,14 +22,18 @@
 			name: 'Round 1',
 			themes: [],
 			meActive: true,
-			skipRoundVoting: $changingBoolean
+			appealVoting: $changingBoolean
 				? {
-						timeoutSeconds: 2,
-						yes: ['asdas'],
-						no: ['asdas'],
-						meVoted: true,
+						correctAnswers: ['Правильно', 'Pravilno'],
+						answer: 'Неправильно',
+						playerName: 'Player 1',
+						agree: ['asd'],
+						disagree: ['asd', 'asd'],
+						timeoutSeconds: 3,
+						meVoted: false,
 					}
 				: undefined,
+			appealResolution: !$changingBoolean ? 'approved' : undefined,
 		},
 		players: [
 			{

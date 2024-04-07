@@ -48,6 +48,16 @@ export namespace ViewState {
 			yes: string[]
 			no: string[]
 		}
+		appealVoting?: {
+			correctAnswers: string[]
+			answer: string
+			playerName: string
+			agree: string[]
+			disagree: string[]
+			timeoutSeconds: number
+			meVoted: boolean
+		}
+		appealResolution?: 'approved' | 'rejected'
 	}
 
 	export type AnswerAttempt = {
@@ -78,22 +88,6 @@ export namespace ViewState {
 		model: PackModel.Answers
 	}
 
-	export type AppealStage = {
-		type: 'appeal'
-		model: PackModel.Question
-		answer: string
-		playerName: string
-		agreePlayers: string[]
-		disagreePlayers: string[]
-		timeoutSeconds: number
-		isMe: boolean
-	}
-
-	export type AppealResultStage = {
-		type: 'appeal-result'
-		resolution: boolean
-	}
-
 	export type View = {
 		disconnected: boolean
 		showPlayers: boolean
@@ -107,8 +101,6 @@ export namespace ViewState {
 			| RoundStage
 			| QuestionStage
 			| AnswerStage
-			| AppealStage
-			| AppealResultStage
 			| { type: 'after-finish' }
 	}
 }

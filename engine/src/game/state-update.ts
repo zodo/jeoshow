@@ -21,11 +21,10 @@ import handleServerButtonHitTimeout from './handlers/server-button-hit-timeout'
 import handleClientAnswerGive from './handlers/client-answer-give'
 import handleServerAnswerTimeout from './handlers/server-answer-timeout'
 import handleClientMediaFinished from './handlers/client-media-finished'
-import handleClientAppealStart from './handlers/client-appeal-start'
-import handleClientAppealResolve from './handlers/client-appeal-resolve'
 import handleClientAnswerTyping from './handlers/client-answer-typing'
 import handleServerButtonHitChoose from './handlers/server-button-hit-choose'
 import handleRoundSkip from './handlers/client-round-skip'
+import handleClientAppealVote from './handlers/client-appeal-vote'
 
 export const updateState = (
 	state: GameState,
@@ -54,8 +53,7 @@ const clientCommandHandlers: {
 	'answer-give': handleClientAnswerGive,
 	'answer-typing': handleClientAnswerTyping,
 	'media-finished': handleClientMediaFinished,
-	'appeal-start': handleClientAppealStart,
-	'appeal-resolve': handleClientAppealResolve,
+	'appeal-vote': handleClientAppealVote,
 	'round-skip': handleRoundSkip,
 }
 

@@ -8,8 +8,7 @@ export type ClientAction =
 	| { type: 'answer-give'; value: string }
 	| { type: 'answer-typing'; value: string }
 	| { type: 'media-finished' }
-	| { type: 'appeal-start' }
-	| { type: 'appeal-resolve'; resolution: boolean }
+	| { type: 'appeal-vote'; vote: 'agree' | 'disagree' }
 	| { type: 'round-skip'; vote: 'yes' | 'no' }
 
 export type GameEvent =

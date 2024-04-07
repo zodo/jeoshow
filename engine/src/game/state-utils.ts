@@ -56,6 +56,13 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 				timeoutSeconds: stage.callbackTimeout ?? 0,
 				playerIdsCanAppeal,
 				skipRoundVoting: stage.skipRoundVoting,
+				appealVoting: stage.appealVoting
+					? {
+							...stage.appealVoting,
+							question: getQuestion(ctx, stage.appealVoting.questionId),
+						}
+					: undefined,
+				appealResolution: stage.appealResolution,
 			}
 		}
 		case 'question':
@@ -109,28 +116,6 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 				model: question.answers,
 			}
 		}
-		case 'appeal': {
-			const question = getQuestion(ctx, stage.questionId)
-
-			const resolutions = Object.entries(stage.resolutions).map(([playerId, resolution]) => ({
-				playerId,
-				resolution,
-			}))
-			return {
-				type: 'appeal',
-				model: question,
-				answer: stage.answer,
-				playerId: stage.playerId,
-				resolutions,
-				timeoutSeconds: stage.callbackTimeout ?? 0,
-			}
-		}
-
-		case 'appeal-result':
-			return {
-				type: 'appeal-result',
-				resolution: stage.resolution,
-			}
 		case 'after-finish':
 			return { type: 'after-finish' }
 	}

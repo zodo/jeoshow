@@ -31,6 +31,15 @@ type RoundStageType =
 				no: PlayerId[]
 				timeoutSeconds: number
 			}
+			appealVoting?: {
+				questionId: string
+				answer: string
+				playerId: PlayerId
+				agree: PlayerId[]
+				disagree: PlayerId[]
+				timeoutSeconds: number
+			}
+			appealResolution?: 'approved' | 'rejected'
 	  }
 	| {
 			type: 'question'
@@ -61,14 +70,6 @@ type RoundStageType =
 			questionId: string
 			finishedMediaPlayers: PlayerId[]
 	  }
-	| {
-			type: 'appeal'
-			questionId: string
-			answer: string
-			playerId: PlayerId
-			resolutions: Record<PlayerId, boolean>
-	  }
-	| { type: 'appeal-result'; resolution: boolean }
 
 export interface AnswersSummary {
 	questionId?: string

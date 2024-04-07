@@ -25,12 +25,12 @@ export class GameState {
 	} | null>(null)
 
 	private activePlayerId = derived(this.stage, ($stage) => {
-		if ($stage?.type === 'round') {
+		if ($stage?.type === 'round' && !$stage.appealVoting) {
 			return $stage.activePlayerId
 		} else if ($stage?.type === 'question' && $stage.substate.type === 'awaiting-answer') {
 			return $stage.substate.activePlayerId
-		} else if ($stage?.type === 'appeal') {
-			return $stage.playerId
+		} else if ($stage?.type === 'round' && $stage.appealVoting?.playerId) {
+			return $stage.appealVoting.playerId
 		}
 		return null
 	})
@@ -205,6 +205,29 @@ export class GameState {
 										serverStage.skipRoundVoting.no.includes(this.userId),
 								}
 							: undefined,
+						appealVoting: serverStage.appealVoting
+							? {
+									correctAnswers:
+										serverStage.appealVoting.question.answers.type === 'regular'
+											? serverStage.appealVoting.question.answers.correct
+											: [],
+									answer: serverStage.appealVoting.answer,
+									playerName:
+										getPlayer(serverStage.appealVoting.playerId)?.name ??
+										'Unknown',
+									agree: serverStage.appealVoting.agree.map(
+										(playerId) => getPlayer(playerId)?.name ?? 'Unknown'
+									),
+									disagree: serverStage.appealVoting.disagree.map(
+										(playerId) => getPlayer(playerId)?.name ?? 'Unknown'
+									),
+									timeoutSeconds: serverStage.appealVoting.timeoutSeconds,
+									meVoted:
+										serverStage.appealVoting.agree.includes(this.userId) ||
+										serverStage.appealVoting.disagree.includes(this.userId),
+								}
+							: undefined,
+						appealResolution: serverStage.appealResolution,
 					}
 					break
 				}
@@ -248,30 +271,6 @@ export class GameState {
 						type: 'answer',
 						theme: serverStage.theme,
 						model: serverStage.model,
-					}
-					break
-				}
-				case 'appeal': {
-					stage = {
-						type: 'appeal',
-						model: serverStage.model,
-						answer: serverStage.answer,
-						playerName: getPlayer(serverStage.playerId)?.name ?? 'Unknown',
-						agreePlayers: serverStage.resolutions
-							.filter((r) => r.resolution)
-							.map((r) => getPlayer(r.playerId)?.name ?? 'Unknown'),
-						disagreePlayers: serverStage.resolutions
-							.filter((r) => !r.resolution)
-							.map((r) => getPlayer(r.playerId)?.name ?? 'Unknown'),
-						timeoutSeconds: serverStage.timeoutSeconds,
-						isMe: serverStage.playerId === this.userId,
-					}
-					break
-				}
-				case 'appeal-result': {
-					stage = {
-						type: 'appeal-result',
-						resolution: serverStage.resolution,
 					}
 					break
 				}

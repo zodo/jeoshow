@@ -9,7 +9,7 @@ const handleRoundSkip = (
 	command: ClientCommand.OfType<'round-skip'>,
 	ctx: CommandContext
 ): UpdateResult => {
-	if (state.stage.type !== 'round') {
+	if (state.stage.type !== 'round' || state.stage.appealVoting) {
 		return { state, effects: [] }
 	}
 	let yesVotes = state.stage.skipRoundVoting?.yes ?? []

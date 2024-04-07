@@ -4,8 +4,6 @@
 	import Question from './stages/Question.svelte'
 	import AfterFinish from './stages/AfterFinish.svelte'
 	import Answer from './stages/Answer.svelte'
-	import Appeal from './stages/Appeal.svelte'
-	import AppealResult from './stages/AppealResult.svelte'
 	import type { ViewState } from '$lib/models'
 	import AnswerAttempt from './AnswerAttempt.svelte'
 	import AnswerAttemptEffects from './AnswerAttemptEffects.svelte'
@@ -30,10 +28,6 @@
 		<Answer answer={stage} on:action />
 	{:else if stage.type === 'after-finish'}
 		<AfterFinish players={state.players} />
-	{:else if stage.type === 'appeal'}
-		<Appeal appeal={stage} on:action />
-	{:else if stage.type === 'appeal-result'}
-		<AppealResult resolution={stage.resolution} />
 	{:else}
 		<p>Unknown stage</p>
 		<pre>{JSON.stringify(stage, null, 2)}</pre>

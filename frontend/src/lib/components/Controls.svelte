@@ -98,7 +98,7 @@
 	{#if controls.mode === 'appeal'}
 		<button
 			class="h-10 w-full cursor-pointer rounded-lg border-none bg-warn text-xl shadow-md"
-			on:click={() => dispatch('action', { type: 'appeal-start' })}
+			on:click={() => dispatch('action', { type: 'appeal-vote', vote: 'agree' })}
 			in:scale={{ duration: 300, easing: quintInOut }}
 		>
 			Я БЫЛ ПРАВ!

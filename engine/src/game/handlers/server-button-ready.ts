@@ -26,7 +26,7 @@ const handleServerButtonReady = (
 	const newStage: Extract<Stage, { type: 'ready-for-hit' }> = {
 		...state.stage,
 		type: 'ready-for-hit',
-		falseStartPlayers: [],
+		falseStartPlayers: state.stage.type === 'question' ? state.stage.falseStartPlayers : [],
 		randomizeHits: true,
 		playersWhoHit: [],
 		callbackId,
