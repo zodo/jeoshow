@@ -9,30 +9,40 @@ export namespace Timeouts {
 	export const appealResult = 2
 	export const answerAttemptShow = 3
 	export const selectAnswerShow = 4
+	export const mediaTimeout = 45
 }
 
-export const getFragmentsTime = (fragments: PackModel.FragmentGroup[]): number => {
+export type FragmentsTime = {
+	seconds: number
+	hasMedia: boolean
+}
+export const getFragmentsTime = (fragments: PackModel.FragmentGroup[]): FragmentsTime => {
 	let totalTimeSeconds = 0
 	let hasDefinedTime = false
+	let hasMedia = false
 	for (const fragment of fragments.flatMap((f) => f)) {
 		if (fragment.type === 'text') {
-			if (!fragment.value) {
-				console.log(JSON.stringify(fragments, null, 2))
-			}
-			totalTimeSeconds += fragment.value.length / 10
+			totalTimeSeconds += fragment.value ? fragment.value.length / 18 : 2
 		} else if (fragment.type === 'image') {
-			totalTimeSeconds += 7
+			totalTimeSeconds += 5
 		} else if (fragment.type === 'audio' || fragment.type === 'video') {
 			hasDefinedTime = fragment.time !== undefined
-			totalTimeSeconds += fragment.time ?? 12
+			totalTimeSeconds += fragment.time ?? 10
+			hasMedia = true
 		}
 	}
 	const minTime = 5
 
 	if (hasDefinedTime) {
-		return Math.floor(Math.max(totalTimeSeconds, minTime))
+		return {
+			seconds: Math.floor(Math.max(totalTimeSeconds, minTime)),
+			hasMedia,
+		}
 	}
 
 	const maxTime = 15
-	return Math.floor(Math.min(Math.max(totalTimeSeconds, minTime), maxTime) + 1)
+	return {
+		seconds: Math.floor(Math.min(Math.max(totalTimeSeconds, minTime), maxTime) + 1),
+		hasMedia,
+	}
 }

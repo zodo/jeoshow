@@ -7,7 +7,23 @@ const handleClientMediaFinished = (
 	command: ClientCommand.OfType<'media-finished'>,
 	ctx: CommandContext
 ): UpdateResult => {
-	if (state.stage.type === 'question') {
+	if (state.stage.type !== 'question' && state.stage.type !== 'answer') {
+		return {}
+	}
+
+	const stage: (typeof state)['stage'] = {
+		...state.stage,
+		finishedMediaPlayers: [...state.stage.finishedMediaPlayers, command.playerId],
+	}
+
+	const allPlayersFinished =
+		stage.finishedMediaPlayers.length === state.players.filter((p) => !p.disconnected).length
+
+	if (!allPlayersFinished) {
+		return { state: { ...state, stage } }
+	}
+
+	if (allPlayersFinished && state.stage.type === 'question') {
 		return {
 			effects: [
 				{
@@ -19,7 +35,9 @@ const handleClientMediaFinished = (
 				},
 			],
 		}
-	} else if (state.stage.type === 'answer') {
+	}
+
+	if (allPlayersFinished && state.stage.type === 'answer') {
 		const callbackId: string = Math.random().toString(36).substring(7)
 		return {
 			state: { ...state, stage: { ...state.stage, callbackId } },
@@ -33,9 +51,9 @@ const handleClientMediaFinished = (
 				},
 			],
 		}
-	} else {
-		return {}
 	}
+
+	return {}
 }
 
 export default handleClientMediaFinished

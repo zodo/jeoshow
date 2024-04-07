@@ -31,8 +31,8 @@ const handleClientQuestionSelect = (
 	}
 
 	const callbackId: string = Math.random().toString(36).substring(7)
-	const fragmentsTime = getFragmentsTime(question.fragments)
-	const questionReadTime = Math.floor(fragmentsTime + Math.random() * 4) + 1
+	const { seconds } = getFragmentsTime(question.fragments)
+	const questionReadTime = Math.floor(seconds + Math.random() * 3) + 1
 
 	const newStage: Extract<Stage, { type: 'question' }> = {
 		type: 'question',
@@ -42,6 +42,7 @@ const handleClientQuestionSelect = (
 		previousAnswers: { questionId: question.id, answers: [], triedToAppeal: [] },
 		takenQuestions: [...stage.takenQuestions, command.action.questionId],
 		falseStartPlayers: [],
+		finishedMediaPlayers: [],
 		questionReadTime,
 		callbackId,
 	}
@@ -59,7 +60,7 @@ const handleClientQuestionSelect = (
 					type: 'server',
 					action: { type: 'button-ready', callbackId },
 				},
-				delaySeconds: Math.floor(questionReadTime / 2) + 1.5,
+				delaySeconds: Math.floor(questionReadTime / 1.5) + 1.5,
 			},
 		],
 	}

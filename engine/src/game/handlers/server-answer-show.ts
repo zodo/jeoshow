@@ -27,13 +27,19 @@ const handleServerAnswerShow = (
 	const stage: Extract<Stage, { type: 'answer' }> = {
 		...state.stage,
 		type: 'answer',
+		finishedMediaPlayers: [],
 		callbackId,
 	}
 
 	const questionModel = getQuestion(ctx, state.stage.questionId)
 	let answerShowTime: number
 	if (questionModel.answers.type === 'regular') {
-		answerShowTime = Math.ceil(getFragmentsTime(questionModel.answers.content) * 0.7)
+		const { seconds, hasMedia } = getFragmentsTime(questionModel.answers.content)
+		if (hasMedia) {
+			answerShowTime = Timeouts.mediaTimeout
+		} else {
+			answerShowTime = seconds
+		}
 	} else if (questionModel.answers.type === 'select') {
 		answerShowTime = Timeouts.selectAnswerShow
 	} else {

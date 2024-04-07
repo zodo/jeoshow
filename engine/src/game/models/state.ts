@@ -33,6 +33,7 @@ type RoundStageType =
 			questionId: string
 			falseStartPlayers: PlayerId[]
 			questionReadTime: number
+			finishedMediaPlayers: PlayerId[]
 	  }
 	| {
 			type: 'ready-for-hit'
@@ -54,6 +55,7 @@ type RoundStageType =
 	| {
 			type: 'answer'
 			questionId: string
+			finishedMediaPlayers: PlayerId[]
 	  }
 	| {
 			type: 'appeal'

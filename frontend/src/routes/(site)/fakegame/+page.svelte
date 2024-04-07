@@ -21,6 +21,8 @@
 			type: 'question',
 			fragments: [],
 			theme: 'Theme',
+			price: 100,
+			showIntroduction: false,
 		},
 		players: [
 			{
