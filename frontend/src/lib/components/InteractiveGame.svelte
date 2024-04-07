@@ -5,6 +5,7 @@
 	import { GameState } from '$lib/game-state'
 	import type { ClientAction, GameEvent } from 'shared/models/messages'
 	import type { SvelteCustomEvent, ViewState } from '$lib/models'
+	import { dev } from '$app/environment'
 
 	export let gameCode: string
 	export let userId: string
@@ -40,7 +41,9 @@
 		wsClient = new WebSocketGameClient(gameCode, userId)
 		gameState = new GameState(userId)
 		gameState.viewState.subscribe((newViewState) => {
-			console.log('new view state', newViewState)
+			if (dev) {
+				console.log('view updated', newViewState)
+			}
 			viewState = newViewState
 		})
 		gameState.addHapticListener((type) => {

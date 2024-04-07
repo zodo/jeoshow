@@ -35,7 +35,7 @@
 				answerAttemts: 123,
 			},
 		],
-		disconnected: false,
+		disconnected: $changingBoolean,
 		controls: {
 			mode: 'hit',
 			ready: false,

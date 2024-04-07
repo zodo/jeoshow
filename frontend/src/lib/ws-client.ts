@@ -1,3 +1,4 @@
+import { dev } from '$app/environment'
 import { PUBLIC_ENGINE_WEBSOCKET_URL } from '$env/static/public'
 import { WebSocket } from 'partysocket'
 import type { ClientAction, GameEvent } from 'shared/models/messages'
@@ -10,7 +11,14 @@ export class WebSocketGameClient {
 
 	constructor(gameCode: string, userId: string) {
 		this.ws = new WebSocket(
-			`${PUBLIC_ENGINE_WEBSOCKET_URL}/ws?gameCode=${gameCode}&userId=${userId}`
+			`${PUBLIC_ENGINE_WEBSOCKET_URL}/ws?gameCode=${gameCode}&userId=${userId}`,
+			[],
+			{
+				minReconnectionDelay: 300,
+				reconnectionDelayGrowFactor: 2,
+				maxEnqueuedMessages: 1,
+				debug: dev,
+			}
 		)
 		this.ws.onclose = () => {
 			this.isConnectedStore.set(false)
