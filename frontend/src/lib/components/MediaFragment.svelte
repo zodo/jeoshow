@@ -5,10 +5,10 @@
 	import { scale } from 'svelte/transition'
 	import { quintInOut } from 'svelte/easing'
 	import { cn } from '$lib/style-utils'
-	import { dev } from '$app/environment'
 	import { fit, parent_style } from '$lib/resizable-text'
 	import MediaVideo from './MediaVideo.svelte'
 	import MediaAudio from './MediaAudio.svelte'
+	import { modifyMediaUrl } from '$lib/game-state'
 
 	export let fragments: PackModel.FragmentGroup[]
 
@@ -26,24 +26,14 @@
 		}
 	}
 
-	const modifyUrl = (url: string) => {
-		if (url.startsWith('http')) {
-			return url
-		}
-		if (dev) {
-			return `/resources/packs/${url}`
-		}
-		const encodedPath = encodeURIComponent(`packs/${url}`)
-		return `https://content.jeoshow.220400.xyz/${encodedPath}`
-	}
-
 	$: fragmentsCount = fragments.flat().length
 	$: fragmentHeight = fragmentsCount == 1 ? 'full' : fragmentsCount == 2 ? '1/2' : '1/3'
 </script>
 
 <div
+	in:scale|global={{ delay: 300, duration: 700, easing: quintInOut }}
+	out:scale|global={{ duration: 300, easing: quintInOut }}
 	class="flex h-full w-full flex-col items-center gap-4 justify-center-safe"
-	in:scale={{ duration: 1000, easing: quintInOut }}
 >
 	{#each fragments as fragmentGroup}
 		{#each fragmentGroup as fragment}
@@ -71,16 +61,19 @@
 				>
 					<img
 						class="h-full w-full object-contain drop-shadow-md"
-						src={modifyUrl(fragment.url)}
+						src={modifyMediaUrl(fragment.url)}
 						alt="Fragment"
 					/>
 				</div>
 			{:else if fragment.type === 'audio'}
-				<MediaAudio url={modifyUrl(fragment.url)} on:media={(e) => onMedia(e.detail)} />
+				<MediaAudio
+					url={modifyMediaUrl(fragment.url)}
+					on:media={(e) => onMedia(e.detail)}
+				/>
 			{:else if fragment.type === 'video'}
 				<MediaVideo
 					{fragmentHeight}
-					url={modifyUrl(fragment.url)}
+					url={modifyMediaUrl(fragment.url)}
 					on:media={(e) => onMedia(e.detail)}
 				/>
 			{/if}

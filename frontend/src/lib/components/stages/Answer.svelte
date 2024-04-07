@@ -20,7 +20,7 @@
 	}
 </script>
 
-<section class="grid h-full grid-rows-[min-content_1fr_min-content]">
+<section class="grid h-full grid-rows-[min-content_1fr]">
 	<div class="font-xl text-center font-bold">{answer.theme}</div>
 
 	<div class="overflow-scroll">

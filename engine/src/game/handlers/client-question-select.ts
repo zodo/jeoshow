@@ -59,7 +59,7 @@ const handleClientQuestionSelect = (
 					type: 'server',
 					action: { type: 'button-ready', callbackId },
 				},
-				delaySeconds: Math.floor(questionReadTime / 2),
+				delaySeconds: Math.floor(questionReadTime / 2) + 1.5,
 			},
 		],
 	}

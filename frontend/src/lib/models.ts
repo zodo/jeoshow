@@ -62,6 +62,8 @@ export namespace ViewState {
 			timeoutSeconds: number
 		}
 		awaitingAnswerTimeoutSeconds?: number
+		showIntroduction: boolean
+		price: number
 	}
 
 	export type AnswerStage = {

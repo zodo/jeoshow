@@ -17,7 +17,8 @@
 
 <section
 	class="grid h-full w-full select-none grid-rows-[min-content_1fr] gap-2"
-	in:scale={{ duration: 300, easing: quintInOut }}
+	in:scale={{ delay: 300, duration: 300, easing: quintInOut }}
+	out:scale={{ duration: 300, easing: quintInOut }}
 >
 	<div class="text-center">
 		<div class="text-sm font-bold">{round.name}</div>
@@ -25,7 +26,7 @@
 			<div class="mt-2 text-sm italic">{round.comments}</div>
 		{/if}
 	</div>
-	<div class="flex flex-col items-center overflow-x-auto px-2 justify-center-safe">
+	<div class="flex flex-col items-center justify-around overflow-x-auto px-2">
 		{#each round.themes as { name, questions }}
 			<h3 class="text-xs font-bold text-text-header">{name}</h3>
 			<div class="flex flex-wrap">

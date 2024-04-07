@@ -3,6 +3,7 @@ import type { Player, StageSnapshot } from 'shared/models/models'
 import type { PackModel } from 'shared/models/siq'
 import { derived, readable, writable, type Readable } from 'svelte/store'
 import type { HapticType, PlayerButtonHit, ViewState } from './models'
+import { dev } from '$app/environment'
 
 export class GameState {
 	userId: string
@@ -61,6 +62,19 @@ export class GameState {
 			if (hitButton.some((b) => b.type === 'false-start' && b.playerId === this.userId)) {
 				set(true)
 			}
+		})
+	})
+
+	private showQuestionIntroduction = readable(false, (set) => {
+		let inRound = false
+		this.stage.subscribe((stage) => {
+			if (stage?.type === 'question' && inRound) {
+				set(true)
+				setTimeout(() => set(false), 1500)
+				inRound = false
+			}
+
+			inRound = stage?.type === 'round'
 		})
 	})
 
@@ -136,6 +150,7 @@ export class GameState {
 			this.controls,
 			this.stageBlink,
 			this.playerAnswerAttempt,
+			this.showQuestionIntroduction,
 		],
 		([
 			$extendedPlayers,
@@ -147,6 +162,7 @@ export class GameState {
 			$controls,
 			$stageBlink,
 			$playerAnswerAttempt,
+			$showQuestionIntroduction,
 		]) => {
 			const getPlayer = (playerId: string) => $extendedPlayers.find((p) => p.id === playerId)
 
@@ -208,6 +224,8 @@ export class GameState {
 							serverStage.substate.activePlayerId === this.userId
 								? serverStage.substate.timeoutSeconds
 								: undefined,
+						showIntroduction: $showQuestionIntroduction,
+						price: serverStage.price,
 					}
 					break
 				}
@@ -342,4 +360,15 @@ export class GameState {
 	setShowPlayers = (showPlayers: boolean) => {
 		this.showPlayers.set(showPlayers)
 	}
+}
+
+export const modifyMediaUrl = (url: string) => {
+	if (url.startsWith('http')) {
+		return url
+	}
+	if (dev) {
+		return `/resources/packs/${url}`
+	}
+	const encodedPath = encodeURIComponent(`packs/${url}`)
+	return `https://content.jeoshow.220400.xyz/${encodedPath}`
 }
