@@ -13,6 +13,7 @@
 
 	$: {
 		if (url && videoElement) {
+			videoElement.volume = 0.5
 			videoElement
 				.play()
 				.then(() => {
@@ -27,6 +28,7 @@
 
 	const manualPlay = () => {
 		console.log('play video manually')
+		videoElement.volume = 0.5
 		videoElement.play()
 		autoplayPrevented = false
 	}

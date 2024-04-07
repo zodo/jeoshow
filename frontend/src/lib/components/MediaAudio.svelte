@@ -13,6 +13,7 @@
 
 	$: {
 		if (url && audioElement) {
+			audioElement.volume = 0.5
 			audioElement
 				.play()
 				.then(() => {
@@ -27,6 +28,7 @@
 
 	const manualPlay = () => {
 		console.log('play audio manually')
+		audioElement.volume = 0.5
 		audioElement.play()
 		autoplayPrevented = false
 	}
