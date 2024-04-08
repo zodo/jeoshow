@@ -1,20 +1,8 @@
 name = "frontend"
 compatibility_date = "2024-03-14"
-logpush = true
 
-# Bind a KV Namespace. Use KV as persistent storage for small key-value pairs.
-# Docs: https://developers.cloudflare.com/workers/runtime-apis/kv
-# [[kv_namespaces]]
-# binding = "MY_KV_NAMESPACE"
-# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+tail_consumers = [{service = "tail-worker"}]
 
 [[r2_buckets]]
 binding = "JEOSHOW_PACKS"
 bucket_name = "jeoshow-packs"
-
-# Bind another Worker service. Use this binding to call another Worker without network overhead.
-# Docs: https://developers.cloudflare.com/workers/platform/services
-# [[services]]
-# binding = "MY_SERVICE"
-# service = "my-service"
-
