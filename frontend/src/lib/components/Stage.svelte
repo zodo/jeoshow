@@ -1,6 +1,6 @@
 <script lang="ts">
 	import BeforeStart from './stages/BeforeStart.svelte'
-	import Round from './stages/Round.svelte'
+	import Round from './stages/round/Round.svelte'
 	import Question from './stages/Question.svelte'
 	import AfterFinish from './stages/AfterFinish.svelte'
 	import Answer from './stages/Answer.svelte'

@@ -4,16 +4,12 @@
 	import { scale, slide } from 'svelte/transition'
 	import { quintInOut } from 'svelte/easing'
 	import { cn } from '$lib/style-utils'
-	import Progress from '../Progress.svelte'
+	import Progress from '../../Progress.svelte'
+	import Themes from './Themes.svelte'
 
 	export let round: ViewState.RoundStage
 
 	const dispatch = createEventDispatcher<SvelteCustomEvent>()
-	const selectQuestion = (questionId: string) => {
-		if (round.meActive && !round.skipRoundVoting) {
-			dispatch('action', { type: 'question-select', questionId })
-		}
-	}
 
 	$: showBackdrop = round.skipRoundVoting || round.appealVoting || round.appealResolution
 </script>
@@ -50,30 +46,8 @@
 			<div class="mt-2 text-sm italic">{round.comments}</div>
 		{/if}
 	</div>
-	<div class="flex flex-col items-center justify-evenly overflow-x-auto px-2">
-		{#each round.themes as { name, questions }}
-			<div>
-				<h3 class="text-center text-xs font-bold text-text-header">{name}</h3>
-				<div class="flex flex-wrap">
-					{#each questions as { id, price, available }}
-						<button
-							type="button"
-							class={cn(
-								'w-15 px-2 py-2 text-text-normal transition-colors',
-								available &&
-									round.meActive &&
-									'cursor-pointer hover:bg-bg-accent hover:text-text-accent',
-								!available && 'text-text-neutral opacity-30'
-							)}
-							on:click={() => selectQuestion(id)}
-						>
-							{price}
-						</button>
-					{/each}
-				</div>
-			</div>
-		{/each}
-	</div>
+
+	<Themes {round} on:action />
 
 	{#if showBackdrop}
 		<div class="absolute -inset-1 backdrop-blur-sm"></div>

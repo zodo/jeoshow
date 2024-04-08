@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { PackModel } from 'shared/models/siq'
-	import { createEventDispatcher } from 'svelte'
+	import { createEventDispatcher, onMount } from 'svelte'
 	import type { SvelteCustomEvent } from '$lib/models'
 	import { scale } from 'svelte/transition'
 	import { quintInOut } from 'svelte/easing'
@@ -28,12 +28,35 @@
 
 	$: fragmentsCount = fragments.flat().length
 	$: fragmentHeight = fragmentsCount == 1 ? 'full' : fragmentsCount == 2 ? '1/2' : '1/3'
+
+	let container: HTMLDivElement
+	let contentOverflows = false
+	const checkOverflow = () => {
+		if (container?.children) {
+			const childHeightSum = Array.from(container.children).reduce(
+				(sum, child) => sum + child.clientHeight,
+				0
+			)
+			contentOverflows = childHeightSum > container.clientHeight
+		} else {
+			contentOverflows = false
+		}
+	}
+
+	onMount(() => {
+		checkOverflow()
+	})
 </script>
+
+<svelte:window on:resize={checkOverflow} />
 
 <div
 	in:scale|global={{ delay: 300, duration: 700, easing: quintInOut }}
 	out:scale|global={{ duration: 300, easing: quintInOut }}
-	class="flex h-full w-full flex-col items-center gap-4 justify-center-safe"
+	class={cn(
+		'flex h-full w-full flex-col items-center justify-center gap-4',
+		contentOverflows && 'justify-start'
+	)}
 >
 	{#each fragments as fragmentGroup}
 		{#each fragmentGroup as fragment}
