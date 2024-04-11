@@ -32,7 +32,7 @@
 
 <style lang="postcss">
 	:global(body) {
-		@apply m-0 w-full bg-bg-main font-sans text-text-normal;
+		@apply h-screen w-full overflow-hidden bg-bg-main font-sans text-text-normal;
 	}
 
 	:global(:root) {

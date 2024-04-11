@@ -35,7 +35,7 @@
 <div
 	bind:this={container}
 	class={cn(
-		'flex flex-col items-center justify-center gap-1 overflow-x-auto px-2',
+		'flex flex-col items-center justify-center gap-2 overflow-x-auto px-2',
 		contentOverflows && 'justify-start'
 	)}
 >
@@ -47,7 +47,7 @@
 					<button
 						type="button"
 						class={cn(
-							'w-15 px-2 py-2 text-text-normal transition-colors',
+							'w-15 px-2 py-1 text-text-normal transition-colors',
 							available &&
 								round.meActive &&
 								'cursor-pointer hover:bg-bg-accent hover:text-text-accent',

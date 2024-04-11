@@ -51,8 +51,9 @@
 	let buttonActive = false
 	let alreadyHit = false
 
-	const clickHit = (e: Event) => {
-		if (hitButton && !alreadyHit) {
+	const clickHit = (e: TouchEvent | MouseEvent | CustomEvent) => {
+		const isSecondTouch = e instanceof TouchEvent && e.touches.length > 1
+		if (hitButton && !alreadyHit && !isSecondTouch) {
 			hitButton.click()
 			dispatch('action', { type: 'button-hit' })
 			buttonActive = true
@@ -85,6 +86,7 @@
 					'bg-danger transition-none': buttonActive && !controls.falselyStart,
 				}
 			)}
+			on:click|preventDefault
 			on:mousedown={clickHit}
 			on:mouseup={releaseHit}
 			on:touchstart={clickHit}
