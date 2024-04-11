@@ -45,11 +45,22 @@ const chooseRandomPlayer = (players: Player[]): Player | null => {
 	const totalWeight = weights.reduce((acc, weight) => acc + weight, 0)
 	let randomNum = Math.random() * totalWeight
 
-	console.log('weights', weights)
-
 	for (let i = 0; i < players.length; i++) {
 		randomNum -= weights[i]
 		if (randomNum < 0) {
+			console.log(
+				'choosing random player',
+				JSON.stringify({
+					players: players.map((player, i) => ({
+						name: player.name,
+						attempts: player.answerAttemts,
+						weight: weights[i],
+					})),
+					totalWeight,
+					randomNum,
+					winner: players[i].name,
+				})
+			)
 			return players[i]
 		}
 	}

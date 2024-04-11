@@ -43,18 +43,30 @@ class GameDurableObject {
 			playerId: this.state.getTags(ws)[0],
 			action: JSON.parse(message as string),
 		}
-		console.log('<- ws:', command.type, command.action.type)
 		await this.modifyState(command, Date.now(), 'ws', ws)
 	}
 
-	async webSocketClose(ws: WebSocket, code: number, reason: string, wasClean: boolean) {
-		const closeCode = code === 1005 ? 1000 : code
-		ws.close(closeCode, 'Durable Object is closing WebSocket')
-		const userId = this.state.getTags(ws)[0]
+	async webSocketClose(webSocket: WebSocket, code: number, reason: string, wasClean: boolean) {
+		console.log('WebSocket closed:', code, reason, wasClean)
+		await this.onCloseOrError(webSocket)
+	}
+
+	async webSocketError(webSocket: WebSocket, error: Error) {
+		console.error('WebSocket error:', error)
+		await this.onCloseOrError(webSocket)
+	}
+
+	private async onCloseOrError(webSocket: WebSocket) {
+		const userId = this.state.getTags(webSocket)[0]
 
 		const websockets = this.state.getWebSockets()
 		for (const ws of websockets) {
-			if (ws.readyState === WebSocket.OPEN && this.state.getTags(ws)[0] === userId) {
+			if (
+				ws !== webSocket &&
+				ws.readyState === WebSocket.OPEN &&
+				this.state.getTags(ws)[0] === userId
+			) {
+				console.log('Another connection exists for this user', userId)
 				return
 			}
 		}
@@ -63,8 +75,7 @@ class GameDurableObject {
 			type: 'server',
 			action: { type: 'player-disconnect', playerId: userId },
 		}
-		console.log('<- ws close:', command.type, command.action.type)
-		await this.modifyState(command, Date.now(), 'ws', ws)
+		await this.modifyState(command, Date.now(), 'ws')
 	}
 
 	async alarm() {
@@ -72,7 +83,6 @@ class GameDurableObject {
 		const commands: ScheduledCommand[] = (await this.storage.get('scheduledCommands')) ?? []
 		const commandsToExecute = commands.filter((c) => c.time <= now)
 		for (const { command, time } of commandsToExecute) {
-			console.log('<- alarm:', command.type, command.action.type, time)
 			await this.modifyState(command, now, 'alarm')
 		}
 	}
@@ -185,9 +195,6 @@ class GameDurableObject {
 				.map((e) => e.event) ?? []
 		if (replyEvents.length > 0 && ws) {
 			ws.send(JSON.stringify(replyEvents))
-			for (const event of replyEvents) {
-				console.log('-> reply:', event.type)
-			}
 		}
 
 		const broadcastEvents =
@@ -199,23 +206,12 @@ class GameDurableObject {
 				.map((e) => e.event) ?? []
 		if (broadcastEvents.length > 0) {
 			await this.broadcast(JSON.stringify(broadcastEvents))
-			for (const event of broadcastEvents) {
-				console.log('-> broadcast:', event.type)
-			}
 		}
 
 		const scheduledCommands =
 			events?.filter(
 				(e): e is Extract<UpdateEffect, { type: 'schedule' }> => e.type === 'schedule'
 			) ?? []
-		for (const event of scheduledCommands) {
-			console.log(
-				'-> schedule:',
-				event.command.type,
-				event.command.action.type,
-				event.delaySeconds
-			)
-		}
 		if (scheduledCommands.length > 0 || origin === 'alarm') {
 			await this.modifyScheduledCommands(now, (commands) => {
 				return [
@@ -227,6 +223,19 @@ class GameDurableObject {
 				]
 			})
 		}
+
+		console.log(
+			`<- ${origin}.${command.type}.${command.action.type}`,
+			JSON.stringify({
+				command,
+				now,
+				effects: events,
+				state: {
+					before: currentState,
+					after: state,
+				},
+			})
+		)
 	}
 
 	private recursivelyUpdateState(

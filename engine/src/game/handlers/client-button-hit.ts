@@ -54,6 +54,10 @@ const handleClientButtonHit = (
 					type: 'client-broadcast',
 					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
 				},
+				{
+					type: 'client-broadcast',
+					event: { type: 'player-hit-the-button', playerId: command.playerId },
+				},
 			],
 		}
 	} else if (
