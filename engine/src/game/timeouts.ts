@@ -3,7 +3,6 @@ import type { PackModel } from 'shared/models/siq'
 export namespace Timeouts {
 	export const selectQuestion = 60
 	export const awaitingHit = 5
-	export const hitRandomizationInterval = 0.8
 	export const awaitingAnswer = 30
 	export const appealTimeout = 25
 	export const appealResult = 2

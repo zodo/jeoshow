@@ -2,12 +2,14 @@ import { dev } from '$app/environment'
 import { PUBLIC_ENGINE_WEBSOCKET_URL } from '$env/static/public'
 import { WebSocket } from 'partysocket'
 import type { ClientAction, GameEvent } from 'shared/models/messages'
-import { writable, type Readable, type Writable } from 'svelte/store'
+import { readable, writable, type Readable, type Writable } from 'svelte/store'
 
 export class WebSocketGameClient {
 	ws: WebSocket
 	pingInterval: NodeJS.Timeout
 	isConnectedStore: Writable<boolean>
+	pingSentAt: number = 0
+	replyLatencies: number[] = []
 
 	constructor(gameCode: string, userId: string) {
 		this.ws = new WebSocket(
@@ -27,6 +29,7 @@ export class WebSocketGameClient {
 
 		this.pingInterval = setInterval(() => {
 			if (this.ws.readyState === this.ws.OPEN) {
+				this.pingSentAt = Date.now()
 				this.ws.send('ping')
 			}
 		}, 5000)
@@ -49,6 +52,12 @@ export class WebSocketGameClient {
 				for (const gameEvent of gameEvents) {
 					callback(gameEvent)
 				}
+			} else {
+				const pongLatency = Date.now() - this.pingSentAt
+				this.replyLatencies.push(pongLatency)
+				if (this.replyLatencies.length > 10) {
+					this.replyLatencies.shift()
+				}
 			}
 		}
 	}
@@ -66,4 +75,15 @@ export class WebSocketGameClient {
 	isConnected(): Readable<boolean> {
 		return this.isConnectedStore
 	}
+
+	currentPing = readable(0, (set) => {
+		const interval = setInterval(() => {
+			set(
+				this.replyLatencies.reduce((acc, latency) => acc + latency, 0) /
+					this.replyLatencies.length
+			)
+		}, 60000)
+
+		return () => clearInterval(interval)
+	})
 }

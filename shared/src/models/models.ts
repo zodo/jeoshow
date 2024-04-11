@@ -7,6 +7,7 @@ export interface Player {
 	score: number
 	disconnected: boolean
 	answerAttemts: number
+	ping: number
 }
 
 export type QuestionState =

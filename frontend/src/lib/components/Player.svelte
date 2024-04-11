@@ -5,6 +5,7 @@
 	import { cn } from '$lib/style-utils'
 
 	export let player: ViewState.ExtendedPlayer
+	export let showDebugInfo = false
 
 	const score = tweened(player.score, {
 		duration: 2000,
@@ -36,6 +37,16 @@
 	>
 		{player.name}
 	</div>
+
+	{#if showDebugInfo}
+		<div>
+			{player.ping}ms
+		</div>
+		<div>
+			{player.answerAttemts} att.
+		</div>
+	{/if}
+
 	<div class="flex-none font-bold">
 		{$score.toFixed(0)}
 	</div>

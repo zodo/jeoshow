@@ -27,7 +27,6 @@ const handleServerButtonHitChoose = (
 					...state.stage,
 					randomizeHits: false,
 					playersWhoHit: [],
-					falseStartPlayers: [],
 				},
 			},
 		}
@@ -66,6 +65,10 @@ const chooseRandomPlayer = (players: Player[]): Player | null => {
 	}
 
 	// This should never happen if the function is correctly implemented
+	console.error(
+		'Failed to choose random player',
+		JSON.stringify({ players, totalWeight, randomNum })
+	)
 	return null
 }
 

@@ -25,6 +25,7 @@ import handleClientAnswerTyping from './handlers/client-answer-typing'
 import handleServerButtonHitChoose from './handlers/server-button-hit-choose'
 import handleRoundSkip from './handlers/client-round-skip'
 import handleClientAppealVote from './handlers/client-appeal-vote'
+import handlePingSet from './handlers/client-ping-set'
 
 export const updateState = (
 	state: GameState,
@@ -55,6 +56,7 @@ const clientCommandHandlers: {
 	'media-finished': handleClientMediaFinished,
 	'appeal-vote': handleClientAppealVote,
 	'round-skip': handleRoundSkip,
+	'ping-set': handlePingSet,
 }
 
 const serverCommandHandlers: {

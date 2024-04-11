@@ -23,14 +23,28 @@ const handleServerButtonReady = (
 		state.stage.type === 'question'
 			? Math.floor(state.stage.questionReadTime / 2)
 			: Timeouts.awaitingHit
+
+	const maxPlayersPing = state.players
+		.filter((p) => !p.disconnected)
+		.reduce((acc, p) => Math.max(acc, p.ping), 0)
+	const randomizeHitsDelay = maxPlayersPing < 300 ? null : Math.min(maxPlayersPing, 1000)
+
 	const newStage: Extract<Stage, { type: 'ready-for-hit' }> = {
 		...state.stage,
 		type: 'ready-for-hit',
 		falseStartPlayers: state.stage.type === 'question' ? state.stage.falseStartPlayers : [],
-		randomizeHits: true,
+		randomizeHits: randomizeHitsDelay !== null,
 		playersWhoHit: [],
 		callbackId,
 		callbackTimeout,
+	}
+
+	if (randomizeHitsDelay !== null) {
+		console.log(
+			`Max players ping is ${maxPlayersPing}, randomize hits delay is ${randomizeHitsDelay}ms`
+		)
+	} else {
+		console.log(`Max players ping is ${maxPlayersPing}, randomize hits delay is disabled`)
 	}
 
 	return {
@@ -40,14 +54,18 @@ const handleServerButtonReady = (
 				type: 'client-broadcast',
 				event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
 			},
-			{
-				type: 'schedule',
-				command: {
-					type: 'server',
-					action: { type: 'button-hit-choose' },
-				},
-				delaySeconds: Timeouts.hitRandomizationInterval,
-			},
+			...(randomizeHitsDelay !== null
+				? [
+						{
+							type: 'schedule',
+							command: {
+								type: 'server',
+								action: { type: 'button-hit-choose' },
+							},
+							delaySeconds: randomizeHitsDelay / 1000,
+						} as const,
+					]
+				: []),
 			{
 				type: 'schedule',
 				command: {

@@ -10,6 +10,7 @@ export type ClientAction =
 	| { type: 'media-finished' }
 	| { type: 'appeal-vote'; vote: 'agree' | 'disagree' }
 	| { type: 'round-skip'; vote: 'yes' | 'no' }
+	| { type: 'ping-set'; ping: number }
 
 export type GameEvent =
 	| { type: 'player-hit-the-button'; playerId: string }

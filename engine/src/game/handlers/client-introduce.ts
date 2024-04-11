@@ -17,6 +17,7 @@ const handleClientIntroduce = (
 		score: existingPlayer?.score || 0,
 		answerAttemts: existingPlayer?.answerAttemts || 0,
 		disconnected: false,
+		ping: existingPlayer?.ping || 0,
 	}
 	const newPlayers = [...state.players.filter((p) => p.id !== command.playerId), player]
 

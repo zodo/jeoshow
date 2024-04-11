@@ -62,6 +62,13 @@
 			gameState.setConnected(connected)
 		})
 
+		wsClient.currentPing.subscribe((ping) => {
+			console.log('ping', ping)
+			if (ping > 0) {
+				wsClient.sendMessage({ type: 'ping-set', ping })
+			}
+		})
+
 		return () => {
 			wsClient.close()
 		}
