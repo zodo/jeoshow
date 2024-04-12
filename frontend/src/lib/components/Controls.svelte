@@ -1,10 +1,11 @@
 <script lang="ts">
 	import type { SvelteCustomEvent, ViewState } from '$lib/models'
-	import { createEventDispatcher } from 'svelte'
+	import { afterUpdate, createEventDispatcher } from 'svelte'
 	import { quintInOut } from 'svelte/easing'
 	import { scale } from 'svelte/transition'
 	import Keydown from 'svelte-keydown'
 	import { cn } from '$lib/style-utils'
+	import { browser } from '$app/environment'
 
 	export let controls: ViewState.Controls
 
@@ -52,7 +53,7 @@
 	let alreadyHit = false
 
 	const clickHit = (e: TouchEvent | MouseEvent | CustomEvent) => {
-		const isSecondTouch = e instanceof TouchEvent && e.touches.length > 1
+		const isSecondTouch = (e as TouchEvent).touches && (e as TouchEvent).touches.length > 1
 		if (hitButton && !alreadyHit && !isSecondTouch) {
 			hitButton.click()
 			dispatch('action', { type: 'button-hit' })
@@ -67,6 +68,12 @@
 	const releaseHit = () => {
 		alreadyHit = false
 	}
+
+	afterUpdate(() => {
+		if (browser) {
+			window.scrollTo(0, 0)
+		}
+	})
 </script>
 
 <Keydown pauseOnInput on:Space={clickHit} on:keyup={releaseHit} />
