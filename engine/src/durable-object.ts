@@ -182,7 +182,7 @@ class GameDurableObject {
 			packMetadata
 		)
 
-		if (state && state !== currentState) {
+		if (state) {
 			await this.storage.put('state', state)
 		}
 
