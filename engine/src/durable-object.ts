@@ -125,6 +125,7 @@ class GameDurableObject {
 		const packId = body.packId
 		const { state, model } = await createState(this.env, packId)
 		await this.state.storage.put('state', state)
+		await this.state.storage.put('packId', packId)
 		await this.modifyScheduledCommands(Date.now(), () => [
 			{
 				command: { type: 'server', action: { type: 'state-cleanup' } },
@@ -163,28 +164,46 @@ class GameDurableObject {
 				return
 			}
 		}
-		const currentState: GameState | undefined = await this.storage.get('state')
-		if (!currentState) {
-			console.error('State not found')
+		const packId: string | undefined = await this.storage.get('packId')
+		if (!packId) {
+			console.error('PackId not found')
 			return
 		}
-		const packMetadata = await loadMetadata(
-			this.env.JEOSHOW_PACKS_METADATA,
-			currentState.packId
-		)
+		const packMetadata = await loadMetadata(this.env.JEOSHOW_PACKS_METADATA, packId)
 		if (!packMetadata) {
 			console.error('Metadata not found')
 			return
 		}
-		const { state, effects: events } = this.recursivelyUpdateState(
-			currentState,
-			command,
-			packMetadata
-		)
+		const events = await this.storage.transaction(async (txn) => {
+			const before: GameState | undefined = await txn.get('state')
+			if (!before) {
+				console.error('State not found')
+				return
+			}
 
-		if (state) {
-			await this.storage.put('state', state)
-		}
+			const { state: after, effects } = this.recursivelyUpdateState(
+				before,
+				command,
+				packMetadata
+			)
+
+			await txn.put('state', after ?? before)
+
+			console.log(
+				`<- ${origin}.${command.type}.${command.action.type}`,
+				JSON.stringify({
+					command,
+					now,
+					effects,
+					state: {
+						before,
+						after,
+					},
+				})
+			)
+
+			return effects
+		})
 
 		const replyEvents =
 			events
@@ -223,19 +242,6 @@ class GameDurableObject {
 				]
 			})
 		}
-
-		console.log(
-			`<- ${origin}.${command.type}.${command.action.type}`,
-			JSON.stringify({
-				command,
-				now,
-				effects: events,
-				state: {
-					before: currentState,
-					after: state,
-				},
-			})
-		)
 	}
 
 	private recursivelyUpdateState(
@@ -293,6 +299,7 @@ class GameDurableObject {
 		await this.storage.deleteAlarm()
 		await this.storage.delete('state')
 		await this.storage.delete('scheduledCommands')
+		await this.storage.delete('packId')
 	}
 
 	private async getGameInfo(request: Request): Promise<Response> {

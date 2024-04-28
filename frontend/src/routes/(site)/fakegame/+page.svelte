@@ -44,6 +44,7 @@
 				disconnected: false,
 				pressedButton: null,
 				answerAttemts: 123,
+				ping: 123,
 			},
 		],
 		disconnected: false,

@@ -3,7 +3,6 @@ import type { Player } from 'shared/models/models'
 type PlayerId = string
 
 export interface GameState {
-	packId: string
 	players: Player[]
 	stage: Stage
 }

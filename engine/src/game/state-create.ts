@@ -26,7 +26,6 @@ export const createState = async (
 
 	return {
 		state: {
-			packId,
 			players: [],
 			stage: { type: 'before-start' },
 		},
