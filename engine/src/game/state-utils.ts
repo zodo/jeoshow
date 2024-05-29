@@ -109,11 +109,18 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 		case 'answer': {
 			const round = getRound(ctx, stage.roundId)
 			const question = getQuestion(ctx, stage.questionId)
+			const hasMedia =
+				question.answers.type === 'regular' &&
+				question.answers.content.some((fg) =>
+					fg.some((f) => f.type === 'image' || f.type === 'video')
+				)
 			return {
 				type: 'answer',
 				theme: round.themes.find((t) => t.questions.some((q) => q.id === stage.questionId))!
 					.name,
 				model: question.answers,
+				canSkip: hasMedia,
+				votedForSkip: stage.votedForSkip,
 			}
 		}
 		case 'after-finish':

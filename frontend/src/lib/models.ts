@@ -28,6 +28,7 @@ export namespace ViewState {
 		| { mode: 'answer-text' }
 		| { mode: 'answer-select'; options: PackModel.SelectAnswerOption[] }
 		| { mode: 'answer-attempt'; correct: boolean }
+		| { mode: 'answer-skip'; totalPlayers: number; votes: number; meVoted: boolean }
 
 	export type RoundStage = {
 		type: 'round'

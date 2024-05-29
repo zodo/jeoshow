@@ -79,8 +79,13 @@ export class GameState {
 	})
 
 	private controls: Readable<ViewState.Controls> = derived(
-		[this.stage, this.falselyStartedThisQuestion, this.playerAnswerAttempt],
-		([$stage, $falselyStartedThisQuestion, $playerAnswerAttempt]) => {
+		[
+			this.stage,
+			this.falselyStartedThisQuestion,
+			this.playerAnswerAttempt,
+			this.extendedPlayers,
+		],
+		([$stage, $falselyStartedThisQuestion, $playerAnswerAttempt, $players]) => {
 			if ($playerAnswerAttempt && $playerAnswerAttempt.playerId === this.userId) {
 				return { mode: 'answer-attempt', correct: $playerAnswerAttempt.correct } as const
 			} else if (
@@ -98,6 +103,13 @@ export class GameState {
 				$stage.playerIdsCanAppeal.includes(this.userId)
 			) {
 				return { mode: 'appeal' } as const
+			} else if ($stage?.type === 'answer' && $stage.canSkip) {
+				return {
+					mode: 'answer-skip',
+					totalPlayers: $players.filter((p) => !p.disconnected).length,
+					votes: $stage.votedForSkip.length,
+					meVoted: $stage.votedForSkip.includes(this.userId),
+				} as const
 			} else {
 				return {
 					mode: 'hit',

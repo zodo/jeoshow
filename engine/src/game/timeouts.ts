@@ -8,7 +8,8 @@ export namespace Timeouts {
 	export const appealResult = 2
 	export const answerAttemptShow = 3
 	export const selectAnswerShow = 4
-	export const mediaTimeout = 45
+	export const mediaTimeout = 30
+	export const mediaReturnDelayAfterFinishedTimeout = 2
 	export const roundSkipVoting = 10
 }
 

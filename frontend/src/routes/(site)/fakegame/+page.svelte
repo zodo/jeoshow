@@ -49,9 +49,10 @@
 		],
 		disconnected: false,
 		controls: {
-			mode: 'hit',
-			ready: false,
-			falselyStart: false,
+			mode: 'answer-skip',
+			totalPlayers: 5,
+			votes: 2,
+			meVoted: $changingBoolean,
 		},
 		answerAttempt: undefined,
 		stageBlink: false,

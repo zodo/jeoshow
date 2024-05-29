@@ -4,7 +4,7 @@
 	import Game from './Game.svelte'
 	import { GameState } from '$lib/game-state'
 	import type { ClientAction, GameEvent } from 'shared/models/messages'
-	import type { SvelteCustomEvent, ViewState } from '$lib/models'
+	import type { HapticType, SvelteCustomEvent, ViewState } from '$lib/models'
 	import { dev } from '$app/environment'
 
 	export let gameCode: string
@@ -76,8 +76,17 @@
 
 	const handleStageEvent = (event: CustomEvent<ClientAction>) => {
 		wsClient.sendMessage(event.detail)
-		if (event.detail.type === 'button-hit') {
-			dispatch('haptic', 'light')
+
+		const hapticActions: Partial<Record<ClientAction['type'], HapticType>> = {
+			'button-hit': 'light',
+			'answer-skip': 'medium',
+			'appeal-vote': 'light',
+			'game-start': 'light',
+			'question-select': 'light',
+			'round-skip': 'medium',
+		}
+		if (hapticActions[event.detail.type]) {
+			dispatch('haptic', hapticActions[event.detail.type]!!)
 		}
 	}
 </script>

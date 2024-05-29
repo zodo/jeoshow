@@ -29,6 +29,7 @@ const handleServerAnswerShow = (
 		type: 'answer',
 		finishedMediaPlayers: [],
 		callbackId,
+		votedForSkip: [],
 	}
 
 	const questionModel = getQuestion(ctx, state.stage.questionId)

@@ -68,6 +68,7 @@ type RoundStageType =
 			type: 'answer'
 			questionId: string
 			finishedMediaPlayers: PlayerId[]
+			votedForSkip: PlayerId[]
 	  }
 
 export interface AnswersSummary {

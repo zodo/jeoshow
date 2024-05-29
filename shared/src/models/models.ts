@@ -61,5 +61,7 @@ export type StageSnapshot =
 			type: 'answer'
 			theme: string
 			model: PackModel.Answers
+			canSkip: boolean
+			votedForSkip: string[]
 	  }
 	| { type: 'after-finish' }

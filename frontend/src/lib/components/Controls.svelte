@@ -55,8 +55,10 @@
 	const clickHit = (e: TouchEvent | MouseEvent | CustomEvent) => {
 		const isSecondTouch = (e as TouchEvent).touches && (e as TouchEvent).touches.length > 1
 		if (hitButton && !alreadyHit && !isSecondTouch) {
-			hitButton.click()
-			dispatch('action', { type: 'button-hit' })
+			if (controls.mode === 'hit') {
+				hitButton.click()
+				dispatch('action', { type: 'button-hit' })
+			}
 			buttonActive = true
 			setTimeout(() => {
 				buttonActive = false
@@ -82,7 +84,7 @@
 	{#if controls.mode === 'hit'}
 		<button
 			class={cn(
-				'h-10 w-full cursor-pointer rounded-lg border-none bg-bg-secondary text-xl transition-colors duration-1000  active:bg-danger active:transition-none',
+				'h-10 w-full cursor-pointer rounded-lg border-none bg-bg-secondary text-xl uppercase transition-colors  duration-1000 active:bg-danger active:transition-none',
 				{
 					'bg-bg-accent text-text-accent': controls.ready && !controls.falselyStart,
 				},
@@ -101,16 +103,16 @@
 			in:scale={{ duration: 300, easing: quintInOut }}
 			bind:this={hitButton}
 		>
-			ЖМИ!
+			Жми!
 		</button>
 	{/if}
 	{#if controls.mode === 'appeal'}
 		<button
-			class="h-10 w-full cursor-pointer rounded-lg border-none bg-warn text-xl shadow-md"
+			class="h-10 w-full cursor-pointer rounded-lg border-none bg-warn text-xl uppercase shadow-md"
 			on:click={() => dispatch('action', { type: 'appeal-vote', vote: 'agree' })}
 			in:scale={{ duration: 300, easing: quintInOut }}
 		>
-			Я БЫЛ ПРАВ!
+			Я был прав!
 		</button>
 	{/if}
 	{#if controls.mode === 'answer-text'}
@@ -180,5 +182,24 @@
 				Неправильно
 			{/if}
 		</div>
+	{/if}
+
+	{#if controls.mode === 'answer-skip'}
+		<button
+			class={cn(
+				'h-10 w-full cursor-pointer rounded-lg border-none bg-bg-secondary text-xl uppercase transition-colors active:transition-none',
+				{
+					'bg-bg-accent text-text-accent shadow-md ': controls.votes > 0,
+				}
+			)}
+			on:click={() => dispatch('action', { type: 'answer-skip' })}
+			in:scale={{ duration: 300, easing: quintInOut }}
+		>
+			{#if controls.meVoted}
+				Пропускаем ({controls.votes} / {controls.totalPlayers})
+			{:else}
+				Пропустить
+			{/if}
+		</button>
 	{/if}
 </section>
