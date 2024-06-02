@@ -27,7 +27,7 @@ const handleServerButtonReady = (
 	const maxPlayersPing = state.players
 		.filter((p) => !p.disconnected)
 		.reduce((acc, p) => Math.max(acc, p.ping), 0)
-	const randomizeHitsDelay = maxPlayersPing < 300 ? null : Math.min(maxPlayersPing, 1000)
+	const randomizeHitsDelay = maxPlayersPing < 300 ? null : Math.min(maxPlayersPing, 500) * 2
 
 	const newStage: Extract<Stage, { type: 'ready-for-hit' }> = {
 		...state.stage,

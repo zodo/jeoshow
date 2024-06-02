@@ -246,7 +246,7 @@ class GameDurableObject {
 					...commands.filter((c) => c.time > now),
 					...scheduledCommands.map((event) => ({
 						command: event.command,
-						time: now + event.delaySeconds * 1000,
+						time: Math.ceil(now + event.delaySeconds * 1000),
 					})),
 				]
 			})
