@@ -16,6 +16,12 @@ export type PlayerButtonHit = {
 	type: 'hit' | 'false-start'
 }
 
+export type PlayerMessage = {
+	id: string
+	playerId: string
+	text: string
+}
+
 export namespace ViewState {
 	export type ExtendedPlayer = {
 		pressedButton: 'hit' | 'false-start' | null
@@ -89,6 +95,12 @@ export namespace ViewState {
 		model: PackModel.Answers
 	}
 
+	export type ChatMessage = {
+		id: string
+		player: Player
+		text: string
+	}
+
 	export type View = {
 		disconnected: boolean
 		showPlayers: boolean
@@ -96,6 +108,7 @@ export namespace ViewState {
 		controls: Controls
 		stageBlink: boolean
 		answerAttempt?: AnswerAttempt
+		messages: ChatMessage[]
 		stage:
 			| { type: 'connecting' }
 			| { type: 'before-start' }

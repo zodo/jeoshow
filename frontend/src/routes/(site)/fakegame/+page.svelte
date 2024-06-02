@@ -22,18 +22,8 @@
 			name: 'Round 1',
 			themes: [],
 			meActive: true,
-			appealVoting: $changingBoolean
-				? {
-						correctAnswers: ['Правильно', 'Pravilno'],
-						answer: 'Неправильно',
-						playerName: 'Player 1',
-						agree: ['asd'],
-						disagree: ['asd', 'asd'],
-						timeoutSeconds: 3,
-						meVoted: false,
-					}
-				: undefined,
-			appealResolution: !$changingBoolean ? 'approved' : undefined,
+			appealVoting: undefined,
+			appealResolution: undefined,
 		},
 		players: [
 			{
@@ -45,18 +35,51 @@
 				pressedButton: null,
 				answerAttemts: 123,
 				ping: 123,
+				avatarUrl: 'https://jeoshow-dev.220400.xyz/telegram/user-photo/5000362861',
 			},
 		],
 		disconnected: false,
 		controls: {
-			mode: 'answer-skip',
-			totalPlayers: 5,
-			votes: 2,
-			meVoted: $changingBoolean,
+			mode: 'hit',
+			ready: false,
+			falselyStart: false,
 		},
 		answerAttempt: undefined,
 		stageBlink: false,
 		showPlayers: true,
+		messages: [
+			...($changingBoolean
+				? [
+						{
+							player: {
+								id: '2',
+								name: 'Player 2',
+								score: 100,
+								disconnected: false,
+								answerAttemts: 123,
+								ping: 123,
+								avatarUrl:
+									'https://jeoshow-dev.220400.xyz/telegram/user-photo/5000362861',
+							},
+							text: '🤔',
+							id: '123',
+						},
+					]
+				: []),
+			{
+				player: {
+					id: '1',
+					name: 'Player 1',
+					score: 100,
+					disconnected: false,
+					answerAttemts: 123,
+					ping: 123,
+					avatarUrl: 'https://jeoshow-dev.220400.xyz/telegram/user-photo/5000362861',
+				},
+				text: 'Текст подольше',
+				id: '22',
+			},
+		],
 	}}
 	on:action={(e) => {
 		if (e.detail.type === 'answer-typing') {

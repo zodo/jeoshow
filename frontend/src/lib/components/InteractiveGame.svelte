@@ -35,6 +35,7 @@
 		},
 		stageBlink: false,
 		showPlayers: true,
+		messages: [],
 	}
 
 	onMount(() => {
@@ -91,4 +92,4 @@
 	}
 </script>
 
-<Game state={viewState} on:action={handleStageEvent} />
+<Game state={viewState} on:action={handleStageEvent} on:haptic />

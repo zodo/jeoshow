@@ -7,13 +7,39 @@
 	import type { ViewState } from '$lib/models'
 	import AnswerAttempt from './AnswerAttempt.svelte'
 	import AnswerAttemptEffects from './AnswerAttemptEffects.svelte'
+	import ChatOverlay from './ChatOverlay.svelte'
+	import ReactionDragger from './ReactionDragger.svelte'
 
 	export let state: ViewState.View
+
+	let reactionDragger: ReactionDragger | undefined = undefined
+
+	function nearStageBottom(y: number) {
+		const stageBottom = window.innerHeight - 150
+		return y > stageBottom
+	}
+
+	const handleMouseDown = (e: MouseEvent) => {
+		if (nearStageBottom(e.clientY)) {
+			reactionDragger?.handleMouseDown(e)
+		}
+	}
+
+	const handleTouchStart = (e: TouchEvent) => {
+		if (nearStageBottom(e.touches[0].clientY)) {
+			reactionDragger?.handleTouchStart(e)
+		}
+	}
 
 	$: stage = state.stage
 </script>
 
-<section class="relative h-full w-full p-2">
+<!-- svelte-ignore a11y-no-static-element-interactions -->
+<section
+	class="relative h-full w-full p-2"
+	on:mousedown={handleMouseDown}
+	on:touchstart={handleTouchStart}
+>
 	{#if stage.type === 'before-start'}
 		<BeforeStart on:action />
 	{:else if stage.type === 'connecting'}
@@ -42,4 +68,8 @@
 			<AnswerAttemptEffects type={state.answerAttempt.type} />
 		{/if}
 	{/if}
+
+	<ReactionDragger on:action on:haptic bind:this={reactionDragger} />
+
+	<ChatOverlay messages={state.messages} />
 </section>

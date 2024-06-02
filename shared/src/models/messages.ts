@@ -12,6 +12,7 @@ export type ClientAction =
 	| { type: 'round-skip'; vote: 'yes' | 'no' }
 	| { type: 'ping-set'; ping: number }
 	| { type: 'answer-skip' }
+	| { type: 'message-send'; text: string }
 
 export type GameEvent =
 	| { type: 'player-hit-the-button'; playerId: string }
@@ -25,3 +26,4 @@ export type GameEvent =
 			answer: string
 			correct: boolean
 	  }
+	| { type: 'player-sent-message'; playerId: string; text: string }

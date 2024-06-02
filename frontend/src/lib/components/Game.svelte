@@ -30,13 +30,13 @@
 			state.stageBlink && 'bg-bg-accent transition-none'
 		)}
 	>
-		<Stage {state} on:action />
+		<Stage {state} on:action on:haptic />
 	</div>
 	<div>
 		{#if state.stage.type === 'connecting'}
 			<div class="h-10"></div>
 		{:else}
-			<Controls controls={state.controls} on:action />
+			<Controls controls={state.controls} on:action on:haptic />
 		{/if}
 	</div>
 

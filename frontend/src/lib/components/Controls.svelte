@@ -3,9 +3,9 @@
 	import { afterUpdate, createEventDispatcher } from 'svelte'
 	import { quintInOut } from 'svelte/easing'
 	import { scale } from 'svelte/transition'
-	import Keydown from 'svelte-keydown'
 	import { cn } from '$lib/style-utils'
 	import { browser } from '$app/environment'
+	import HitButton from './HitButton.svelte'
 
 	export let controls: ViewState.Controls
 
@@ -48,28 +48,6 @@
 
 	let answer = ''
 	let answerInput: HTMLInputElement
-	let hitButton: HTMLButtonElement
-	let buttonActive = false
-	let alreadyHit = false
-
-	const clickHit = (e: TouchEvent | MouseEvent | CustomEvent) => {
-		const isSecondTouch = (e as TouchEvent).touches && (e as TouchEvent).touches.length > 1
-		if (hitButton && !alreadyHit && !isSecondTouch) {
-			if (controls.mode === 'hit') {
-				hitButton.click()
-				dispatch('action', { type: 'button-hit' })
-			}
-			buttonActive = true
-			setTimeout(() => {
-				buttonActive = false
-			}, 100)
-			alreadyHit = true
-		}
-	}
-
-	const releaseHit = () => {
-		alreadyHit = false
-	}
 
 	afterUpdate(() => {
 		if (browser) {
@@ -78,33 +56,9 @@
 	})
 </script>
 
-<Keydown pauseOnInput on:Space={clickHit} on:keyup={releaseHit} />
-
 <section in:scale={{ duration: 800, easing: quintInOut }} class="mx-auto w-full">
 	{#if controls.mode === 'hit'}
-		<button
-			class={cn(
-				'h-10 w-full cursor-pointer rounded-lg border-none bg-bg-secondary text-xl uppercase transition-colors  duration-1000 active:bg-danger active:transition-none',
-				{
-					'bg-bg-accent text-text-accent': controls.ready && !controls.falselyStart,
-				},
-				{
-					'bg-warn transition-none': buttonActive && controls.falselyStart,
-				},
-				{
-					'bg-danger transition-none': buttonActive && !controls.falselyStart,
-				}
-			)}
-			on:click|preventDefault
-			on:mousedown={clickHit}
-			on:mouseup={releaseHit}
-			on:touchstart={clickHit}
-			on:touchend={releaseHit}
-			in:scale={{ duration: 300, easing: quintInOut }}
-			bind:this={hitButton}
-		>
-			Жми!
-		</button>
+		<HitButton on:action {controls} on:haptic />
 	{/if}
 	{#if controls.mode === 'appeal'}
 		<button

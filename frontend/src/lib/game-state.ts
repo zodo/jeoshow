@@ -2,7 +2,7 @@ import type { GameEvent } from 'shared/models/messages'
 import type { Player, StageSnapshot } from 'shared/models/models'
 import type { PackModel } from 'shared/models/siq'
 import { derived, readable, writable, type Readable } from 'svelte/store'
-import type { HapticType, PlayerButtonHit, ViewState } from './models'
+import type { HapticType, PlayerButtonHit, PlayerMessage, ViewState } from './models'
 import { dev } from '$app/environment'
 
 export class GameState {
@@ -23,6 +23,7 @@ export class GameState {
 		answer: string
 		correct: boolean
 	} | null>(null)
+	private chatMessages = writable<PlayerMessage[]>([])
 
 	private activePlayerId = derived(this.stage, ($stage) => {
 		if ($stage?.type === 'round' && !$stage.appealVoting) {
@@ -163,6 +164,7 @@ export class GameState {
 			this.stageBlink,
 			this.playerAnswerAttempt,
 			this.showQuestionIntroduction,
+			this.chatMessages,
 		],
 		([
 			$extendedPlayers,
@@ -175,6 +177,7 @@ export class GameState {
 			$stageBlink,
 			$playerAnswerAttempt,
 			$showQuestionIntroduction,
+			$chatMessages,
 		]) => {
 			const getPlayer = (playerId: string) => $extendedPlayers.find((p) => p.id === playerId)
 
@@ -318,6 +321,12 @@ export class GameState {
 				}
 			}
 
+			const messages = $chatMessages.map((message) => ({
+				id: message.id,
+				player: getPlayer(message.playerId) ?? unknownPlayer,
+				text: message.text,
+			}))
+
 			const result: ViewState.View = {
 				disconnected: !$connected,
 				showPlayers: $showPlayers,
@@ -326,6 +335,7 @@ export class GameState {
 				stageBlink: $stageBlink,
 				stage: stage,
 				answerAttempt,
+				messages,
 			}
 			return result
 		}
@@ -367,6 +377,20 @@ export class GameState {
 				})
 				setTimeout(() => this.playerAnswerAttempt.set(null), 2500)
 				break
+			case 'player-sent-message':
+				const id = Math.random().toString(36).substring(7)
+				this.chatMessages.update((messages) => [
+					{
+						id,
+						playerId: event.playerId,
+						text: event.text,
+					},
+					...messages,
+				])
+				setTimeout(() => {
+					this.chatMessages.update((messages) => messages.filter((m) => m.id !== id))
+				}, 3000)
+				break
 		}
 	}
 
@@ -396,4 +420,16 @@ export const modifyMediaUrl = (url: string) => {
 	}
 	const encodedPath = encodeURIComponent(`packs/${url}`)
 	return `https://content.jeoshow.220400.xyz/${encodedPath}`
+}
+
+const unknownPlayer: ViewState.ExtendedPlayer = {
+	id: 'unknown',
+	name: 'Unknown',
+	score: 0,
+	disconnected: false,
+	answerAttemts: 0,
+	ping: 0,
+	avatarUrl: undefined,
+	active: false,
+	pressedButton: null,
 }
