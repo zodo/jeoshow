@@ -112,7 +112,7 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 			const hasMedia =
 				question.answers.type === 'regular' &&
 				question.answers.content.some((fg) =>
-					fg.some((f) => f.type === 'image' || f.type === 'video')
+					fg.some((f) => f.type === 'audio' || f.type === 'video')
 				)
 			return {
 				type: 'answer',

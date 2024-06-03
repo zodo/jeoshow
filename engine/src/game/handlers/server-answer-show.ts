@@ -39,7 +39,7 @@ const handleServerAnswerShow = (
 		if (hasMedia) {
 			answerShowTime = Timeouts.mediaTimeout
 		} else {
-			answerShowTime = seconds
+			answerShowTime = seconds - 2
 		}
 	} else if (questionModel.answers.type === 'select') {
 		answerShowTime = Timeouts.selectAnswerShow
