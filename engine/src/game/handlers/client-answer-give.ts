@@ -108,6 +108,14 @@ const handleClientAnswerGive = (
 					correct: isCorrectAnswer,
 				},
 			},
+			{
+				type: 'client-broadcast',
+				event: {
+					type: 'player-sent-message',
+					playerId: command.playerId,
+					text: playerAnswerText,
+				},
+			},
 			allowAnswersFromOtherPlayers
 				? {
 						type: 'schedule',

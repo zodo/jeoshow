@@ -87,7 +87,7 @@ export class GameState {
 			this.extendedPlayers,
 		],
 		([$stage, $falselyStartedThisQuestion, $playerAnswerAttempt, $players]) => {
-			if ($playerAnswerAttempt && $playerAnswerAttempt.playerId === this.userId) {
+			if ($playerAnswerAttempt) {
 				return { mode: 'answer-attempt', correct: $playerAnswerAttempt.correct } as const
 			} else if (
 				$stage?.type === 'question' &&

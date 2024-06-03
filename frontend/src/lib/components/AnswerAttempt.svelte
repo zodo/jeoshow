@@ -24,31 +24,19 @@
 			: playerAnswer.slice(0, Math.ceil($typingIndex))
 </script>
 
-{#if !answerAttempt.isMe}
+{#if !answerAttempt.isMe && answerAttempt?.type === 'in-progress'}
 	<div
 		transition:scale={{ duration: 500, easing: quintInOut }}
-		class={cn(
-			'relative z-10 flex flex-wrap rounded-md bg-bg-accent p-2 text-text-accent shadow-md transition-colors duration-1000',
-			answerAttempt?.type === 'correct' && 'bg-green-600',
-			answerAttempt?.type === 'incorrect' && 'bg-danger'
-		)}
+		class="relative z-10 flex flex-wrap rounded-md bg-bg-accent p-2 text-text-accent shadow-md transition-colors duration-1000"
 	>
-		{#if answerAttempt?.type === 'in-progress'}
-			<div class="mr-2">
-				Отвечает <strong>{answerAttempt.playerName}:</strong>
-			</div>
+		<div class="mr-2">
+			Отвечает <strong>{answerAttempt.playerName}:</strong>
+		</div>
 
-			<div
-				class="relative font-serif after:absolute after:-right-1 after:animate-blink-cursor after:content-['|']"
-			>
-				{slicedAnswer}
-			</div>
-		{/if}
-
-		{#if answerAttempt?.type === 'correct' || answerAttempt?.type === 'incorrect'}
-			<div in:scale={{ duration: 500, easing: quintInOut }} class="w-full text-center">
-				{playerAnswer}
-			</div>
-		{/if}
+		<div
+			class="relative font-serif after:absolute after:-right-1 after:animate-blink-cursor after:content-['|']"
+		>
+			{slicedAnswer}
+		</div>
 	</div>
 {/if}

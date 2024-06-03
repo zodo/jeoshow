@@ -18,24 +18,15 @@
 <Game
 	state={{
 		stage: {
-			type: 'round',
-			name: 'Round 1',
-			themes: [
-				...Array.from({ length: 26 }).map((_, i) => ({
-					id: i.toString(),
-					name: `Theme ${i + 1}`,
-					questions: [
-						{
-							id: '1',
-							price: 100,
-							available: true,
-						},
-					],
-				})),
-			],
-			meActive: true,
-			appealVoting: undefined,
-			appealResolution: undefined,
+			type: 'question',
+			fragments: [],
+			theme: 'Тема вопроса',
+			readyForHit: {
+				timeoutSeconds: 10,
+				ready: true,
+			},
+			showIntroduction: false,
+			price: 100,
 		},
 		players: [
 			{

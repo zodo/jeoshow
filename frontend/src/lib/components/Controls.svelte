@@ -160,7 +160,9 @@
 		{/if}
 	</div>
 
-	<div class="flex-0">
-		<ReactionSelector on:haptic on:action />
-	</div>
+	{#if controls.mode !== 'answer-text' && controls.mode !== 'answer-select' && controls.mode !== 'answer-attempt'}
+		<div class="flex-0">
+			<ReactionSelector on:haptic on:action />
+		</div>
+	{/if}
 </section>
