@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { ViewState } from '$lib/models'
 	import { fade, slide } from 'svelte/transition'
+	import PlayerAvatar from './PlayerAvatar.svelte'
 
 	export let messages: ViewState.ChatMessage[]
 </script>
@@ -12,19 +13,7 @@
 			in:slide={{ duration: 500 }}
 			out:fade={{ duration: 500 }}
 		>
-			{#if message.player.avatarUrl}
-				<img
-					src={message.player.avatarUrl}
-					alt="Player avatar"
-					class="h-8 w-8 flex-none rounded-full"
-				/>
-			{:else}
-				<div
-					class="h-8 w-8 flex-none rounded-full bg-gray-300 text-center align-bottom text-xl font-bold text-gray-500"
-				>
-					?
-				</div>
-			{/if}
+			<PlayerAvatar player={message.player} />
 
 			<div class="ml-2 text-text-normal">
 				<div class="text-sm font-semibold leading-4">

@@ -3,6 +3,7 @@
 	import { cubicInOut } from 'svelte/easing'
 	import { tweened } from 'svelte/motion'
 	import { cn } from '$lib/style-utils'
+	import PlayerAvatar from './PlayerAvatar.svelte'
 
 	export let player: ViewState.ExtendedPlayer
 	export let showDebugInfo = false
@@ -28,9 +29,7 @@
 		}
 	)}
 >
-	{#if player.avatarUrl}
-		<img src={player.avatarUrl} alt="Player avatar" class="h-5 w-5 flex-none rounded-full" />
-	{/if}
+	<PlayerAvatar {player} sizeRem={1.25} />
 	<div
 		class="w-12 flex-1 overflow-hidden overflow-ellipsis whitespace-nowrap"
 		title={player.name}
