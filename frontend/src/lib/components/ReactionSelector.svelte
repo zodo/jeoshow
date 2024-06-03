@@ -182,7 +182,7 @@
 				) / 2
 			const distanceToAngle = Math.min(1, Math.abs(coordinatesDegree - angle) / degreeRange)
 			const distanceSizeFactor = Math.pow(2 - distanceToAngle, 2)
-			const size = 0.5 + sizeIncreaseFactor * distanceSizeFactor + (selected ? 1 : 0)
+			const size = (0.5 + sizeIncreaseFactor * distanceSizeFactor + (selected ? 1.5 : 0)) / 2
 
 			// Position along circular path
 			const radius = distanceFromButton + radiusOffset + (selected ? 10 : 0)
