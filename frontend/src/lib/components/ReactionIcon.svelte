@@ -25,7 +25,7 @@
 
 <div
 	class="text-3xl"
-	style="transform: translate({$emojiSpringPosition.x}px, {$emojiSpringPosition.y}px) scale({$emojiSpringSize}); opacity: {opacity}; transition: opacity 0.1s ease-in-out;"
+	style="transform: translate({$emojiSpringPosition.x}px, {$emojiSpringPosition.y}px) scale({$emojiSpringSize}) perspective(1px) translateZ(0); opacity: {opacity}; transition: opacity 0.1s ease-in-out;"
 >
 	{emoji.icon}
 </div>
