@@ -3,6 +3,7 @@
 	import ReactionIcon from './ReactionIcon.svelte'
 	import type { SvelteCustomEvent } from '$lib/models'
 	import { spring } from 'svelte/motion'
+	import { cn } from '$lib/style-utils'
 
 	const dispatch = createEventDispatcher<SvelteCustomEvent>()
 
@@ -14,10 +15,15 @@
 	const buttonSpring = spring(
 		{ x: 0, y: 0 },
 		{
-			stiffness: 0.5,
+			stiffness: 0.4,
 			damping: 0.5,
 		}
 	)
+
+	const buttonSizeSpring = spring(1, {
+		stiffness: 0.3,
+		damping: 0.7,
+	})
 
 	$: relativeCoordinates = {
 		x: absoluteCoordinates.x - initialCoordinates.x,
@@ -70,6 +76,7 @@
 
 	function startDragging(x: number, y: number) {
 		dragging = true
+
 		draggingStartTime = Date.now()
 
 		initialCoordinates = {
@@ -78,23 +85,38 @@
 		}
 
 		absoluteCoordinates = initialCoordinates
+
+		buttonSizeSpring.set(0.7, { soft: true })
+
+		dispatch('haptic', 'medium')
 	}
 
 	function finishDragging() {
-		dragging = false
 		chooseEmoji()
 
 		const draggingTime = Date.now() - draggingStartTime
 
-		if (draggingTime < 200) {
-			buttonSpring.set({ x: 0, y: 3 }, { soft: true })
+		buttonSpring.set({ x: 0, y: 0 }, { soft: true })
+		buttonSizeSpring.set(1, { soft: true })
+
+		const distance = Math.sqrt(
+			Math.pow(relativeCoordinates.x, 2) + Math.pow(relativeCoordinates.y, 2)
+		)
+
+		if (draggingTime < 200 && distance < 10) {
+			buttonSizeSpring.set(0.7, { soft: true })
+			buttonSpring.set({ x: 3, y: 3 }, { soft: true })
 			setTimeout(() => {
-				buttonSpring.set({ x: 0, y: -15 }, { soft: true })
-			}, 100)
+				buttonSpring.set({ x: -10, y: -10 }, { soft: true })
+			}, 150)
+
 			setTimeout(() => {
 				buttonSpring.set({ x: 0, y: 0 }, { soft: true })
-			}, 200)
+				buttonSizeSpring.set(1, { soft: true })
+			}, 250)
 		}
+
+		dragging = false
 	}
 
 	function chooseEmoji() {
@@ -114,11 +136,24 @@
 	}))
 
 	$: {
+		const radians = Math.atan2(relativeCoordinates.y, relativeCoordinates.x)
+		const radius = Math.sqrt(
+			Math.pow(relativeCoordinates.x, 2) + Math.pow(relativeCoordinates.y, 2)
+		)
+		const maxRadius = 15
+
+		buttonSpring.set({
+			x: Math.cos(radians) * Math.min(radius, maxRadius),
+			y: Math.sin(radians) * Math.min(radius, maxRadius),
+		})
+	}
+
+	$: {
 		interactiveEmojis = interactiveEmojis.map((emoji, index) => {
 			if (!dragging) return { ...emoji, x: 0, y: 0, size: 0, selected: false }
 
-			const radiusOffset = 90
 			const activationRadius = 130
+			const radiusOffset = 85
 			const startDegree = 195
 			const endDegree = 265
 			const degreeRange = endDegree - startDegree
@@ -131,10 +166,6 @@
 			const degreeStep = degreeRange / (emojis.length - 1)
 			const angle = startDegree + degreeStep * index
 			const radians = (angle * Math.PI) / 180
-
-			// Position along circular path
-			const x = (distanceFromButton + radiusOffset) * Math.cos(radians)
-			const y = (distanceFromButton + radiusOffset) * Math.sin(radians)
 
 			const coordinatesRadians = Math.atan2(relativeCoordinates.y, relativeCoordinates.x)
 			const coordinatesDegree = ((coordinatesRadians * 180) / Math.PI + 360) % 360
@@ -149,10 +180,17 @@
 					0,
 					Math.min(1, (-activationRadius / 2 + distanceFromButton) / activationRadius)
 				) / 2
-			const size = 1 + sizeIncreaseFactor + (selected ? 2 : 0)
+			const distanceToAngle = Math.min(1, Math.abs(coordinatesDegree - angle) / degreeRange)
+			const distanceSizeFactor = Math.pow(2 - distanceToAngle, 2)
+			const size = 0.5 + sizeIncreaseFactor * distanceSizeFactor + (selected ? 1 : 0)
+
+			// Position along circular path
+			const radius = distanceFromButton + radiusOffset + (selected ? 10 : 0)
+			const x = radius * Math.cos(radians)
+			const y = radius * Math.sin(radians)
 
 			if (selected && !emoji.selected) {
-				dispatch('haptic', 'medium')
+				dispatch('haptic', 'light')
 			}
 
 			return {
@@ -168,7 +206,7 @@
 
 <div class="relative h-10 w-10">
 	{#each interactiveEmojis as emoji}
-		<div class="pointer-events-none absolute inset-3 z-20">
+		<div class={cn('pointer-events-none absolute inset-3 z-20', emoji.selected && 'z-30')}>
 			<ReactionIcon {emoji} />
 		</div>
 	{/each}
@@ -176,11 +214,11 @@
 	<button
 		on:mousedown={handleMouseDown}
 		on:touchstart={handleTouchStart}
-		class="relative z-30 inline-flex h-full w-full cursor-pointer items-center justify-center rounded-lg border-none bg-bg-accent"
-		style="transform: translate({$buttonSpring.x}px, {$buttonSpring.y}px)"
+		class="relative z-30 inline-flex h-full w-full cursor-pointer items-center justify-center"
+		style="transform: translate({$buttonSpring.x}px, {$buttonSpring.y}px) scale({$buttonSizeSpring})"
 	>
 		<svg
-			class="h-7 w-7 text-text-accent"
+			class="h-7 w-7 text-bg-accent"
 			aria-hidden="true"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"

@@ -58,7 +58,7 @@
 </script>
 
 <section in:scale={{ duration: 800, easing: quintInOut }} class="mx-auto flex w-full gap-1">
-	<div class="flex-auto">
+	<div class="flex-1">
 		{#if controls.mode === 'hit'}
 			<HitButton on:action {controls} on:haptic />
 		{/if}

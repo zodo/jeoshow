@@ -7,7 +7,7 @@
 		{ x: emoji.x, y: emoji.y },
 		{
 			stiffness: 0.2,
-			damping: 0.5,
+			damping: 0.4,
 		}
 	)
 
@@ -19,10 +19,12 @@
 	})
 
 	$: emojiSpringSize.set(emoji.size)
+
+	$: opacity = emoji.size < 0.5 ? 0 : 1
 </script>
 
 <div
-	style="transform: translate({$emojiSpringPosition.x}px, {$emojiSpringPosition.y}px) scale({$emojiSpringSize})"
+	style="transform: translate({$emojiSpringPosition.x}px, {$emojiSpringPosition.y}px) scale({$emojiSpringSize}); opacity: {opacity}; transition: opacity 0.1s ease-in-out;"
 >
 	{emoji.icon}
 </div>
