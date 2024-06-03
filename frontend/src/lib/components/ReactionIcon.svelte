@@ -1,14 +1,17 @@
 <script lang="ts">
 	import { spring } from 'svelte/motion'
 
-	export let emoji: { icon: string; y: number; size: number; selected: boolean }
+	export let emoji: { icon: string; x: number; y: number; size: number; selected: boolean }
 
-	const emojiSpringY = spring(emoji.y, {
-		stiffness: 0.2,
-		damping: 0.5,
-	})
+	const emojiSpringPosition = spring(
+		{ x: emoji.x, y: emoji.y },
+		{
+			stiffness: 0.2,
+			damping: 0.5,
+		}
+	)
 
-	$: emojiSpringY.set(emoji.y)
+	$: emojiSpringPosition.set({ x: emoji.x, y: emoji.y })
 
 	const emojiSpringSize = spring(emoji.size, {
 		stiffness: 0.2,
@@ -18,6 +21,8 @@
 	$: emojiSpringSize.set(emoji.size)
 </script>
 
-<div style="transform: translate(0, {$emojiSpringY}px) scale({$emojiSpringSize})">
+<div
+	style="transform: translate({$emojiSpringPosition.x}px, {$emojiSpringPosition.y}px) scale({$emojiSpringSize})"
+>
 	{emoji.icon}
 </div>

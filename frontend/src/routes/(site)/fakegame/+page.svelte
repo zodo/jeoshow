@@ -20,7 +20,19 @@
 		stage: {
 			type: 'round',
 			name: 'Round 1',
-			themes: [],
+			themes: [
+				...Array.from({ length: 26 }).map((_, i) => ({
+					id: i.toString(),
+					name: `Theme ${i + 1}`,
+					questions: [
+						{
+							id: '1',
+							price: 100,
+							available: true,
+						},
+					],
+				})),
+			],
 			meActive: true,
 			appealVoting: undefined,
 			appealResolution: undefined,
