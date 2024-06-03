@@ -9,10 +9,14 @@
 
 <section class="flex h-full items-center justify-center">
 	<button
-		class="rounded-lg bg-bg-accent px-8 py-2 text-lg text-text-accent shadow-md transition-colors"
+		class="relative cursor-pointer rounded-lg border-2 border-text-normal bg-bg-secondary"
 		transition:scale={{ duration: 300, easing: quintInOut }}
 		on:click={() => dispatch('action', { type: 'game-start' })}
 	>
-		Начинаем
+		<span
+			class="relative -mx-0.5 flex h-full w-auto -translate-y-1 select-none items-center justify-center rounded-lg border-2 border-text-normal bg-bg-accent px-4 py-2 text-center text-sm font-bold uppercase text-text-accent transition-transform ease-in-out hover:-translate-y-1.5 active:-translate-y-0.5 active:transition-all active:duration-100"
+		>
+			Начинаем
+		</span>
 	</button>
 </section>

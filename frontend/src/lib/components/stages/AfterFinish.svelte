@@ -15,8 +15,10 @@
 	<table class="mt-4 border-collapse">
 		{#each players as player (player.id)}
 			<tr>
-				<td class="border-neutral border-2 p-2 text-right">{player.score}</td>
-				<td class="border-neutral border-2 p-2">{player.name}</td>
+				<td class="border-neutral border-2 border-text-normal p-2 text-right"
+					>{player.score}</td
+				>
+				<td class="border-neutral border-2 border-text-normal p-2">{player.name}</td>
 			</tr>
 		{/each}
 	</table>

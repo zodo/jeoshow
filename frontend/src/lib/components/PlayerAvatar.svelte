@@ -7,13 +7,13 @@
 
 	const colorFromName = (name: string) => {
 		const colors = [
-			['bg-red-300', 'text-red-500'],
-			['bg-yellow-300', 'text-yellow-500'],
-			['bg-green-300', 'text-green-500'],
-			['bg-blue-300', 'text-blue-500'],
-			['bg-indigo-300', 'text-indigo-500'],
-			['bg-purple-300', 'text-purple-500'],
-			['bg-pink-300', 'text-pink-500'],
+			['bg-red-300', 'text-red-950'],
+			['bg-yellow-300', 'text-yellow-950'],
+			['bg-green-300', 'text-green-950'],
+			['bg-blue-300', 'text-blue-950'],
+			['bg-indigo-300', 'text-indigo-950'],
+			['bg-purple-300', 'text-purple-950'],
+			['bg-pink-300', 'text-pink-950'],
 		]
 
 		const charCodeSum = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0)
@@ -35,11 +35,11 @@
 	/>
 {:else}
 	<div
-		class={cn('flex items-center justify-center rounded-full bg-gray-300', bgColor, textColor)}
+		class={cn('flex items-center justify-center rounded-full', bgColor, textColor)}
 		style:width={sizeRem + 'rem'}
 		style:height={sizeRem + 'rem'}
 	>
-		<div class="text-xl font-bold text-gray-500" style:font-size={sizeRem - 0.5 + 'rem'}>
+		<div class="text-xl font-bold" style:font-size={sizeRem - 0.5 + 'rem'}>
 			{player.name.length > 0 ? player.name[0].toUpperCase() : '?'}
 		</div>
 	</div>

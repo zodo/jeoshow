@@ -218,7 +218,7 @@
 		style="transform: translate({$buttonSpring.x}px, {$buttonSpring.y}px) scale({$buttonSizeSpring})"
 	>
 		<svg
-			class="h-7 w-7 text-bg-accent"
+			class="h-7 w-7 text-text-normal"
 			aria-hidden="true"
 			xmlns="http://www.w3.org/2000/svg"
 			width="24"

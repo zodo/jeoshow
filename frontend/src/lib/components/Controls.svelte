@@ -64,11 +64,15 @@
 		{/if}
 		{#if controls.mode === 'appeal'}
 			<button
-				class="h-10 w-full cursor-pointer rounded-lg border-none bg-warn text-xl uppercase shadow-md"
+				class="relative h-full w-full cursor-pointer rounded-lg border-2 border-text-normal bg-bg-secondary"
 				on:click={() => dispatch('action', { type: 'appeal-vote', vote: 'agree' })}
 				in:scale={{ duration: 300, easing: quintInOut }}
 			>
-				Я был прав!
+				<span
+					class="relative -mx-0.5 flex h-full w-auto -translate-y-1 select-none items-center justify-center rounded-lg border-2 border-text-normal bg-warn text-center text-sm font-bold uppercase text-text-normal transition-transform ease-in-out hover:-translate-y-1.5 active:-translate-y-0.5 active:transition-all active:duration-100"
+				>
+					я был прав!
+				</span>
 			</button>
 		{/if}
 		{#if controls.mode === 'answer-text'}
@@ -79,7 +83,7 @@
 						dispatch('action', { type: 'answer-give', value: answer })}
 				>
 					<input
-						class="h-full flex-1 rounded-lg bg-bg-secondary p-2 pr-12 text-center font-serif text-text-normal"
+						class="h-full flex-1 rounded-md border-2 border-b-4 border-text-normal bg-bg-secondary p-2 pr-12 text-center font-serif font-bold text-text-normal outline-none"
 						type="text"
 						placeholder="Пиши ответ"
 						bind:value={answer}
@@ -110,7 +114,7 @@
 				<div class="flex gap-2">
 					{#each controls.options as option}
 						<button
-							class="h-full flex-1 rounded-lg bg-bg-accent p-2 text-center text-text-accent transition-colors disabled:bg-bg-secondary disabled:text-text-normal"
+							class="h-full flex-1 rounded-md border border-b-2 border-text-normal bg-bg-accent p-2 text-center text-text-accent transition-colors disabled:bg-bg-secondary disabled:text-text-normal"
 							on:click={() =>
 								dispatch('action', { type: 'answer-give', value: option.name })}
 							on:focus={(e) => e.preventDefault()}
@@ -127,7 +131,7 @@
 			<div
 				in:scale={{ duration: 300, easing: quintInOut }}
 				class={cn(
-					'h-10 rounded-md bg-bg-accent p-2 text-center text-text-accent shadow-md',
+					'h-10 rounded-md border-2 border-b-4 border-text-normal bg-bg-accent p-1 text-center font-bold text-text-normal',
 					controls.correct && 'bg-green-600',
 					!controls.correct && 'bg-danger'
 				)}
@@ -142,20 +146,24 @@
 
 		{#if controls.mode === 'answer-skip'}
 			<button
-				class={cn(
-					'h-10 w-full cursor-pointer rounded-lg border-none bg-bg-secondary text-xl uppercase transition-colors active:transition-none',
-					{
-						'bg-bg-accent text-text-accent shadow-md ': controls.votes > 0,
-					}
-				)}
+				class="relative h-full w-full cursor-pointer rounded-lg border-2 border-text-normal bg-bg-secondary"
 				on:click={() => dispatch('action', { type: 'answer-skip' })}
 				in:scale={{ duration: 300, easing: quintInOut }}
 			>
-				{#if controls.meVoted}
-					Пропускаем ({controls.votes} / {controls.totalPlayers})
-				{:else}
-					Пропустить
-				{/if}
+				<span
+					class={cn(
+						'relative -mx-0.5 flex h-full w-auto -translate-y-1 select-none items-center justify-center rounded-lg border-2 border-text-normal bg-bg-secondary text-center text-sm font-bold uppercase text-text-normal transition-transform ease-in-out hover:-translate-y-1.5 active:-translate-y-0.5 active:transition-all active:duration-100',
+						{
+							'bg-bg-accent text-text-accent shadow-md ': controls.votes > 0,
+						}
+					)}
+				>
+					{#if controls.meVoted}
+						Пропускаем ({controls.votes} / {controls.totalPlayers})
+					{:else}
+						Пропустить
+					{/if}
+				</span>
 			</button>
 		{/if}
 	</div>

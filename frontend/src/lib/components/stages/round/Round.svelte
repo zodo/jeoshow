@@ -56,12 +56,12 @@
 	{#if round.skipRoundVoting}
 		<div
 			transition:slide={{ duration: 300, easing: quintInOut }}
-			class="absolute bottom-0 left-0 w-full rounded-md bg-bg-accent p-2 text-text-accent"
+			class="absolute bottom-0 left-0 w-full rounded-sm border border-b-2 border-text-normal bg-bg-accent p-2 text-text-accent"
 		>
 			<div class="mb-2 flex flex-wrap justify-center gap-2">
 				<div>Пропускаем раунд?</div>
 				<button
-					class="rounded-md bg-bg-section px-2 text-text-normal disabled:text-text-neutral"
+					class="rounded-sm border border-text-normal bg-bg-section px-2 text-text-normal disabled:text-text-neutral"
 					disabled={round.skipRoundVoting.meVoted}
 					on:click={() => dispatch('action', { type: 'round-skip', vote: 'no' })}
 				>
@@ -71,7 +71,7 @@
 					{round.skipRoundVoting.no.length} | {round.skipRoundVoting.yes.length}
 				</div>
 				<button
-					class="rounded-md bg-bg-section px-2 text-text-normal disabled:text-text-neutral"
+					class="rounded-sm border border-text-normal bg-bg-section px-2 text-text-normal disabled:text-text-neutral"
 					disabled={round.skipRoundVoting.meVoted}
 					on:click={() => dispatch('action', { type: 'round-skip', vote: 'yes' })}
 				>
@@ -87,7 +87,7 @@
 		<div
 			transition:slide={{ delay: 300, duration: 300, easing: quintInOut }}
 			class={cn(
-				'absolute bottom-0 left-0 w-full rounded-md bg-bg-accent p-2 text-center text-text-accent',
+				'absolute bottom-0 left-0 w-full rounded-sm border border-b-2 border-text-normal bg-bg-accent p-2 text-center text-text-accent ',
 				round.appealResolution === 'approved' && 'bg-green-600',
 				round.appealResolution === 'rejected' && 'bg-danger'
 			)}
@@ -101,7 +101,7 @@
 	{:else if round.appealVoting}
 		<div
 			transition:slide={{ duration: 300, easing: quintInOut }}
-			class="absolute bottom-0 left-0 w-full rounded-md bg-bg-accent p-2 text-text-accent"
+			class="absolute bottom-0 left-0 w-full rounded-sm border border-b-2 border-text-normal bg-bg-accent p-2 text-text-accent"
 		>
 			<div class="mb-2 flex flex-wrap justify-center gap-2">
 				<div>
@@ -123,7 +123,7 @@
 			<div class="mb-2 flex flex-wrap justify-center gap-2">
 				<div>{round.appealVoting.playerName} был прав?</div>
 				<button
-					class="rounded-md bg-bg-section px-2 text-text-normal disabled:text-text-neutral"
+					class="rounded-sm border border-text-normal bg-bg-section px-2 text-text-normal disabled:text-text-neutral"
 					disabled={round.appealVoting.meVoted}
 					on:click={() => dispatch('action', { type: 'appeal-vote', vote: 'disagree' })}
 				>
@@ -133,7 +133,7 @@
 					{round.appealVoting.disagree.length} | {round.appealVoting.agree.length}
 				</div>
 				<button
-					class="rounded-md bg-bg-section px-2 text-text-normal disabled:text-text-neutral"
+					class="rounded-sm border border-text-normal bg-bg-section px-2 text-text-normal disabled:text-text-neutral"
 					disabled={round.appealVoting.meVoted}
 					on:click={() => dispatch('action', { type: 'appeal-vote', vote: 'agree' })}
 				>

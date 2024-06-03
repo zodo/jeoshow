@@ -26,7 +26,7 @@
 <div class="flex w-full justify-center" in:fade={{ duration: 1000, easing: quintInOut }}>
 	<div
 		class={cn(
-			'h-3 w-full rounded-3xl bg-bg-accent shadow-md',
+			'h-3 w-full rounded-lg border border-b-2 border-text-normal bg-bg-accent',
 			color === 'font' && 'bg-text-accent'
 		)}
 		style="width: {$width}%; opacity: {$opacity}"

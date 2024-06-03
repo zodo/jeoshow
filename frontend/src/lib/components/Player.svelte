@@ -20,7 +20,7 @@
 
 <div
 	class={cn(
-		'flex min-w-0 max-w-full items-center justify-between gap-2 rounded-lg bg-bg-secondary px-2 py-0.5 transition-colors duration-1000',
+		'flex min-w-0 max-w-full items-center justify-between gap-2 rounded-md border border-b-2 border-text-normal bg-bg-secondary px-2 py-0.5 transition-colors duration-1000',
 		{
 			'bg-bg-accent text-text-accent': player.active,
 			'text-slate-600 opacity-60': player.disconnected,

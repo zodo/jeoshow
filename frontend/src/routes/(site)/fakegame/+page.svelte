@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Game from '$lib/components/Game.svelte'
+	import AfterFinish from '$lib/components/stages/AfterFinish.svelte'
 	import { readable } from 'svelte/store'
 
 	const changingBoolean = readable(true, (set, update) => {
@@ -18,15 +19,21 @@
 <Game
 	state={{
 		stage: {
-			type: 'question',
-			fragments: [],
-			theme: 'Тема вопроса',
-			readyForHit: {
-				timeoutSeconds: 10,
-				ready: true,
-			},
-			showIntroduction: false,
-			price: 100,
+			type: 'round',
+			name: 'Round 1',
+			meActive: true,
+			themes: [
+				...Array.from({ length: 26 }).map((_, i) => ({
+					name: `Theme ${i + 1}`,
+					questions: [
+						...Array.from({ length: 15 }).map((_, j) => ({
+							id: `${i}-${j}`,
+							price: 100 * (j + 1),
+							available: true,
+						})),
+					],
+				})),
+			],
 		},
 		players: [
 			{
@@ -44,12 +51,19 @@
 		disconnected: false,
 		controls: {
 			mode: 'hit',
-			ready: false,
+			ready: true,
 			falselyStart: false,
 		},
-		answerAttempt: undefined,
+		answerAttempt: {
+			isMe: false,
+			playerName: 'Join',
+			type: 'in-progress',
+			answer: 'Answer',
+			avatarUrl: '/telegram/user-photo/5000362861',
+		},
 		stageBlink: false,
 		showPlayers: true,
+
 		messages: [
 			...(true
 				? [
@@ -76,7 +90,7 @@
 					disconnected: false,
 					answerAttemts: 123,
 					ping: 123,
-					avatarUrl: 'https://jeoshow-dev.220400.xyz/telegram/user-photo/5000362861',
+					avatarUrl: '/telegram/user-photo/5000362861',
 				},
 				text: 'Текст подольше',
 				id: '22',

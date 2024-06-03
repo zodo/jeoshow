@@ -6,10 +6,12 @@
 	export let messages: ViewState.ChatMessage[]
 </script>
 
-<div class="pointer-events-none absolute inset-0 flex flex-col-reverse gap-2 p-3 pb-8 align-bottom">
+<div
+	class="pointer-events-none absolute inset-0 z-10 flex flex-col-reverse items-end gap-2 p-3 align-bottom"
+>
 	{#each messages as message (message.id)}
 		<div
-			class="flex items-center drop-shadow-md"
+			class="flex items-center rounded-xl rounded-br-sm border border-b-2 border-text-normal bg-bg-main px-2 py-1"
 			in:slide={{ duration: 500 }}
 			out:fade={{ duration: 500 }}
 		>

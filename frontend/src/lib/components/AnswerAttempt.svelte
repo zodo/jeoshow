@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { ViewState } from '$lib/models'
 	import { scale } from 'svelte/transition'
-	import { cn } from '$lib/style-utils'
 	import { linear, quintInOut } from 'svelte/easing'
 	import { tweened } from 'svelte/motion'
 
@@ -27,7 +26,7 @@
 {#if !answerAttempt.isMe && answerAttempt?.type === 'in-progress'}
 	<div
 		transition:scale={{ duration: 500, easing: quintInOut }}
-		class="relative z-10 flex flex-wrap rounded-md bg-bg-accent p-2 text-text-accent shadow-md transition-colors duration-1000"
+		class="relative z-10 flex flex-wrap rounded-sm border border-b-2 border-text-normal bg-bg-accent p-2 text-text-accent shadow-md transition-colors duration-1000"
 	>
 		<div class="mr-2">
 			Отвечает <strong>{answerAttempt.playerName}:</strong>
