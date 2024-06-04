@@ -20,11 +20,12 @@
 			tgWebApp.ready()
 			$webapp = tgWebApp
 
-			if (tgWebApp.colorScheme === 'dark') {
-				tgWebApp.setHeaderColor('#2e2724')
-			} else {
-				tgWebApp.setHeaderColor('#fdf6e3')
-			}
+			// if (tgWebApp.colorScheme === 'dark') {
+			// 	tgWebApp.setHeaderColor('#2e2724')
+			// } else {
+			//  tgWebApp.setHeaderColor('#fdf6e3')
+			// }
+			tgWebApp.setHeaderColor('#fdf6e3')
 
 			hasMounted = true
 		}
@@ -78,10 +79,10 @@
 		color: var(--color-text-normal);
 		background-color: var(--color-bg-main);
 
-		color-scheme: var(--tg-color-scheme, light);
+		/* color-scheme: var(--tg-color-scheme, light); */
 	}
 
-	@media (prefers-color-scheme: dark) {
+	/* @media (prefers-color-scheme: dark) {
 		:global(:root) {
 			--color-bg-main: #2e2724;
 			--color-bg-secondary: #3c3431;
@@ -94,5 +95,5 @@
 			--color-text-normal: #f3e0c3;
 			--color-text-section-header: #f3e0c3;
 		}
-	}
+	} */
 </style>
