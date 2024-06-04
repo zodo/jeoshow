@@ -26,7 +26,7 @@
 	</div>
 	<div
 		class={cn(
-			'h-full w-full overflow-hidden rounded-md border border-b-4 border-text-normal bg-bg-secondary transition-colors',
+			'h-full w-full overflow-hidden rounded-sm border border-text-normal bg-bg-secondary transition-colors',
 			state.stageBlink && 'bg-bg-accent transition-none'
 		)}
 	>

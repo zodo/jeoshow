@@ -10,19 +10,17 @@
 	class="pointer-events-none absolute inset-0 z-10 flex flex-col-reverse items-end gap-2 p-3 align-bottom"
 >
 	{#each messages as message (message.id)}
-		<div
-			class="flex items-center rounded-xl rounded-br-sm border border-b-2 border-text-normal bg-bg-main px-2 py-1"
-			in:slide={{ duration: 500 }}
-			out:fade={{ duration: 500 }}
-		>
-			<PlayerAvatar player={message.player} />
-
-			<div class="ml-2 text-text-normal">
-				<div class="text-sm font-semibold leading-4">
+		<div class="flex items-end gap-2" out:fade={{ duration: 500 }} in:slide={{ duration: 500 }}>
+			<div
+				class="mb-0.5 rounded-lg rounded-br-sm border border-b-2 border-text-normal bg-bg-main px-2 py-0.5 text-right text-text-normal"
+			>
+				<div class="pl-1 text-sm font-semibold leading-4">
 					{message.player.name}
 				</div>
 				<div class="font-serif text-base font-light">{message.text}</div>
 			</div>
+
+			<PlayerAvatar player={message.player} />
 		</div>
 	{/each}
 </div>

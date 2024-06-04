@@ -60,10 +60,15 @@
 					'active:-translate-y-0.5 active:transition-all active:duration-100':
 						!controls.falselyStart,
 					'-translate-y-1.5': controls.ready && !controls.falselyStart,
+					'bg-warn': controls.falselyStart,
 				}
 			)}
 		>
-			жми!
+			{#if controls.falselyStart}
+				фальстарт
+			{:else}
+				жми!
+			{/if}
 		</span>
 	</button>
 </div>

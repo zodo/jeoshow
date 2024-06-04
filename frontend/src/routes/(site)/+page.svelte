@@ -3,8 +3,8 @@
 	import FileUploader from '$lib/components/FileUploader.svelte'
 </script>
 
-<h1 class="text-text font-serif text-xl">Загрузи пак</h1>
-<p class="text-text mb-4 mt-1 font-serif text-sm">
+<h1 class="text-text font-serif text-2xl">Загрузи пак</h1>
+<p class="text-text mb-6 mt-1 font-serif text-sm">
 	Скачивай паки с
 	<a href="https://sigame.xyz/" target="_blank" rel="noopener noreferrer" class="text-bg-accent">
 		https://sigame.xyz/

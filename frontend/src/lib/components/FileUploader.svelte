@@ -51,9 +51,12 @@
 	}
 </script>
 
-<form class="mx-auto flex max-w-screen-sm flex-col items-center gap-4" on:submit={handleFormSubmit}>
+<form
+	class="mx-auto flex max-w-screen-sm flex-col items-center gap-2 rounded-sm border-2 border-b-4 border-text-normal p-4"
+	on:submit={handleFormSubmit}
+>
 	<div
-		class="relative flex w-auto -translate-y-1 select-none items-center justify-center rounded-lg border-2 border-text-normal bg-bg-secondary p-2 text-center text-sm font-bold uppercase text-text-normal transition-transform ease-in-out hover:-translate-y-1.5 active:-translate-y-0.5 active:transition-all active:duration-100"
+		class="relative flex w-auto -translate-y-1 select-none items-center justify-center rounded-md border-2 border-text-normal bg-bg-secondary p-2 text-center text-sm font-bold uppercase text-text-normal transition-transform ease-in-out hover:-translate-y-1.5 active:-translate-y-0.5 active:transition-all active:duration-100"
 	>
 		<input class="text-text" type="file" name="pack" on:change={handleInputChange} />
 	</div>
