@@ -31,7 +31,7 @@
 >
 	<PlayerAvatar {player} sizeRem={1.25} />
 	<div
-		class="w-12 flex-1 overflow-hidden overflow-ellipsis whitespace-nowrap"
+		class="w-12 flex-1 overflow-hidden overflow-ellipsis whitespace-nowrap font-semibold"
 		title={player.name}
 	>
 		{player.name}

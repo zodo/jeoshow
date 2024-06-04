@@ -131,7 +131,7 @@
 			<div
 				in:scale={{ duration: 300, easing: quintInOut }}
 				class={cn(
-					'h-10 rounded-md border-2 border-b-4 border-text-normal bg-bg-accent p-1 text-center font-bold text-text-normal',
+					'h-10 rounded-md border-2 border-b-4 border-text-normal bg-bg-accent p-1 text-center font-bold text-text-accent',
 					controls.correct && 'bg-green-600',
 					!controls.correct && 'bg-danger'
 				)}

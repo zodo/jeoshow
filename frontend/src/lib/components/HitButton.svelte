@@ -55,7 +55,7 @@
 	>
 		<span
 			class={cn(
-				'relative -mx-0.5 flex h-full w-auto -translate-y-1 select-none items-center justify-center rounded-lg border-2 border-text-normal bg-bg-accent text-center text-sm font-bold uppercase text-text-normal transition-transform ease-in-out hover:-translate-y-1.5',
+				'relative -mx-0.5 flex h-full w-auto -translate-y-1 select-none items-center justify-center rounded-lg border-2 border-text-normal bg-bg-accent text-center text-sm font-bold uppercase text-text-accent transition-transform ease-in-out hover:-translate-y-1.5',
 				{
 					'active:-translate-y-0.5 active:transition-all active:duration-100':
 						!controls.falselyStart,

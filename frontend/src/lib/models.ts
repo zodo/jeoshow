@@ -8,7 +8,7 @@ export type SvelteCustomEvent = {
 	action: ClientAction
 	haptic: HapticType
 	media: 'started' | 'stopped'
-	'game-created': { gameId: string }
+	'game-created': { gameId: string; packName: string }
 }
 
 export type PlayerButtonHit = {

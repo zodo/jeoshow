@@ -3,6 +3,7 @@
 	import { createGame, uploadPack } from '$lib/pack-uploader'
 	import { createEventDispatcher } from 'svelte'
 	import type { SvelteCustomEvent } from '$lib/models'
+	import { cn } from '$lib/style-utils'
 
 	const dispatch = createEventDispatcher<SvelteCustomEvent>()
 
@@ -36,7 +37,7 @@
 			console.log(`Pack uploaded, creating game`)
 			const { gameCode, packName } = await createGame(packId)
 			console.log(`Game created: ${gameCode} with pack ${packName}`)
-			dispatch('game-created', { gameId: gameCode })
+			dispatch('game-created', { gameId: gameCode, packName })
 		} catch (e) {
 			console.error(e)
 			if (e instanceof Error) {
@@ -50,24 +51,34 @@
 	}
 </script>
 
-<form class="flex max-w-full drop-shadow-md" on:submit={handleFormSubmit}>
-	<input
-		class="inline-block h-14 flex-1 rounded-l-2xl bg-bg-secondary p-4 transition-colors"
-		id="pack"
-		type="file"
-		name="pack"
-		on:change={handleInputChange}
-	/>
+<form class="mx-auto flex max-w-screen-sm flex-col items-center gap-4" on:submit={handleFormSubmit}>
+	<div
+		class="relative flex w-auto -translate-y-1 select-none items-center justify-center rounded-lg border-2 border-text-normal bg-bg-secondary p-2 text-center text-sm font-bold uppercase text-text-normal transition-transform ease-in-out hover:-translate-y-1.5 active:-translate-y-0.5 active:transition-all active:duration-100"
+	>
+		<input class="text-text" type="file" name="pack" on:change={handleInputChange} />
+	</div>
+
 	<button
-		class="min-w-20 rounded-r-2xl bg-bg-accent p-4 text-text-accent transition-colors"
+		class="relative min-w-44 cursor-pointer rounded-lg border-2 border-text-normal bg-bg-secondary"
 		type="submit"
 		disabled={formLoading || !hasFiles}
 	>
-		{#if formLoading}
-			{uploadProgress?.toFixed(0)}%
-		{:else}
-			Upload
-		{/if}
+		<span
+			class={cn(
+				'relative -mx-0.5 flex h-full w-auto -translate-y-1 select-none items-center justify-center rounded-lg border-2 border-text-normal bg-warn px-4 py-2 text-center text-sm font-bold uppercase text-text-normal transition-transform ease-in-out',
+				{
+					'hover:-translate-y-1.5 active:-translate-y-0.5 active:transition-all active:duration-100':
+						hasFiles,
+				},
+				{ 'bg-bg-main': !hasFiles }
+			)}
+		>
+			{#if formLoading}
+				{uploadProgress?.toFixed(0)}%
+			{:else}
+				Upload
+			{/if}
+		</span>
 	</button>
 </form>
 
