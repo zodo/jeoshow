@@ -8,6 +8,7 @@
 	const dispatch = createEventDispatcher<SvelteCustomEvent>()
 
 	let formLoading = false
+	let submitted = false
 	let hasFiles = false
 	let file: File | null = null
 	let message: string | null = null
@@ -33,6 +34,7 @@
 		}
 		try {
 			formLoading = true
+			submitted = true
 			const packId = await uploadPack(file, reportUploadProgress)
 			console.log(`Pack uploaded, creating game`)
 			const { gameCode, packName } = await createGame(packId)
@@ -76,10 +78,14 @@
 				{ 'bg-bg-main': !hasFiles }
 			)}
 		>
-			{#if formLoading}
+			{#if formLoading && uploadProgress && uploadProgress > 0}
 				{uploadProgress?.toFixed(0)}%
-			{:else}
+			{:else if formLoading}
+				Uploading...
+			{:else if !submitted}
 				Upload
+			{:else}
+				Loading...
 			{/if}
 		</span>
 	</button>
