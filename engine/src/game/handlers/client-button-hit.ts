@@ -17,7 +17,11 @@ const handleClientButtonHit = (
 			effects: [
 				{
 					type: 'client-broadcast',
-					event: { type: 'player-false-start', playerId: command.playerId },
+					event: {
+						type: 'player-hit-the-button',
+						playerId: command.playerId,
+						falseStart: true,
+					},
 				},
 			],
 		}
@@ -31,7 +35,11 @@ const handleClientButtonHit = (
 			effects: [
 				{
 					type: 'client-broadcast',
-					event: { type: 'player-false-start', playerId: command.playerId },
+					event: {
+						type: 'player-hit-the-button',
+						playerId: command.playerId,
+						falseStart: true,
+					},
 				},
 			],
 		}
@@ -56,7 +64,11 @@ const handleClientButtonHit = (
 				},
 				{
 					type: 'client-broadcast',
-					event: { type: 'player-hit-the-button', playerId: command.playerId },
+					event: {
+						type: 'player-hit-the-button',
+						playerId: command.playerId,
+						falseStart: false,
+					},
 				},
 			],
 		}
@@ -71,7 +83,11 @@ const handleClientButtonHit = (
 			effects: [
 				{
 					type: 'client-broadcast',
-					event: { type: 'player-hit-the-button', playerId: command.playerId },
+					event: {
+						type: 'player-hit-the-button',
+						playerId: command.playerId,
+						falseStart: false,
+					},
 				},
 			],
 		}
@@ -107,7 +123,7 @@ export const goToAwaitingAnswer = (
 			},
 			{
 				type: 'client-broadcast',
-				event: { type: 'player-hit-the-button', playerId },
+				event: { type: 'player-hit-the-button', playerId, falseStart: false },
 			},
 			{
 				type: 'schedule',

@@ -55,7 +55,7 @@ export class GameState {
 
 	private falselyStartedThisQuestion = readable(false, (set) => {
 		this.stage.subscribe((stage) => {
-			if (stage?.type !== 'question' || stage.substate.type !== 'idle') {
+			if (stage?.type !== 'question') {
 				set(false)
 			}
 		})
@@ -355,9 +355,8 @@ export class GameState {
 					this.playerAnswerTyping.set(null)
 				}
 				break
-			case 'player-hit-the-button':
-			case 'player-false-start': {
-				const type = event.type === 'player-hit-the-button' ? 'hit' : 'false-start'
+			case 'player-hit-the-button': {
+				const type = event.falseStart ? 'false-start' : 'hit'
 				this.hitButton.update((players) => [...players, { playerId: event.playerId, type }])
 				setTimeout(() => {
 					this.hitButton.update((players) =>
