@@ -1,5 +1,6 @@
 import { PUBLIC_ENGINE_URL } from '$env/static/public'
 import JSZip from 'jszip'
+import posthog from 'posthog-js'
 
 export const uploadPack = async (
 	file: File,
@@ -69,6 +70,13 @@ export const createGame = async (
 		}),
 	})
 	const data = (await res.json()) as any
+
+	posthog.capture('game_created', {
+		pack_id: packId,
+		pack_name: data.packName,
+		game_code: data.gameCode,
+	})
+
 	return data
 }
 

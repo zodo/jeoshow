@@ -6,6 +6,7 @@
 	import type { ClientAction, GameEvent } from 'shared/models/messages'
 	import type { HapticType, SvelteCustomEvent, ViewState } from '$lib/models'
 	import { dev } from '$app/environment'
+	import posthog from 'posthog-js'
 
 	export let gameCode: string
 	export let userId: string
@@ -53,6 +54,7 @@
 
 		wsClient.onConnect(() => {
 			wsClient.sendMessage({ type: 'introduce', name: playerName, avatarUrl })
+			posthog.identify(userId, { name: playerName, avatarUrl })
 		})
 
 		wsClient.onMessage((message: GameEvent) => {
@@ -77,6 +79,14 @@
 
 	const handleStageEvent = (event: CustomEvent<ClientAction>) => {
 		wsClient.sendMessage(event.detail)
+
+		if (event.detail.type !== 'answer-typing') {
+			posthog.capture('game-action', {
+				gameCode,
+				playerName,
+				...event.detail,
+			})
+		}
 
 		const hapticActions: Partial<Record<ClientAction['type'], HapticType>> = {
 			'button-hit': 'light',
