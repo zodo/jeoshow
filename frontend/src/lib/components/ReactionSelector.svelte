@@ -155,7 +155,7 @@
 			const activationRadius = 130
 			const radiusOffset = 85
 			const startDegree = 195
-			const endDegree = 265
+			const endDegree = 255
 			const degreeRange = endDegree - startDegree
 
 			const distanceFromButton = Math.sqrt(
