@@ -54,7 +54,6 @@
 
 		wsClient.onConnect(() => {
 			wsClient.sendMessage({ type: 'introduce', name: playerName, avatarUrl })
-			posthog.identify(userId, { name: playerName, avatarUrl })
 		})
 
 		wsClient.onMessage((message: GameEvent) => {

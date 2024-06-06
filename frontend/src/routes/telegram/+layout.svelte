@@ -3,6 +3,7 @@
 	import { goto } from '$app/navigation'
 	import { setWebappContext } from '$lib/tg-webapp-context'
 	import type { WebApp } from '@twa-dev/types'
+	import posthog from 'posthog-js'
 	import { onMount } from 'svelte'
 	import { writable } from 'svelte/store'
 
@@ -26,6 +27,10 @@
 			//  tgWebApp.setHeaderColor('#fdf6e3')
 			// }
 			tgWebApp.setHeaderColor('#fdf6e3')
+
+			posthog.identify(tgWebApp.initDataUnsafe.user?.id?.toString(), {
+				name: tgWebApp.initDataUnsafe.user?.first_name,
+			})
 
 			hasMounted = true
 		}

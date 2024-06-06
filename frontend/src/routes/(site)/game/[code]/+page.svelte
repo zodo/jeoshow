@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { page } from '$app/stores'
 	import InteractiveGame from '$lib/components/InteractiveGame.svelte'
+	import posthog from 'posthog-js'
 	import { onMount } from 'svelte'
 
 	const gameExists: boolean = $page.data.gameExists
@@ -28,6 +29,7 @@
 	const handleJoin = () => {
 		localStorage.setItem('userName', playerName)
 		joinedGame = true
+		posthog.identify(userId, { name: playerName, avatarUrl })
 	}
 </script>
 
