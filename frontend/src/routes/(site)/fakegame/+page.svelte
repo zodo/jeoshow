@@ -45,7 +45,6 @@
 				pressedButton: null,
 				answerAttemts: 123,
 				ping: 123,
-				// avatarUrl: 'https://jeoshow-dev.220400.xyz/telegram/user-photo/5000362861',
 			},
 		],
 		disconnected: false,
