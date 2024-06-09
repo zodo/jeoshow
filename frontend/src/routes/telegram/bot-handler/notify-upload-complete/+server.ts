@@ -18,7 +18,7 @@ export const POST = async ({ request }) => {
 		url: webappUrl,
 		input_message_content: {
 			parse_mode: 'Markdown',
-			message_text: `Игра с паком ${body.packName} готова! [JOIN](${webappUrl})`,
+			message_text: `Игра с паком ${body.packName} готова! [JOIN](${webappUrl}). Пересылай это сообщение другим игрокам, чтобы играть вместе`,
 		},
 	})
 
