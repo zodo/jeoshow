@@ -1,6 +1,6 @@
-import GameDurableObject from './durable-object'
+import GameDurableObjectSqlite from './durable-object'
 
-export { GameDurableObject }
+export { GameDurableObjectSqlite }
 
 export default {
 	async fetch(request: Request, env: CfEnv, ctx: ExecutionContext): Promise<Response> {
@@ -15,8 +15,8 @@ export default {
 			})
 		} else if (url.pathname === '/create-game' && request.method === 'POST') {
 			const gameCode = Math.random().toString(36).substring(2, 8)
-			const gameId = env.JEOSHOW_GAME_STATE.idFromName(gameCode)
-			const game = env.JEOSHOW_GAME_STATE.get(gameId)
+			const gameId = env.JEOSHOW_GAME_STATE_SQLITE.idFromName(gameCode)
+			const game = env.JEOSHOW_GAME_STATE_SQLITE.get(gameId)
 
 			const createResponse = await game.fetch(request)
 			const createJson = (await createResponse.json()) as any
@@ -30,8 +30,8 @@ export default {
 				},
 			})
 		} else if (url.searchParams.has('gameCode')) {
-			const gameId = env.JEOSHOW_GAME_STATE.idFromName(url.searchParams.get('gameCode')!!)
-			const game = env.JEOSHOW_GAME_STATE.get(gameId)
+			const gameId = env.JEOSHOW_GAME_STATE_SQLITE.idFromName(url.searchParams.get('gameCode')!!)
+			const game = env.JEOSHOW_GAME_STATE_SQLITE.get(gameId)
 			return game.fetch(request)
 		}
 

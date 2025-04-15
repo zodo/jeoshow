@@ -11,7 +11,7 @@ import type { ClientAction } from 'shared/models/messages'
 import type { GameState } from './game/models/state'
 import type { UpdateEffect, UpdateResult } from './game/models/state-machine'
 
-class GameDurableObject {
+class GameDurableObjectSqlite {
 	state: DurableObjectState
 	storage: DurableObjectStorage
 	env: CfEnv
@@ -334,4 +334,4 @@ class GameDurableObject {
 	}
 }
 
-export default GameDurableObject
+export default GameDurableObjectSqlite

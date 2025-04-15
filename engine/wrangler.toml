@@ -5,12 +5,17 @@ compatibility_date = "2024-03-04"
 tail_consumers = [{service = "tail-worker"}]
 
 [[durable_objects.bindings]]
-name = "JEOSHOW_GAME_STATE"
-class_name = "GameDurableObject"
+name = "JEOSHOW_GAME_STATE_SQLITE"
+class_name = "GameDurableObjectSqlite"
 
 [[migrations]]
 tag = "v1"
 new_classes = ["GameDurableObject"]
+
+[[migrations]]
+tag = "v2"
+deleted_classes = ["GameDurableObject"]
+new_sqlite_classes = ["GameDurableObjectSqlite"]
 
 
 [[r2_buckets]]
