@@ -50,10 +50,10 @@ PUBLIC_POSTGHOG_API_KEY=<posthog-key>
 
 ```
 
-cd engine && yarn install && cd ..
-cd frontend && yarn install && cd ..
-cd tail-worker && yarn install && cd ..
-yarn dev
+cd engine && pnpm install && cd ..
+cd frontend && pnpm install && cd ..
+cd tail-worker && pnpm install && cd ..
+pnpm dev
 
 ```
 
@@ -61,4 +61,4 @@ yarn dev
 
 1. Update `engine/wrangle.toml`
 1. Create a file `frontend/.env.production` with appropriate values:
-1. Deploy with `yarn deploy`
+1. Deploy with `pnpm deploy`

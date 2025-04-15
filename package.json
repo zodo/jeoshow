@@ -2,11 +2,11 @@
 	"name": "jeoshow",
 	"version": "1.0.0",
 	"scripts": {
-		"check": "concurrently \"cd engine && yarn run check\" \"cd frontend && yarn run check\"",
-		"deploy": "concurrently \"cd engine && yarn run deploy\" \"cd frontend && yarn run deploy\"",
+		"check": "concurrently \"cd engine && pnpm run check\" \"cd frontend && pnpm run check\"",
+		"deploy": "concurrently \"cd engine && pnpm run deploy\" \"cd frontend && pnpm run deploy\"",
 		"format": "prettier --write .",
-		"cf-dev": "concurrently \"cd engine && yarn run dev\" \"cd frontend && yarn run dev --mode cf-dev\" \"cloudflared tunnel run\"",
-		"dev": "concurrently \"cd engine && yarn dev\" \"cd frontend && yarn dev\""
+		"cf-dev": "concurrently \"cd engine && pnpm run dev\" \"cd frontend && pnpm run dev --mode cf-dev\" \"cloudflared tunnel run\"",
+		"dev": "concurrently \"cd engine && pnpm dev\" \"cd frontend && pnpm dev\""
 	},
 	"devDependencies": {
 		"concurrently": "^8.2.2",
