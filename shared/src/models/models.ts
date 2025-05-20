@@ -55,6 +55,7 @@ export type StageSnapshot =
 			theme: string
 			themeComment?: string
 			substate: QuestionState
+			falselyStartedPlayerIds: string[]
 			selectAnswerOptions?: PackModel.SelectAnswerOption[]
 	  }
 	| {

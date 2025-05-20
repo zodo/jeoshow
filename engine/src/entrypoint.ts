@@ -30,7 +30,9 @@ export default {
 				},
 			})
 		} else if (url.searchParams.has('gameCode')) {
-			const gameId = env.JEOSHOW_GAME_STATE_SQLITE.idFromName(url.searchParams.get('gameCode')!!)
+			const gameId = env.JEOSHOW_GAME_STATE_SQLITE.idFromName(
+				url.searchParams.get('gameCode')!!
+			)
 			const game = env.JEOSHOW_GAME_STATE_SQLITE.get(gameId)
 			return game.fetch(request)
 		}

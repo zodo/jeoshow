@@ -43,14 +43,14 @@ type RoundStageType =
 	| {
 			type: 'question'
 			questionId: string
-			falseStartPlayers: PlayerId[]
+			falseStartPlayers: FalseStartRecord[]
 			questionReadTime: number
 			finishedMediaPlayers: PlayerId[]
 	  }
 	| {
 			type: 'ready-for-hit'
 			questionId: string
-			falseStartPlayers: PlayerId[]
+			falseStartPlayers: FalseStartRecord[]
 			randomizeHits: boolean
 			playersWhoHit: PlayerId[]
 	  }
@@ -58,7 +58,6 @@ type RoundStageType =
 			type: 'awaiting-answer'
 			questionId: string
 			answeringPlayer: PlayerId
-			falseStartPlayers: PlayerId[]
 	  }
 	| {
 			type: 'answer-attempt'
@@ -70,6 +69,11 @@ type RoundStageType =
 			finishedMediaPlayers: PlayerId[]
 			votedForSkip: PlayerId[]
 	  }
+
+export interface FalseStartRecord {
+	playerId: PlayerId
+	expiresAt: number
+}
 
 export interface AnswersSummary {
 	questionId?: string

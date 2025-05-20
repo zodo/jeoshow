@@ -95,6 +95,15 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 			const question = getQuestion(ctx, stage.questionId)
 			const theme = round.themes.find((t) => t.questions.some((q) => q.id === question.id))
 
+			const falselyStartedPlayerIds =
+				stage.type === 'question' || stage.type === 'ready-for-hit'
+					? stage.falseStartPlayers
+							.filter(
+								(p) => p.playerId === stage.activePlayer && ctx.now < p.expiresAt
+							)
+							.map((p) => p.playerId)
+					: []
+
 			return {
 				type: 'question',
 				fragments: question.fragments,
@@ -102,6 +111,7 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 				theme: theme?.name ?? '',
 				themeComment: theme?.comments,
 				substate: substate,
+				falselyStartedPlayerIds,
 				selectAnswerOptions:
 					question.answers.type === 'select' ? question.answers.options : undefined,
 			}

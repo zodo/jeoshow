@@ -1,4 +1,4 @@
-import type { GameState, Stage } from '../models/state'
+import type { FalseStartRecord, GameState, Stage } from '../models/state'
 import type { ClientCommand } from '../models/state-commands'
 import type { CommandContext, UpdateResult } from '../models/state-machine'
 import { toSnapshot } from '../state-utils'
@@ -11,7 +11,7 @@ const handleClientButtonHit = (
 ): UpdateResult => {
 	if (
 		(state.stage.type === 'question' || state.stage.type === 'ready-for-hit') &&
-		state.stage.falseStartPlayers.includes(command.playerId)
+		isPlayerInFalseStartBan(ctx, state.stage.falseStartPlayers, command.playerId)
 	) {
 		return {
 			effects: [
@@ -28,7 +28,11 @@ const handleClientButtonHit = (
 	} else if (state.stage.type === 'question') {
 		const newStage = {
 			...state.stage,
-			falseStartPlayers: [...state.stage.falseStartPlayers, command.playerId],
+			falseStartPlayers: updateFalseStartPlayers(
+				state.stage.falseStartPlayers,
+				command.playerId,
+				ctx
+			),
 		}
 		return {
 			state: { ...state, stage: newStage },
@@ -40,6 +44,21 @@ const handleClientButtonHit = (
 						playerId: command.playerId,
 						falseStart: true,
 					},
+				},
+				{
+					type: 'client-reply',
+					event: {
+						type: 'stage-updated',
+						stage: toSnapshot(newStage, ctx),
+					},
+				},
+				{
+					type: 'schedule',
+					command: {
+						type: 'server',
+						action: { type: 'fire-stage-update' },
+					},
+					delaySeconds: 3,
 				},
 			],
 		}
@@ -135,6 +154,31 @@ export const goToAwaitingAnswer = (
 			},
 		],
 	}
+}
+
+const isPlayerInFalseStartBan = (
+	ctx: CommandContext,
+	falseStartPlayers: FalseStartRecord[],
+	playerId: string
+): boolean => {
+	const falseStart = falseStartPlayers.find((record) => record.playerId === playerId)
+	if (!falseStart) return false
+
+	return ctx.now < falseStart.expiresAt
+}
+
+const updateFalseStartPlayers = (
+	falseStartPlayers: FalseStartRecord[],
+	playerId: string,
+	ctx: CommandContext
+): FalseStartRecord[] => {
+	if (isPlayerInFalseStartBan(ctx, falseStartPlayers, playerId)) {
+		return falseStartPlayers
+	}
+	return [
+		...falseStartPlayers.filter((p) => p.playerId !== playerId),
+		{ playerId, expiresAt: ctx.now + 2900 },
+	]
 }
 
 export default handleClientButtonHit

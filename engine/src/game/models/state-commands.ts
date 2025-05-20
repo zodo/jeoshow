@@ -9,6 +9,7 @@ export type ServerAction =
 	| { type: 'answer-timeout'; callbackId: string }
 	| { type: 'round-return'; callbackId: string; forceNextRound?: boolean }
 	| { type: 'question-random'; callbackId: string }
+	| { type: 'fire-stage-update' }
 	| { type: 'state-cleanup' }
 
 export type ServerCommand<A extends ServerAction> = {

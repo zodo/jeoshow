@@ -190,11 +190,12 @@ class GameDurableObjectSqlite {
 				return
 			}
 
-			const { state: after, effects } = this.recursivelyUpdateState(
-				before,
+			const { state: after, effects } = this.recursivelyUpdateState({
+				state: before,
 				command,
-				packMetadata
-			)
+				packMetadata,
+				now,
+			})
 
 			await txn.put('state', after ?? before)
 
@@ -253,12 +254,14 @@ class GameDurableObjectSqlite {
 		}
 	}
 
-	private recursivelyUpdateState(
-		state: GameState,
-		command: GameCommand,
-		packMetadata: PackMetadata,
-		depth = 0
-	): UpdateResult {
+	private recursivelyUpdateState(opts: {
+		state: GameState
+		command: GameCommand
+		packMetadata: PackMetadata
+		now: number
+		depth?: number
+	}): UpdateResult {
+		const { state, command, packMetadata, now, depth = 0 } = opts
 		if (depth > 10) {
 			throw new Error(`Likely infinite loop: ${depth}, command: ${JSON.stringify(command)}`)
 		}
@@ -266,6 +269,7 @@ class GameDurableObjectSqlite {
 		const { state: updatedState, effects: events } = updateState(state, command, {
 			pack: packMetadata.model,
 			mediaMapping: packMetadata.mediaMapping,
+			now,
 		})
 
 		const triggerEvents =
@@ -273,16 +277,17 @@ class GameDurableObjectSqlite {
 				(e): e is Extract<UpdateEffect, { type: 'trigger' }> => e.type === 'trigger'
 			) ?? []
 
-		const nonTriggerEvents = events?.filter((e) => e.type !== 'trigger') ?? []
+		const nonTriggerEvents: UpdateEffect[] = events?.filter((e) => e.type !== 'trigger') ?? []
 
 		const finalState = triggerEvents.reduce<GameState>((currentState, event) => {
 			console.log('-> trigger:', event.command.type, event.command.action.type)
-			const result = this.recursivelyUpdateState(
-				currentState,
-				event.command,
+			const result = this.recursivelyUpdateState({
+				state: currentState,
+				command: event.command,
 				packMetadata,
-				depth + 1
-			)
+				now,
+				depth: depth + 1,
+			})
 			nonTriggerEvents.push(...(result.effects ?? []))
 			return result.state ?? currentState
 		}, updatedState ?? state)

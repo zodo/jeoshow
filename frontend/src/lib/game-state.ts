@@ -53,19 +53,6 @@ export class GameState {
 		}
 	)
 
-	private falselyStartedThisQuestion = readable(false, (set) => {
-		this.stage.subscribe((stage) => {
-			if (stage?.type !== 'question') {
-				set(false)
-			}
-		})
-		this.hitButton.subscribe((hitButton) => {
-			if (hitButton.some((b) => b.type === 'false-start' && b.playerId === this.userId)) {
-				set(true)
-			}
-		})
-	})
-
 	private showQuestionIntroduction = readable(false, (set) => {
 		let inRound = false
 		this.stage.subscribe((stage) => {
@@ -80,13 +67,8 @@ export class GameState {
 	})
 
 	private controls: Readable<ViewState.Controls> = derived(
-		[
-			this.stage,
-			this.falselyStartedThisQuestion,
-			this.playerAnswerAttempt,
-			this.extendedPlayers,
-		],
-		([$stage, $falselyStartedThisQuestion, $playerAnswerAttempt, $players]) => {
+		[this.stage, this.playerAnswerAttempt, this.extendedPlayers],
+		([$stage, $playerAnswerAttempt, $players]) => {
 			if ($playerAnswerAttempt) {
 				return { mode: 'answer-attempt', correct: $playerAnswerAttempt.correct } as const
 			} else if (
@@ -115,7 +97,9 @@ export class GameState {
 				return {
 					mode: 'hit',
 					ready: $stage?.type === 'question' && $stage.substate.type === 'ready-for-hit',
-					falselyStart: $falselyStartedThisQuestion,
+					falselyStart:
+						$stage?.type === 'question' &&
+						$stage.falselyStartedPlayerIds.includes(this.userId),
 				} as const
 			}
 		}

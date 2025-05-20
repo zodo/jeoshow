@@ -23,4 +23,5 @@ export interface UpdateResult {
 export type CommandContext = {
 	pack: PackModel.Pack
 	mediaMapping: Record<string, string>
+	now: number
 }
