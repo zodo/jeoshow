@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { goto } from '$app/navigation'
 	import FileUploader from '$lib/components/FileUploader.svelte'
+	import PackBrowser from '$lib/components/PackBrowser.svelte'
+
+	const onGameCreated = (e: CustomEvent<{ gameId: string }>) => goto(`/game/${e.detail.gameId}`)
 </script>
 
-<h1 class="text-text font-serif text-2xl">Загрузи пак</h1>
-<p class="text-text mb-6 mt-1 font-serif text-sm">
-	Скачивай паки с
-	<a href="https://sigame.xyz/" target="_blank" rel="noopener noreferrer" class="text-bg-accent">
-		https://sigame.xyz/
-	</a>
-</p>
+<div class="w-full max-w-screen-sm overflow-y-auto px-4 py-6">
+<FileUploader on:game-created={onGameCreated} />
 
-<FileUploader on:game-created={(e) => goto(`/game/${e.detail.gameId}`)} />
+<h2 class="text-text mt-8 mb-4 font-serif text-xl">Или выбери из популярных</h2>
+
+<PackBrowser on:game-created={onGameCreated} />
+</div>

@@ -1,5 +1,26 @@
 import type { RequestEvent } from '@sveltejs/kit'
 
+const MIME_TYPES: Record<string, string> = {
+	mp4: 'video/mp4',
+	webm: 'video/webm',
+	mp3: 'audio/mpeg',
+	ogg: 'audio/ogg',
+	wav: 'audio/wav',
+	jpg: 'image/jpeg',
+	jpeg: 'image/jpeg',
+	png: 'image/png',
+	gif: 'image/gif',
+	webp: 'image/webp',
+	svg: 'image/svg+xml',
+	xml: 'application/xml',
+	json: 'application/json',
+}
+
+function getMimeType(filename: string): string {
+	const ext = filename.split('.').pop()?.toLowerCase() ?? ''
+	return MIME_TYPES[ext] ?? 'application/octet-stream'
+}
+
 export const GET = async ({ params, platform, request }: RequestEvent) => {
 	const packId = params.packId
 	const filename = params.file
@@ -9,17 +30,15 @@ export const GET = async ({ params, platform, request }: RequestEvent) => {
 		return new Response(JSON.stringify({ error: 'No bucket found' }), { status: 500 })
 	}
 
-	let range: { offset: number; length: number } | undefined
 	const rangeHeader = request.headers.get('Range')
-	if (rangeHeader) {
-		const match = rangeHeader.match(/^bytes=(\d+)-(\d+)$/)
-		if (match) {
-			const [start, end] = match.map((n) => parseInt(n))
-			range = {
-				offset: start,
-				length: end - start + 1,
-			}
-		}
+	const rangeMatch = rangeHeader?.match(/^bytes=(\d+)-(\d*)$/)
+
+	// First get the object without range to know the size, or with range if fully specified
+	let range: R2Range | undefined
+	if (rangeMatch) {
+		const start = parseInt(rangeMatch[1])
+		const end = rangeMatch[2] ? parseInt(rangeMatch[2]) : undefined
+		range = end !== undefined ? { offset: start, length: end - start + 1 } : { offset: start }
 	}
 
 	const contentObject = await bucket.get(`packs/${packId}/${filename}`, { range })
@@ -28,19 +47,29 @@ export const GET = async ({ params, platform, request }: RequestEvent) => {
 	}
 
 	const content = await contentObject.blob()
+	const totalSize = contentObject.size
+	const contentType = content.type || getMimeType(filename!)
 
-	contentObject.size
+	if (rangeMatch) {
+		const start = parseInt(rangeMatch[1])
+		const end = rangeMatch[2] ? parseInt(rangeMatch[2]) : totalSize - 1
+		const length = end - start + 1
+		return new Response(content, {
+			status: 206,
+			headers: {
+				'Content-Type': contentType,
+				'Content-Range': `bytes ${start}-${end}/${totalSize}`,
+				'Content-Length': `${length}`,
+				'Accept-Ranges': 'bytes',
+			},
+		})
+	}
 
 	return new Response(content, {
 		headers: {
-			'Content-Type': content.type,
-			...(range
-				? {
-						'Content-Range': `bytes ${range.offset}-${range.offset + range.length - 1}/${contentObject.size}`,
-						'Content-Length': `${range.length + 1}`,
-					}
-				: {}),
+			'Content-Type': contentType,
+			'Content-Length': `${totalSize}`,
+			'Accept-Ranges': 'bytes',
 		},
-		status: range ? 206 : 200,
 	})
 }

@@ -23,7 +23,7 @@
 		}
 	}
 
-	const reportUploadProgress = (progress: number) => {
+	const reportЗагрузитьProgress = (progress: number) => {
 		uploadProgress = progress
 	}
 
@@ -35,7 +35,7 @@
 		try {
 			formLoading = true
 			submitted = true
-			const packId = await uploadPack(file, reportUploadProgress)
+			const packId = await uploadPack(file, reportЗагрузитьProgress)
 			console.log(`Pack uploaded, creating game`)
 			const { gameCode, packName } = await createGame(packId)
 			console.log(`Game created: ${gameCode} with pack ${packName}`)
@@ -57,6 +57,13 @@
 	class="mx-auto flex max-w-screen-sm flex-col items-center gap-2 rounded-sm border-2 border-b-4 border-text-normal p-4"
 	on:submit={handleFormSubmit}
 >
+	<h1 class="text-text font-serif text-2xl">Загрузи пак</h1>
+	<p class="text-text mb-2 font-serif text-sm">
+		Скачивай паки с
+		<a href="https://sigame.xyz/" target="_blank" rel="noopener noreferrer" class="text-bg-accent">
+			https://sigame.xyz/
+		</a>
+	</p>
 	<div
 		class="relative flex w-auto -translate-y-1 select-none items-center justify-center rounded-md border-2 border-text-normal bg-bg-secondary p-2 text-center text-sm font-bold uppercase text-text-normal transition-transform ease-in-out hover:-translate-y-1.5 active:-translate-y-0.5 active:transition-all active:duration-100"
 	>
@@ -81,9 +88,9 @@
 			{#if formLoading && uploadProgress && uploadProgress > 0}
 				{uploadProgress?.toFixed(0)}%
 			{:else if formLoading}
-				Uploading...
+				Загрузитьing...
 			{:else if !submitted}
-				Upload
+				Загрузить
 			{:else}
 				Loading...
 			{/if}
