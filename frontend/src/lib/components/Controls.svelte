@@ -130,9 +130,9 @@
 		{#if controls.mode === 'llm-checking'}
 			<div
 				in:scale={{ duration: 300, easing: quintInOut }}
-				class="h-10 rounded-md border-2 border-b-4 border-text-normal bg-bg-accent p-1 text-center font-bold text-text-accent animate-pulse"
+				class="h-10 animate-pulse rounded-md border-2 border-b-4 border-text-normal bg-bg-accent p-1 text-center font-bold text-text-accent"
 			>
-				AI проверяет...
+				Судья проверяет...
 			</div>
 		{/if}
 

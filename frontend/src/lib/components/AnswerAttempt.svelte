@@ -26,9 +26,9 @@
 {#if answerAttempt?.type === 'llm-checking'}
 	<div
 		transition:scale={{ duration: 500, easing: quintInOut }}
-		class="relative z-10 flex items-center justify-center rounded-sm border border-b-2 border-text-normal bg-bg-accent p-2 text-text-accent shadow-md animate-pulse"
+		class="relative z-10 flex animate-pulse items-center justify-center rounded-sm border border-b-2 border-text-normal bg-bg-accent p-2 text-text-accent shadow-md"
 	>
-		AI проверяет ответ <strong class="ml-1">{answerAttempt.playerName}</strong>...
+		Судья проверяет ответ <strong class="ml-1">{answerAttempt.playerName}</strong>...
 	</div>
 {:else if !answerAttempt.isMe && answerAttempt?.type === 'in-progress'}
 	<div
