@@ -37,12 +37,12 @@ export const POST = async ({ request, platform }) => {
 
 			const response = await TelegramClient.sendMessage(
 				update.message.chat.id,
-				'Привет! Загружай siq пак. Скачивай паки с https://sigame.xyz/',
+				'Привет! Загрузи свой siq пак или выбери один из популярных',
 				{
 					inline_keyboard: [
 						[
 							{
-								text: 'Загрузить',
+								text: 'Открыть',
 								web_app: {
 									url: `${PUBLIC_FRONTEND_ROOT_URL}/telegram`,
 								},
