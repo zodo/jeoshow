@@ -10,6 +10,7 @@
 	let loading = true
 	let error: string | null = null
 	let creatingGameForId: string | null = null
+	let progressMessage: string | null = null
 
 	onMount(async () => {
 		try {
@@ -28,20 +29,71 @@
 		if (creatingGameForId) return
 		creatingGameForId = pack.id
 		error = null
+		progressMessage = null
 		try {
 			const res = await fetch(`/api/sibrowser/packs/${pack.id}/create-game`, {
 				method: 'POST',
 			})
-			const data = (await res.json()) as { gameCode?: string; packName?: string; error?: string }
-			if (data.gameCode) {
-				dispatch('game-created', { gameId: data.gameCode, packName: data.packName ?? '' })
-			} else {
-				error = data.error ?? 'Не удалось создать игру'
+
+			// Fast path: JSON response (cached pack)
+			const ct = res.headers.get('content-type') ?? ''
+			if (ct.includes('application/json')) {
+				const data = (await res.json()) as {
+					gameCode?: string
+					packName?: string
+					error?: string
+				}
+				if (data.gameCode) {
+					dispatch('game-created', { gameId: data.gameCode, packName: data.packName ?? '' })
+				} else {
+					error = data.error ?? 'Не удалось создать игру'
+				}
+				return
+			}
+
+			// Slow path: SSE stream
+			const reader = res.body?.getReader()
+			if (!reader) {
+				error = 'Не удалось создать игру'
+				return
+			}
+
+			const decoder = new TextDecoder()
+			let buffer = ''
+
+			while (true) {
+				const { done, value } = await reader.read()
+				if (done) break
+				buffer += decoder.decode(value, { stream: true })
+
+				const parts = buffer.split('\n\n')
+				buffer = parts.pop() ?? ''
+
+				for (const part of parts) {
+					const eventMatch = part.match(/^event: (\w+)\ndata: (.+)$/s)
+					if (!eventMatch) continue
+					const [, event, data] = eventMatch
+
+					if (event === 'progress') {
+						progressMessage = data
+					} else if (event === 'done') {
+						const result = JSON.parse(data) as { gameCode: string; packName: string }
+						dispatch('game-created', {
+							gameId: result.gameCode,
+							packName: result.packName ?? '',
+						})
+						return
+					} else if (event === 'error') {
+						error = data
+						return
+					}
+				}
 			}
 		} catch {
 			error = 'Не удалось создать игру'
 		} finally {
 			creatingGameForId = null
+			progressMessage = null
 		}
 	}
 
@@ -106,32 +158,42 @@
 							</details>
 						{/if}
 					</div>
-					<button
-						class={cn(
-							'shrink-0 self-center cursor-pointer rounded-lg border-2 border-text-normal bg-warn px-3 py-1.5 text-xs font-bold uppercase text-text-normal transition-transform ease-in-out',
-							{
-								'hover:-translate-y-0.5 active:translate-y-0.5': !creatingGameForId,
-							}
-						)}
-						on:click={() => handleSelectPack(pack)}
-						disabled={!!creatingGameForId}
-					>
-						{#if creatingGameForId === pack.id}
-							<span class="inline-flex gap-0.5">
-								<span class="animate-bounce">.</span>
-								<span class="animate-bounce [animation-delay:0.15s]">.</span>
-								<span class="animate-bounce [animation-delay:0.3s]">.</span>
+					<div class="shrink-0 self-center flex flex-col items-center gap-1">
+						<button
+							class={cn(
+								'cursor-pointer rounded-lg border-2 border-text-normal bg-warn px-3 py-1.5 text-xs font-bold uppercase text-text-normal transition-transform ease-in-out',
+								{
+									'hover:-translate-y-0.5 active:translate-y-0.5': !creatingGameForId,
+								}
+							)}
+							on:click={() => handleSelectPack(pack)}
+							disabled={!!creatingGameForId}
+						>
+							{#if creatingGameForId === pack.id}
+								<span class="inline-flex gap-0.5">
+									<span class="animate-bounce">.</span>
+									<span class="animate-bounce [animation-delay:0.15s]">.</span>
+									<span class="animate-bounce [animation-delay:0.3s]">.</span>
+								</span>
+							{:else}
+								Играть
+							{/if}
+						</button>
+						{#if creatingGameForId === pack.id && progressMessage}
+							<span class="text-[10px] text-text-neutral whitespace-nowrap">
+								{progressMessage}
 							</span>
-						{:else}
-							Играть
 						{/if}
-					</button>
+					</div>
 				</div>
+				{#if creatingGameForId === pack.id && error}
+					<p class="mt-2 text-center text-danger text-xs">{error}</p>
+				{/if}
 			</div>
 		{/each}
 	</div>
 
-	{#if error}
+	{#if error && !creatingGameForId}
 		<p class="mt-2 text-center text-danger text-sm">{error}</p>
 	{/if}
 {/if}

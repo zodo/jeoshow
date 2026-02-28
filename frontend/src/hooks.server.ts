@@ -5,15 +5,15 @@ import { dev } from '$app/environment'
   will emulate any bindings defined in `wrangler.toml`.
 */
 
-let platform: App.Platform
+let platform: App.Platform | undefined
 
 if (dev) {
 	const { getPlatformProxy } = await import('wrangler')
-	platform = await getPlatformProxy({
+	platform = (await getPlatformProxy({
 		persist: {
 			path: '../.wrangler/v3/',
 		},
-	})
+	})) as unknown as App.Platform
 }
 
 export const handle = async ({ event, resolve }: { event: any; resolve: any }) => {

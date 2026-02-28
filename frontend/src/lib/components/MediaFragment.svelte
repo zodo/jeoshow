@@ -29,7 +29,7 @@
 	$: fragmentsCount = fragments.flat().length
 	$: fragmentHeight = fragmentsCount == 1 ? 'full' : fragmentsCount == 2 ? '1/2' : '1/3'
 
-	let container: HTMLDivElement
+	let container: HTMLDivElement | undefined
 	let contentOverflows = false
 	const checkOverflow = () => {
 		if (container?.children) {
