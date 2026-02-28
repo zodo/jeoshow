@@ -36,7 +36,7 @@ const handleClientIntroduce = (
 			},
 			{
 				type: 'client-reply',
-				event: { type: 'stage-updated', stage: toSnapshot(state.stage, ctx) },
+				event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
 			},
 		],
 	}
