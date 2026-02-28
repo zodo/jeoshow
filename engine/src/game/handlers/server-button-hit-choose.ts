@@ -15,7 +15,7 @@ const handleServerButtonHitChoose = (
 
 	const playerIds = state.stage.playersWhoHit
 	const attemptedPlayers = state.players.filter((p) => playerIds.includes(p.id))
-	const winner = chooseRandomPlayer(attemptedPlayers)
+	const winner = chooseRandomPlayer(attemptedPlayers, ctx.random)
 
 	if (winner) {
 		return goToAwaitingAnswer(state, ctx, winner.id)
@@ -33,7 +33,7 @@ const handleServerButtonHitChoose = (
 	}
 }
 
-const chooseRandomPlayer = (players: Player[]): Player | null => {
+const chooseRandomPlayer = (players: Player[], random: () => number): Player | null => {
 	if (players.length === 0) {
 		return null
 	}
@@ -42,7 +42,7 @@ const chooseRandomPlayer = (players: Player[]): Player | null => {
 
 	const weights = players.map((player) => maxAnswers + 1 - player.answerAttemts)
 	const totalWeight = weights.reduce((acc, weight) => acc + weight, 0)
-	let randomNum = Math.random() * totalWeight
+	let randomNum = random() * totalWeight
 
 	for (let i = 0; i < players.length; i++) {
 		randomNum -= weights[i]

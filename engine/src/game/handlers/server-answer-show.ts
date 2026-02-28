@@ -23,7 +23,7 @@ const handleServerAnswerShow = (
 		return { state, effects: [] }
 	}
 
-	const callbackId: string = Math.random().toString(36).substring(7)
+	const callbackId: string = ctx.random().toString(36).substring(7)
 	const stage: Extract<Stage, { type: 'answer' }> = {
 		...state.stage,
 		type: 'answer',

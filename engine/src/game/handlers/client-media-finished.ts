@@ -27,7 +27,7 @@ const handleClientMediaFinished = (
 	}
 
 	if (state.stage.type === 'answer') {
-		const callbackId: string = Math.random().toString(36).substring(7)
+		const callbackId: string = ctx.random().toString(36).substring(7)
 
 		const stage: (typeof state)['stage'] = {
 			...state.stage,

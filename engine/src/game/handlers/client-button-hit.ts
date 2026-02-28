@@ -122,7 +122,7 @@ export const goToAwaitingAnswer = (
 		return {}
 	}
 
-	const callbackId = Math.random().toString(36).substring(7)
+	const callbackId = ctx.random().toString(36).substring(7)
 	const newStage: Extract<Stage, { type: 'awaiting-answer' }> = {
 		...state.stage,
 		type: 'awaiting-answer',

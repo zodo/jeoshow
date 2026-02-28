@@ -24,7 +24,7 @@ const handleRoundSkip = (
 	} else {
 		noVotes = [...noVotes, command.playerId]
 	}
-	const callbackId = Math.random().toString(36).substring(7)
+	const callbackId = ctx.random().toString(36).substring(7)
 
 	if (yesVotes.length + noVotes.length === state.players.filter((p) => !p.disconnected).length) {
 		if (yesVotes.length > noVotes.length) {

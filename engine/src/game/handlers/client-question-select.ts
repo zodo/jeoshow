@@ -30,9 +30,9 @@ const handleClientQuestionSelect = (
 		return {}
 	}
 
-	const callbackId: string = Math.random().toString(36).substring(7)
+	const callbackId: string = ctx.random().toString(36).substring(7)
 	const { seconds } = getFragmentsTime(question.fragments)
-	const questionReadTime = Math.floor(seconds + Math.random() * 3) + 1
+	const questionReadTime = Math.floor(seconds + ctx.random() * 3) + 1
 
 	const newStage: Extract<Stage, { type: 'question' }> = {
 		type: 'question',

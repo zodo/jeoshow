@@ -20,7 +20,7 @@ const handleClientAnswerSkip = (
 	const alivePlayers = state.players.filter((p) => !p.disconnected).length
 
 	if (newVotedForSkip.length >= alivePlayers) {
-		const callbackId: string = Math.random().toString(36).substring(7)
+		const callbackId: string = ctx.random().toString(36).substring(7)
 		return {
 			state: { ...state, stage: { ...state.stage, callbackId } },
 			effects: [

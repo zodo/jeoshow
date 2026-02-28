@@ -22,13 +22,13 @@ const handleServerRoundReturn = (
 		!command.action.forceNextRound
 
 	const hasMoreRounds = ctx.pack.rounds[ctx.pack.rounds.length - 1].id !== state.stage.roundId
-	const callbackId: string = Math.random().toString(36).substring(7)
+	const callbackId: string = ctx.random().toString(36).substring(7)
 
 	let activePlayer = state.stage.activePlayer
 	if (state.players.find((p) => p.id === activePlayer)?.disconnected) {
 		const alivePlayers = state.players.filter((p) => !p.disconnected)
 		if (alivePlayers.length > 0) {
-			activePlayer = alivePlayers[Math.floor(Math.random() * alivePlayers.length)].id
+			activePlayer = alivePlayers[Math.floor(ctx.random() * alivePlayers.length)].id
 		}
 	}
 

@@ -35,7 +35,7 @@ const handleServerQuestionRandom = (
 						type: 'question-select',
 						questionId:
 							availableQuestionIds[
-								Math.floor(Math.random() * availableQuestionIds.length)
+								Math.floor(ctx.random() * availableQuestionIds.length)
 							],
 					},
 					playerId: state.stage.activePlayer,

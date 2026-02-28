@@ -45,7 +45,7 @@ const handleVote = (
 		return {}
 	}
 
-	const callbackId: string = Math.random().toString(36).substring(7)
+	const callbackId: string = ctx.random().toString(36).substring(7)
 
 	let agreeVotes = appealVoting.agree
 	let disagreeVotes = appealVoting.disagree
@@ -172,7 +172,7 @@ const handleStartAppeal = (
 		return {}
 	}
 
-	const callbackId: string = Math.random().toString(36).substring(7)
+	const callbackId: string = ctx.random().toString(36).substring(7)
 
 	const playerAnswer = state.stage.previousAnswers.answers.find(
 		(a) => a.playerId === command.playerId

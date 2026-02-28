@@ -33,4 +33,5 @@ export type CommandContext = {
 	pack: PackModel.Pack
 	mediaMapping: Record<string, string>
 	now: number
+	random: () => number
 }

@@ -299,6 +299,7 @@ class GameDurableObjectSqlite {
 			pack: packMetadata.model,
 			mediaMapping: packMetadata.mediaMapping,
 			now,
+			random: Math.random,
 		})
 
 		const triggerEvents =

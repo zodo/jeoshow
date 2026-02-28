@@ -44,7 +44,7 @@ const handleClientAnswerGive = (
 	}
 
 	// Slow path: string match failed on regular answer — ask LLM
-	const callbackId = Math.random().toString(36).substring(7)
+	const callbackId = ctx.random().toString(36).substring(7)
 
 	const stage: Extract<Stage, { type: 'llm-checking' }> = {
 		...state.stage,
@@ -133,7 +133,7 @@ export const resolveAnswer = (opts: {
 		],
 	}
 
-	const callbackId = Math.random().toString(36).substring(7)
+	const callbackId = ctx.random().toString(36).substring(7)
 
 	const allowAnswersFromOtherPlayers =
 		!isCorrectAnswer &&
