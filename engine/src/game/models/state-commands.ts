@@ -10,6 +10,7 @@ export type ServerAction =
 	| { type: 'round-return'; callbackId: string; forceNextRound?: boolean }
 	| { type: 'question-random'; callbackId: string }
 	| { type: 'fire-stage-update' }
+	| { type: 'llm-verdict'; correct: boolean; callbackId: string }
 	| { type: 'state-cleanup' }
 
 export type ServerCommand<A extends ServerAction> = {

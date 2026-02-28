@@ -9,7 +9,9 @@ declare namespace Cloudflare {
 		JEOSHOW_PACKS: R2Bucket
 	}
 }
-interface CfEnv extends Cloudflare.Env {}
+interface CfEnv extends Cloudflare.Env {
+	OPENROUTER_API_KEY?: string
+}
 
 // Begin runtime types
 /*! *****************************************************************************

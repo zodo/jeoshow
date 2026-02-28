@@ -33,6 +33,7 @@ export namespace ViewState {
 		| { mode: 'appeal' }
 		| { mode: 'answer-text' }
 		| { mode: 'answer-select'; options: PackModel.SelectAnswerOption[] }
+		| { mode: 'llm-checking' }
 		| { mode: 'answer-attempt'; correct: boolean }
 		| { mode: 'answer-skip'; totalPlayers: number; votes: number; meVoted: boolean }
 
@@ -68,7 +69,7 @@ export namespace ViewState {
 	}
 
 	export type AnswerAttempt = {
-		type: 'in-progress' | 'correct' | 'incorrect'
+		type: 'in-progress' | 'correct' | 'incorrect' | 'llm-checking'
 		playerName: string
 		avatarUrl?: string
 		answer: string

@@ -11,6 +11,7 @@ export namespace Timeouts {
 	export const mediaTimeout = 30
 	export const mediaReturnDelayAfterFinishedTimeout = 2
 	export const roundSkipVoting = 10
+	export const llmJudgeTimeout = 8
 }
 
 export type FragmentsTime = {

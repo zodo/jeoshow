@@ -1,6 +1,7 @@
 import { updateState } from './game/state-update'
 import { loadMetadata, type PackMetadata } from './game/metadata'
 import { createState } from './game/state-create'
+import { judgeLlm } from './game/llm-judge'
 import type {
 	ClientCommand,
 	GameCommand,
@@ -164,7 +165,7 @@ class GameDurableObjectSqlite {
 	private async modifyState(
 		command: GameCommand,
 		now: number,
-		origin: 'ws' | 'alarm',
+		origin: 'ws' | 'alarm' | 'llm',
 		ws?: WebSocket
 	) {
 		if (command.type === 'server' && command.action.type === 'state-cleanup') {
@@ -250,6 +251,34 @@ class GameDurableObjectSqlite {
 						time: Math.ceil(now + event.delaySeconds * 1000),
 					})),
 				]
+			})
+		}
+
+		const llmJudgeEffects =
+			events?.filter(
+				(e): e is Extract<UpdateEffect, { type: 'llm-judge' }> => e.type === 'llm-judge'
+			) ?? []
+		for (const effect of llmJudgeEffects) {
+			const apiKey = this.env.OPENROUTER_API_KEY
+			if (!apiKey) {
+				console.error('OPENROUTER_API_KEY not configured, falling back to incorrect')
+				continue
+			}
+			judgeLlm(apiKey, {
+				questionText: effect.questionText,
+				theme: effect.theme,
+				correctAnswers: effect.correctAnswers,
+				incorrectAnswers: effect.incorrectAnswers,
+				playerAnswer: effect.playerAnswer,
+			}).then((correct) => {
+				this.modifyState(
+					{
+						type: 'server',
+						action: { type: 'llm-verdict', correct, callbackId: effect.callbackId },
+					},
+					Date.now(),
+					'llm'
+				)
 			})
 		}
 	}

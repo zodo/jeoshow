@@ -127,6 +127,15 @@
 			</div>
 		{/if}
 
+		{#if controls.mode === 'llm-checking'}
+			<div
+				in:scale={{ duration: 300, easing: quintInOut }}
+				class="h-10 rounded-md border-2 border-b-4 border-text-normal bg-bg-accent p-1 text-center font-bold text-text-accent animate-pulse"
+			>
+				AI проверяет...
+			</div>
+		{/if}
+
 		{#if controls.mode === 'answer-attempt'}
 			<div
 				in:scale={{ duration: 300, easing: quintInOut }}
@@ -168,7 +177,7 @@
 		{/if}
 	</div>
 
-	{#if controls.mode !== 'answer-text' && controls.mode !== 'answer-select' && controls.mode !== 'answer-attempt'}
+	{#if controls.mode !== 'answer-text' && controls.mode !== 'answer-select' && controls.mode !== 'answer-attempt' && controls.mode !== 'llm-checking'}
 		<div class="flex-0">
 			<ReactionSelector on:haptic on:action />
 		</div>

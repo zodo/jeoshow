@@ -39,7 +39,7 @@
 			<AnswerAttempt answerAttempt={state.answerAttempt} />
 		</div>
 
-		{#if state.answerAttempt.type !== 'in-progress'}
+		{#if state.answerAttempt.type === 'correct' || state.answerAttempt.type === 'incorrect'}
 			<AnswerAttemptEffects type={state.answerAttempt.type} />
 		{/if}
 	{/if}

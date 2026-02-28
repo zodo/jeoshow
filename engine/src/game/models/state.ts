@@ -60,6 +60,13 @@ type RoundStageType =
 			answeringPlayer: PlayerId
 	  }
 	| {
+			type: 'llm-checking'
+			questionId: string
+			answeringPlayer: PlayerId
+			playerAnswer: string
+			playerAnswerText: string
+	  }
+	| {
 			type: 'answer-attempt'
 			questionId: string
 	  }

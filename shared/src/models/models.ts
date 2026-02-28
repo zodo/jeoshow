@@ -14,6 +14,7 @@ export type QuestionState =
 	| { type: 'idle' }
 	| { type: 'ready-for-hit'; timeoutSeconds: number }
 	| { type: 'awaiting-answer'; activePlayerId: string; timeoutSeconds: number }
+	| { type: 'llm-checking'; activePlayerId: string }
 	| { type: 'answer-attempt' }
 
 export type StageSnapshot =

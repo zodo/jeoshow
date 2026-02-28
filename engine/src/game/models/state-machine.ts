@@ -14,6 +14,15 @@ export type UpdateEffect =
 	| { type: 'client-reply'; event: GameEvent }
 	| { type: 'schedule'; command: GameCommand; delaySeconds: number }
 	| { type: 'trigger'; command: GameCommand }
+	| {
+			type: 'llm-judge'
+			questionText: string
+			theme: string
+			correctAnswers: string[]
+			incorrectAnswers: string[]
+			playerAnswer: string
+			callbackId: string
+	  }
 
 export interface UpdateResult {
 	state?: GameState

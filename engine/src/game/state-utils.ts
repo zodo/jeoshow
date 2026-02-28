@@ -68,6 +68,7 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 		case 'question':
 		case 'ready-for-hit':
 		case 'awaiting-answer':
+		case 'llm-checking':
 		case 'answer-attempt': {
 			let substate: QuestionState
 			switch (stage.type) {
@@ -82,6 +83,12 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 						type: 'awaiting-answer',
 						activePlayerId: stage.answeringPlayer,
 						timeoutSeconds: stage.callbackTimeout ?? 0,
+					}
+					break
+				case 'llm-checking':
+					substate = {
+						type: 'llm-checking',
+						activePlayerId: stage.answeringPlayer,
 					}
 					break
 				case 'answer-attempt':

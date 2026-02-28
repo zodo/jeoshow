@@ -29,6 +29,7 @@ import handlePingSet from './handlers/client-ping-set'
 import handleClientAnswerSkip from './handlers/client-answer-skip'
 import handleClientMessageSend from './handlers/client-message-send'
 import handleServerFireStageUpdate from './handlers/server-fire-stage-update'
+import handleServerLlmVerdict from './handlers/server-llm-verdict'
 
 export const updateState = (
 	state: GameState,
@@ -80,5 +81,6 @@ const serverCommandHandlers: {
 	'button-hit-choose': handleServerButtonHitChoose,
 	'answer-timeout': handleServerAnswerTimeout,
 	'fire-stage-update': handleServerFireStageUpdate,
+	'llm-verdict': handleServerLlmVerdict,
 	'state-cleanup': () => ({}), // handled by caller code
 }

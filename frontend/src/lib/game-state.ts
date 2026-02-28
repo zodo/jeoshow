@@ -69,7 +69,12 @@ export class GameState {
 	private controls: Readable<ViewState.Controls> = derived(
 		[this.stage, this.playerAnswerAttempt, this.extendedPlayers],
 		([$stage, $playerAnswerAttempt, $players]) => {
-			if ($playerAnswerAttempt) {
+			if (
+				$stage?.type === 'question' &&
+				$stage.substate.type === 'llm-checking'
+			) {
+				return { mode: 'llm-checking' } as const
+			} else if ($playerAnswerAttempt) {
 				return { mode: 'answer-attempt', correct: $playerAnswerAttempt.correct } as const
 			} else if (
 				$stage?.type === 'question' &&
@@ -280,7 +285,19 @@ export class GameState {
 			}
 
 			let answerAttempt: ViewState.AnswerAttempt | undefined = undefined
-			if ($playerAnswerAttempt) {
+			if (
+				serverStage.type === 'question' &&
+				serverStage.substate.type === 'llm-checking'
+			) {
+				const player = getPlayer(serverStage.substate.activePlayerId)
+				answerAttempt = {
+					type: 'llm-checking',
+					playerName: player?.name ?? 'Unknown',
+					avatarUrl: player?.avatarUrl,
+					answer: '',
+					isMe: serverStage.substate.activePlayerId === this.userId,
+				}
+			} else if ($playerAnswerAttempt) {
 				const activePlayer = $playerAnswerAttempt.playerId
 				const player = getPlayer(activePlayer)
 				answerAttempt = {
