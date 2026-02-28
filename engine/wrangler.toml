@@ -25,3 +25,8 @@ bucket_name = "jeoshow-packs"
 [[kv_namespaces]]
 binding = "JEOSHOW_PACKS_METADATA"
 id = "9f16fbbc252c4561a7e4ea0ceb611fb7"
+
+[observability]
+[observability.logs]
+enabled = true
+invocation_logs = true
