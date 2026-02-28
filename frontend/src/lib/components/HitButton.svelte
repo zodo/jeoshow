@@ -55,12 +55,15 @@
 	>
 		<span
 			class={cn(
-				'relative -mx-0.5 flex h-full w-auto -translate-y-1 select-none items-center justify-center rounded-lg border-2 border-text-normal bg-bg-accent text-center text-sm font-bold uppercase text-text-accent transition-transform ease-in-out hover:-translate-y-1.5',
+				'relative -mx-0.5 flex h-full w-auto select-none items-center justify-center rounded-lg border-2 border-text-normal text-center text-sm font-bold uppercase transition-transform ease-in-out',
 				{
 					'active:-translate-y-0.5 active:transition-all active:duration-100':
 						!controls.falselyStart,
-					'-translate-y-1.5': controls.ready && !controls.falselyStart,
-					'bg-warn': controls.falselyStart,
+					'-translate-y-1.5 bg-bg-accent text-text-accent hover:-translate-y-1.5':
+						controls.ready && !controls.falselyStart,
+					'-translate-y-0.5 bg-bg-secondary text-text-normal':
+						!controls.ready && !controls.falselyStart,
+					'bg-warn -translate-y-1 text-text-accent': controls.falselyStart,
 				}
 			)}
 		>
