@@ -72,14 +72,6 @@ const handleClientAnswerGive = (
 			event: { type: 'stage-updated', stage: toSnapshot(stage, ctx) },
 		},
 		{
-			type: 'client-broadcast',
-			event: {
-				type: 'player-sent-message',
-				playerId: command.playerId,
-				text: playerAnswerText,
-			},
-		},
-		{
 			type: 'llm-judge',
 			questionText,
 			theme: theme?.name ?? '',
