@@ -144,7 +144,8 @@
 		scoresVisible = true
 		dispatch('haptic', 'medium')
 
-		await delay(3000)
+		const allPassed = sortedVerdicts.every((v) => v.passed)
+		await delay(allPassed ? 300 : 3000)
 		dispatch('action', { type: 'party-reveal-ready' })
 	}
 
