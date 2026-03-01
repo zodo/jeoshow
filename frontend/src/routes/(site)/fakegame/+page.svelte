@@ -82,9 +82,7 @@
 		stage: {
 			type: 'party-reveal',
 			loading: false,
-			totalPot: 1800,
 			price: 600,
-			jackpot: 1200,
 			verdicts: [
 				{
 					playerName: 'Алексей',
@@ -142,7 +140,6 @@
 		controls: { mode: 'party-waiting' },
 		stageBlink: false,
 		showPlayers: true,
-		jackpot: 0,
 		messages: [],
 	}}
 	on:action={(e) => console.log('action', e.detail)}

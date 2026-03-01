@@ -4,7 +4,6 @@
 	import DisconnectedOverlay from './DisconnectedOverlay.svelte'
 	import type { ViewState } from '$lib/models'
 	import Controls from './Controls.svelte'
-	import JackpotStrip from './JackpotStrip.svelte'
 	import { scale } from 'svelte/transition'
 	import { quintInOut } from 'svelte/easing'
 	import { cn } from '$lib/style-utils'
@@ -26,9 +25,6 @@
 				{/if}
 			{/if}
 		</div>
-		{#if state.jackpot > 0}
-			<JackpotStrip amount={state.jackpot} />
-		{/if}
 	</div>
 	<div
 		class={cn(

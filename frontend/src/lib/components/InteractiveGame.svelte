@@ -38,7 +38,6 @@
 		showPlayers: true,
 		messages: [],
 		gameMode: 'classic',
-		jackpot: 0,
 	}
 
 	onMount(() => {

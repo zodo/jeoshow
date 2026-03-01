@@ -164,7 +164,6 @@ export class GameState {
 		})
 	})
 
-	private _lastJackpot = 0
 	private _lastPartyPrice = 0
 
 	viewState: Readable<ViewState.View> = derived(
@@ -326,8 +325,6 @@ export class GameState {
 						themeComment: serverStage.themeComment,
 						timeoutSeconds: serverStage.timeoutSeconds,
 						submittedPlayerIds: serverStage.submittedPlayerIds,
-						jackpot: serverStage.jackpot,
-						totalPot: serverStage.totalPot,
 						price: serverStage.price,
 						showIntroduction: $showQuestionIntroduction,
 					}
@@ -338,9 +335,7 @@ export class GameState {
 						type: 'party-reveal',
 						loading: true,
 						verdicts: [],
-						totalPot: serverStage.totalPot,
 						price: this._lastPartyPrice,
-						jackpot: this._lastJackpot,
 					}
 					break
 				}
@@ -360,9 +355,7 @@ export class GameState {
 								passed: v.answer === '' && v.scoreDiff === 0 && !v.correct,
 							}
 						}),
-						totalPot: serverStage.totalPot,
 						price: this._lastPartyPrice,
-						jackpot: this._lastJackpot,
 					}
 					break
 				}
@@ -417,12 +410,7 @@ export class GameState {
 			}))
 
 			if (serverStage.type === 'party-question') {
-				this._lastJackpot = serverStage.jackpot
 				this._lastPartyPrice = serverStage.price
-			} else if (serverStage.type === 'party-reveal') {
-				this._lastJackpot = serverStage.jackpot
-			} else if (serverStage.type === 'round' && serverStage.jackpot) {
-				this._lastJackpot = serverStage.jackpot
 			}
 
 			const result: ViewState.View = {
@@ -435,7 +423,6 @@ export class GameState {
 				answerAttempt,
 				messages,
 				gameMode: $gameMode,
-				jackpot: this._lastJackpot,
 			}
 			return result
 		}

@@ -131,5 +131,4 @@ export const makeInitialState = (players: Player[] = [PLAYER1, PLAYER2]): GameSt
 	players,
 	stage: { type: 'before-start' },
 	gameMode: 'classic',
-	jackpot: 0,
 })

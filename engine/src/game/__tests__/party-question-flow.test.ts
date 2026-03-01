@@ -7,7 +7,6 @@ describe('party mode: question flow', () => {
 	it('game-start with party mode sets gameMode', () => {
 		const g = startedPartyGame()
 		expect(g.state.gameMode).toBe('party')
-		expect(g.state.jackpot).toBe(0)
 		expect(g.stageType).toBe('round')
 	})
 

@@ -102,8 +102,6 @@ export namespace ViewState {
 		themeComment?: string
 		timeoutSeconds: number
 		submittedPlayerIds: string[]
-		jackpot: number
-		totalPot: number
 		price: number
 		showIntroduction: boolean
 	}
@@ -122,9 +120,7 @@ export namespace ViewState {
 		type: 'party-reveal'
 		loading: boolean
 		verdicts: PartyRevealVerdict[]
-		totalPot: number
 		price: number
-		jackpot: number
 	}
 
 	export type AnswerStage = {
@@ -148,7 +144,6 @@ export namespace ViewState {
 		answerAttempt?: AnswerAttempt
 		messages: ChatMessage[]
 		gameMode: 'classic' | 'party'
-		jackpot: number
 		stage:
 			| { type: 'connecting' }
 			| { type: 'before-start' }

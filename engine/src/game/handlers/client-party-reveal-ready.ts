@@ -1,7 +1,7 @@
 import type { GameState } from '../models/state'
 import type { ClientCommand } from '../models/state-commands'
 import type { CommandContext, UpdateResult } from '../models/state-machine'
-import { applyRevealScores, getQuestion } from '../state-utils'
+import { applyRevealScores } from '../state-utils'
 
 const handleClientPartyRevealReady = (
 	state: GameState,
@@ -26,14 +26,12 @@ const handleClientPartyRevealReady = (
 	const majorityReached = readyCount >= connectedPlayers.length / 2
 
 	if (majorityReached) {
-		const questionModel = getQuestion(ctx, state.stage.questionId)
-		const { players, jackpot } = applyRevealScores(
+		const players = applyRevealScores(
 			state as GameState & { stage: typeof state.stage },
-			questionModel.price
 		)
 
 		return {
-			state: { ...state, players, jackpot, stage },
+			state: { ...state, players, stage },
 			effects: [
 				{
 					type: 'trigger',

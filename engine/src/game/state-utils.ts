@@ -1,22 +1,18 @@
-import type { GameMode, PartyVerdict, QuestionState, StageSnapshot } from 'shared/models/models'
+import type { GameMode, QuestionState, StageSnapshot } from 'shared/models/models'
 import type { Player } from 'shared/models/models'
 import type { GameState, Stage } from './models/state'
 import type { CommandContext } from './models/state-machine'
 
-/** Apply verdict scoreDiffs to players and compute new jackpot. */
+/** Apply verdict scoreDiffs to players. */
 export function applyRevealScores(
-	state: GameState & { stage: Extract<Stage, { type: 'party-reveal' }> },
-	questionPrice: number
-): { players: Player[]; jackpot: number } {
+	state: GameState & { stage: Extract<Stage, { type: 'party-reveal' }> }
+): Player[] {
 	const verdicts = state.stage.verdicts
-	const players = state.players.map((p) => {
+	return state.players.map((p) => {
 		const verdict = verdicts.find((v) => v.playerId === p.id)
 		if (!verdict || verdict.scoreDiff === 0) return p
 		return { ...p, score: p.score + verdict.scoreDiff }
 	})
-	const anyCorrect = verdicts.some((v) => v.correct)
-	const jackpot = anyCorrect ? 0 : state.jackpot + questionPrice
-	return { players, jackpot }
 }
 
 export const getRound = (ctx: CommandContext, roundId: string) => {
@@ -38,7 +34,7 @@ export const getQuestion = (ctx: CommandContext, questionId: string) => {
 }
 
 export const toSnapshot = (
-	state: Pick<GameState, 'gameMode' | 'players' | 'jackpot' | 'stage'>,
+	state: Pick<GameState, 'gameMode' | 'players' | 'stage'>,
 	ctx: CommandContext
 ): StageSnapshot => {
 	const { stage } = state
@@ -79,7 +75,6 @@ export const toSnapshot = (
 				activePlayerId: stage.activePlayer,
 				timeoutSeconds: stage.callbackTimeout ?? 0,
 				playerIdsCanAppeal,
-				jackpot: state.jackpot || undefined,
 				skipRoundVoting: stage.skipRoundVoting,
 				appealVoting: stage.appealVoting
 					? {
@@ -171,8 +166,6 @@ export const toSnapshot = (
 			const round = getRound(ctx, stage.roundId)
 			const question = getQuestion(ctx, stage.questionId)
 			const theme = round.themes.find((t) => t.questions.some((q) => q.id === question.id))
-			const jackpot = state.jackpot ?? 0
-			const totalPot = question.price + jackpot
 			return {
 				type: 'party-question',
 				gameMode,
@@ -182,19 +175,14 @@ export const toSnapshot = (
 				themeComment: theme?.comments,
 				timeoutSeconds: stage.callbackTimeout ?? stage.answerTimeSeconds,
 				submittedPlayerIds: stage.submissions.map((s) => s.playerId),
-				jackpot,
-				totalPot,
 				selectAnswerOptions:
 					question.answers.type === 'select' ? question.answers.options : undefined,
 			}
 		}
 		case 'party-checking': {
-			const question = getQuestion(ctx, stage.questionId)
-			const jackpot = state.jackpot ?? 0
 			return {
 				type: 'party-checking',
 				gameMode,
-				totalPot: question.price + jackpot,
 			}
 		}
 		case 'party-reveal': {
@@ -202,8 +190,6 @@ export const toSnapshot = (
 				type: 'party-reveal',
 				gameMode,
 				verdicts: stage.verdicts,
-				totalPot: stage.potAmount,
-				jackpot: state.jackpot,
 			}
 		}
 		case 'after-finish':

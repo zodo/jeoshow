@@ -4,7 +4,7 @@
 	import type { ClientAction } from 'shared/models/messages'
 	import { createEventDispatcher, onMount } from 'svelte'
 	import { tweened } from 'svelte/motion'
-	import { cubicOut, cubicInOut } from 'svelte/easing'
+	import { cubicOut } from 'svelte/easing'
 	import { cn } from '$lib/style-utils'
 	import Confetti from 'svelte-confetti'
 
@@ -12,14 +12,11 @@
 
 	export let reveal: ViewState.PartyRevealStage
 
-	type BankPhase = 'price-enter' | 'jackpot-merge' | 'float-up' | 'settled' | 'verdicts'
+	type BankPhase = 'price-enter' | 'float-up' | 'settled' | 'verdicts'
 	let bankPhase: BankPhase = 'price-enter'
 
-	const hasJackpot = reveal.jackpot > 0
 	const bankDisplay = tweened(0, { duration: 600, easing: cubicOut })
-	const jackpotDisplay = tweened(reveal.jackpot, { duration: 600, easing: cubicInOut })
 
-	let jackpotVisible = false
 	let priceVisible = false
 
 	let verdictsReady = false
@@ -51,18 +48,6 @@
 		priceVisible = true
 		await bankDisplay.set(reveal.price)
 		await delay(200)
-
-		if (hasJackpot) {
-			bankPhase = 'jackpot-merge'
-			jackpotVisible = true
-			await delay(400)
-			await Promise.all([
-				bankDisplay.set(reveal.totalPot, { duration: 800, easing: cubicInOut }),
-				jackpotDisplay.set(0, { duration: 800, easing: cubicInOut }),
-			])
-			jackpotVisible = false
-			await delay(200)
-		}
 
 		bankPhase = 'float-up'
 		await delay(500)
@@ -168,13 +153,13 @@
 	<!-- Bank number -->
 	<div
 		class="bank-container absolute left-0 right-0 flex flex-col items-center justify-center transition-all duration-500 ease-out"
-		class:bank-center={bankPhase === 'price-enter' || bankPhase === 'jackpot-merge'}
+		class:bank-center={bankPhase === 'price-enter'}
 		class:bank-top={bankPhase === 'float-up' || bankPhase === 'settled' || bankPhase === 'verdicts'}
 	>
 		{#if priceVisible}
 			<div
 				class="bank-value select-none text-center"
-				class:bank-value-large={bankPhase === 'price-enter' || bankPhase === 'jackpot-merge'}
+				class:bank-value-large={bankPhase === 'price-enter'}
 				class:bank-value-settled={bankPhase === 'float-up' || bankPhase === 'settled' || bankPhase === 'verdicts'}
 			>
 				<div class="bank-label text-xs font-semibold uppercase tracking-widest text-text-neutral">
@@ -182,17 +167,6 @@
 				</div>
 				<div class="bank-number font-bold tabular-nums text-text-normal">
 					{formatNumber($bankDisplay)}
-				</div>
-			</div>
-		{/if}
-
-		{#if jackpotVisible}
-			<div class="jackpot-merge-value mt-2 text-center">
-				<div class="text-xs font-semibold uppercase tracking-wide text-text-neutral">
-					Джекпот
-				</div>
-				<div class="text-2xl font-bold tabular-nums text-text-normal">
-					+{formatNumber($jackpotDisplay)}
 				</div>
 			</div>
 		{/if}
@@ -334,10 +308,6 @@
 		line-height: 1.2;
 	}
 
-	.jackpot-merge-value {
-		animation: fade-up 0.3s ease-out;
-	}
-
 	.verdict-card {
 		animation: card-enter 0.5s cubic-bezier(0.18, 1.8, 0.58, 1) both;
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
@@ -385,17 +355,6 @@
 		border-radius: 50%;
 		background: var(--color-text-neutral);
 		animation: dot-pulse 1s ease-in-out infinite;
-	}
-
-	@keyframes fade-up {
-		from {
-			opacity: 0;
-			transform: translateY(8px);
-		}
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
 	}
 
 	@keyframes card-enter {

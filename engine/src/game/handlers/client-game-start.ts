@@ -26,7 +26,7 @@ const handleClientGameStart = (
 	}
 
 	return {
-		state: { ...state, gameMode, jackpot: 0, stage: newStage },
+		state: { ...state, gameMode, stage: newStage },
 		effects: [
 			{
 				type: 'schedule',

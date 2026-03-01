@@ -1,7 +1,7 @@
 import type { GameState } from '../models/state'
 import type { ServerCommand } from '../models/state-commands'
 import type { CommandContext, UpdateResult } from '../models/state-machine'
-import { applyRevealScores, getQuestion } from '../state-utils'
+import { applyRevealScores } from '../state-utils'
 
 const handleServerPartyRevealTimeout = (
 	state: GameState,
@@ -15,14 +15,12 @@ const handleServerPartyRevealTimeout = (
 		return { state, effects: [] }
 	}
 
-	const questionModel = getQuestion(ctx, state.stage.questionId)
-	const { players, jackpot } = applyRevealScores(
+	const players = applyRevealScores(
 		state as GameState & { stage: typeof state.stage },
-		questionModel.price
 	)
 
 	return {
-		state: { ...state, players, jackpot },
+		state: { ...state, players },
 		effects: [
 			{
 				type: 'trigger',

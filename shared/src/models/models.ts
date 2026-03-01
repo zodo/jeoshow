@@ -58,7 +58,6 @@ export type StageSnapshot = { gameMode: GameMode } & (
 				timeoutSeconds: number
 			}
 			appealResolution?: 'approved' | 'rejected'
-			jackpot?: number
 	  }
 	| {
 			type: 'question'
@@ -85,19 +84,14 @@ export type StageSnapshot = { gameMode: GameMode } & (
 			themeComment?: string
 			timeoutSeconds: number
 			submittedPlayerIds: string[]
-			jackpot: number
-			totalPot: number
 			selectAnswerOptions?: PackModel.SelectAnswerOption[]
 	  }
 	| {
 			type: 'party-checking'
-			totalPot: number
 	  }
 	| {
 			type: 'party-reveal'
 			verdicts: PartyVerdict[]
-			totalPot: number
-			jackpot: number
 	  }
 	| { type: 'after-finish' }
 )

@@ -8,7 +8,6 @@ export interface GameState {
 	players: Player[]
 	stage: Stage
 	gameMode: GameMode
-	jackpot: number
 }
 
 export type Stage =
@@ -98,7 +97,6 @@ type RoundStageType =
 			type: 'party-reveal'
 			questionId: string
 			verdicts: PartyVerdict[]
-			potAmount: number
 			finishedRevealPlayers: PlayerId[]
 	  }
 

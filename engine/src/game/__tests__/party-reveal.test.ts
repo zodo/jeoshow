@@ -55,19 +55,6 @@ describe('party mode: reveal phase', () => {
 		expect(g.playerScore('p2')).toBe(0)
 	})
 
-	it('jackpot deferred until reveal animation ends', () => {
-		const g = partyQuestionGame(players)
-		g.partyPass('p1')
-		g.partyPass('p2')
-		g.partyPass('p3')
-
-		// Jackpot NOT updated during party-reveal
-		expect(g.state.jackpot).toBe(0)
-
-		g.fireScheduled('party-reveal-timeout')
-		// After reveal ends, jackpot updated
-		expect(g.state.jackpot).toBe(100)
-	})
 
 	it('fastest correct answerer becomes active player', () => {
 		const g = partyQuestionGame(players)

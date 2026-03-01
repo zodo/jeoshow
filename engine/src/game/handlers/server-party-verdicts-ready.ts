@@ -19,7 +19,7 @@ const handleServerPartyVerdictsReady = (
 
 	const questionModel = getQuestion(ctx, state.stage.questionId)
 	const alivePlayers = state.players.filter((p) => !p.disconnected)
-	const pot = questionModel.price + state.jackpot
+	const pot = questionModel.price
 
 	// Fill in verdicts for players who didn't submit (treat as pass)
 	const allVerdicts: PartyVerdict[] = [...state.stage.verdicts]
@@ -84,7 +84,6 @@ const handleServerPartyVerdictsReady = (
 		...state.stage,
 		type: 'party-reveal',
 		verdicts: scoredVerdicts,
-		potAmount: pot,
 		activePlayer,
 		callbackId,
 		finishedRevealPlayers: [],
@@ -102,7 +101,7 @@ const handleServerPartyVerdictsReady = (
 		},
 	]
 
-	// Scores and jackpot are deferred — applied when reveal animation ends
+	// Scores are deferred — applied when reveal animation ends
 	return {
 		state: { ...state, stage: newStage },
 		effects,
