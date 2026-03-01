@@ -3,6 +3,16 @@ import JSZip from 'jszip'
 const SIBROWSER_BASE = 'https://www.sibrowser.ru'
 const MAX_PACK_SIZE = 100 * 1024 * 1024
 const MAPPING_PREFIX = 'sibrowser-cache/id-map/'
+const REGISTRY_KEY = 'sibrowser-cache/downloaded-registry.json'
+
+export interface PackMetadataInput {
+	title: string
+	author: string
+	fileSize: string
+	tags: string[]
+	description: string
+	rounds: { name: string; themes: string }[]
+}
 
 type SSEWriter = {
 	progress: (msg: string) => void
@@ -49,7 +59,8 @@ export async function processSibrowserPack(
 	sibrowserId: string,
 	env: CfEnv,
 	createGame: (packId: string) => Promise<{ gameCode: string; packName: string }>,
-	corsHeaders: Record<string, string>
+	corsHeaders: Record<string, string>,
+	packMetadata?: PackMetadataInput
 ): Promise<Response> {
 	const bucket = env.JEOSHOW_PACKS
 
@@ -57,6 +68,10 @@ export async function processSibrowserPack(
 	const cachedMapping = await bucket.get(`${MAPPING_PREFIX}${sibrowserId}`)
 	if (cachedMapping) {
 		const hash = await cachedMapping.text()
+		// Lazy backfill: add to registry if not yet there
+		if (packMetadata) {
+			updateDownloadedRegistry(bucket, sibrowserId, hash, packMetadata)
+		}
 		try {
 			const result = await createGame(hash)
 			return new Response(JSON.stringify(result), {
@@ -155,6 +170,10 @@ export async function processSibrowserPack(
 
 			await bucket.put(`${MAPPING_PREFIX}${sibrowserId}`, hash)
 
+			if (packMetadata) {
+				await updateDownloadedRegistry(bucket, sibrowserId, hash, packMetadata)
+			}
+
 			writer.progress('Создание игры...')
 
 			try {
@@ -172,4 +191,55 @@ export async function processSibrowserPack(
 	run()
 
 	return response
+}
+
+interface DownloadedPack {
+	sibrowserId: string
+	packHash: string
+	title: string
+	author: string
+	fileSize: string
+	tags: string[]
+	description: string
+	rounds: { name: string; themes: string }[]
+	downloadedAt: number
+}
+
+async function updateDownloadedRegistry(
+	bucket: R2Bucket,
+	sibrowserId: string,
+	packHash: string,
+	meta: PackMetadataInput
+) {
+	let packs: DownloadedPack[] = []
+	try {
+		const existing = await bucket.get(REGISTRY_KEY)
+		if (existing) {
+			const registry = (await existing.json()) as { packs: DownloadedPack[] }
+			packs = registry.packs
+		}
+	} catch {
+		// start fresh
+	}
+
+	const idx = packs.findIndex((p) => p.sibrowserId === sibrowserId)
+	const entry: DownloadedPack = {
+		sibrowserId,
+		packHash,
+		title: meta.title,
+		author: meta.author,
+		fileSize: meta.fileSize,
+		tags: meta.tags,
+		description: meta.description,
+		rounds: meta.rounds,
+		downloadedAt: Date.now(),
+	}
+
+	if (idx >= 0) {
+		packs[idx] = entry
+	} else {
+		packs.push(entry)
+	}
+
+	await bucket.put(REGISTRY_KEY, JSON.stringify({ packs, updatedAt: Date.now() }))
 }

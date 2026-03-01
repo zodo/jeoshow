@@ -20,12 +20,13 @@ export default {
 				headers: { 'Content-Type': 'application/json', ...CORS_HEADERS },
 			})
 		} else if (url.pathname === '/process-sibrowser-pack' && request.method === 'POST') {
-			const body = (await request.json()) as { sibrowserId: string }
+			const body = (await request.json()) as { sibrowserId: string; packMetadata?: any }
 			return processSibrowserPack(
 				body.sibrowserId,
 				env,
 				(packId) => createGameFromPack(env, packId),
-				CORS_HEADERS
+				CORS_HEADERS,
+				body.packMetadata
 			)
 		} else if (url.searchParams.has('gameCode')) {
 			const gameId = env.JEOSHOW_GAME_STATE_SQLITE.idFromName(
