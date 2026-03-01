@@ -42,9 +42,8 @@ describe('party mode: scoring', () => {
 		g.partyAnswer('p2', 'correct answer')
 		g.partyPass('p3')
 		finishReveal(g)
-		// 100/2 = 50 each, first may get early bonus
-		expect(g.playerScore('p1')).toBeGreaterThanOrEqual(50)
-		expect(g.playerScore('p2')).toBeGreaterThanOrEqual(50)
+		expect(g.playerScore('p1')).toBe(50)
+		expect(g.playerScore('p2')).toBe(50)
 		expect(g.playerScore('p3')).toBe(0)
 	})
 
@@ -54,8 +53,7 @@ describe('party mode: scoring', () => {
 		g.partyAnswer('p2', 'correct answer')
 		g.partyAnswer('p3', 'correct answer')
 		finishReveal(g)
-		// 100/3 ≈ 33 each, first submitter gets early bonus
-		expect(g.playerScore('p1')).toBe(37) // Math.round(33.33 * 1.1) = 37
+		expect(g.playerScore('p1')).toBe(33)
 		expect(g.playerScore('p2')).toBe(33)
 		expect(g.playerScore('p3')).toBe(33)
 	})

@@ -49,33 +49,11 @@ const handleServerPartyVerdictsReady = (
 	}
 
 	const correctVerdicts = allVerdicts.filter((v) => v.correct)
-	const answerTimeSeconds = state.stage.type === 'party-checking'
-		? (state.stage.submissions[0]
-			? state.stage.submissions.reduce((_, s) => {
-				// find the answerTimeSeconds from the previous stage — stored in submissions' context
-				return 0 // we'll use a fallback approach
-			}, 0)
-			: 0)
-		: 0
 
 	// Calculate score diffs
 	const scoredVerdicts = allVerdicts.map((v) => {
 		if (v.correct) {
-			const baseShare = pot / correctVerdicts.length
-
-			// Early submit bonus: find if this player submitted in first half of timer
-			const sub = state.stage.type === 'party-checking'
-				? state.stage.submissions.find((s) => s.playerId === v.playerId)
-				: undefined
-			// We can't easily get the timer start — use submission order as proxy
-			// First submitter among correct gets the early bonus
-			const isEarlySubmitter = sub && correctVerdicts.length > 1
-				? state.stage.type === 'party-checking' &&
-				  state.stage.submissions.filter((s) => !s.passed).indexOf(sub) === 0
-				: false
-
-			const earlyBonus = isEarlySubmitter ? 0.1 : 0
-			let share = Math.round(baseShare * (1 + earlyBonus))
+			let share = Math.round(pot / correctVerdicts.length)
 
 			if (v.confidenceBet) {
 				share = share * 2
