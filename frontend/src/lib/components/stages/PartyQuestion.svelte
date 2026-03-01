@@ -27,7 +27,7 @@
 	<section
 		in:scale={{ delay: 300, duration: 300, easing: quintInOut }}
 		out:scale={{ duration: 300, easing: quintInOut }}
-		class="flex h-full flex-col items-center justify-center text-center font-bold"
+		class="absolute inset-0 z-10 flex h-full flex-col items-center justify-center text-center font-bold"
 	>
 		<h3 class="text-lg font-bold text-text-header">
 			{question.theme}
@@ -36,9 +36,7 @@
 			{question.price}
 		</div>
 	</section>
-{/if}
-
-{#if !question.showIntroduction && mounted}
+{:else if mounted}
 	<section class="relative grid h-full grid-rows-[min-content_1fr_1rem] gap-2">
 		<div class="text-center">
 			<div class="text-xl font-bold">{question.theme}</div>
@@ -52,7 +50,7 @@
 		</div>
 
 		<div class="h-4 w-full">
-			<Progress seconds={question.timeoutSeconds} />
+			<Progress seconds={question.timeoutSeconds - 1.5} />
 		</div>
 	</section>
 {/if}

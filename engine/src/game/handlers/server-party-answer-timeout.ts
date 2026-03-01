@@ -27,10 +27,25 @@ const handleServerPartyAnswerTimeout = (
 
 	const questionText = extractQuestionText(questionModel.fragments)
 
+	// Auto-pass players who didn't submit
+	const submittedPlayerIds = new Set(state.stage.submissions.map((s) => s.playerId))
+	const alivePlayers = state.players.filter((p) => !p.disconnected)
+	const autoPassSubmissions: PartySubmission[] = alivePlayers
+		.filter((p) => !submittedPlayerIds.has(p.id))
+		.map((p) => ({
+			playerId: p.id,
+			answer: '',
+			answerText: '',
+			submittedAt: ctx.now,
+			passed: true,
+			confidenceBet: false,
+		}))
+	const allSubmissions = [...state.stage.submissions, ...autoPassSubmissions]
+
 	const verdicts: PartyVerdict[] = []
 	const needsLlm: PartySubmission[] = []
 
-	for (const sub of state.stage.submissions) {
+	for (const sub of allSubmissions) {
 		if (sub.passed) {
 			verdicts.push({
 				playerId: sub.playerId,
@@ -61,7 +76,7 @@ const handleServerPartyAnswerTimeout = (
 	const newStage: Extract<Stage, { type: 'party-checking' }> = {
 		...state.stage,
 		type: 'party-checking',
-		submissions: state.stage.submissions,
+		submissions: allSubmissions,
 		pendingVerdicts: needsLlm.length,
 		verdicts,
 		callbackId,

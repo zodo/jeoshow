@@ -83,6 +83,9 @@
 			type: 'party-reveal',
 			loading: false,
 			price: 600,
+			theme: 'Озёра мира',
+			answeredCount: 4,
+			passedCount: 1,
 			verdicts: [
 				{
 					playerName: 'Алексей',

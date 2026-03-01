@@ -180,9 +180,17 @@ export const toSnapshot = (
 			}
 		}
 		case 'party-checking': {
+			const round = getRound(ctx, stage.roundId)
+			const question = getQuestion(ctx, stage.questionId)
+			const theme = round.themes.find((t) => t.questions.some((q) => q.id === question.id))
+			const passedCount = stage.submissions.filter((s) => s.passed).length
 			return {
 				type: 'party-checking',
 				gameMode,
+				theme: theme?.name ?? '',
+				price: question.price,
+				answeredCount: stage.submissions.length - passedCount,
+				passedCount,
 			}
 		}
 		case 'party-reveal': {

@@ -12,12 +12,30 @@
 
 	export let reveal: ViewState.PartyRevealStage
 
-	type BankPhase = 'price-enter' | 'float-up' | 'settled' | 'verdicts'
-	let bankPhase: BankPhase = 'price-enter'
+	type BankPhase = 'intro-theme' | 'intro-price' | 'intro-stats' | 'float-up' | 'settled' | 'verdicts'
+	let bankPhase: BankPhase = 'intro-theme'
 
-	const bankDisplay = tweened(0, { duration: 600, easing: cubicOut })
+	const BEAT = 450
+	const bankDisplay = tweened(0, { duration: BEAT, easing: cubicOut })
 
+	let themeVisible = false
 	let priceVisible = false
+	let statsVisible = false
+	let passedStatsVisible = false
+
+	const allAnswered = reveal.answeredCount > 0 && reveal.passedCount === 0
+	const allPassed = reveal.answeredCount === 0
+
+	function countWord(n: number): string {
+		const words = ['', 'один', 'двое', 'трое', 'четверо', 'пятеро', 'шестеро', 'семеро']
+		return words[n] ?? String(n)
+	}
+
+	function statsLine(verb1: string, verbMany: string, n: number): string {
+		return `${n === 1 ? verb1 : verbMany} ${countWord(n)}`
+	}
+
+	$: isIntro = bankPhase === 'intro-theme' || bankPhase === 'intro-price' || bankPhase === 'intro-stats'
 
 	let verdictsReady = false
 	$: if (!reveal.loading && reveal.verdicts.length > 0) {
@@ -44,18 +62,49 @@
 	})
 
 	async function runAnimation() {
-		bankPhase = 'price-enter'
-		priceVisible = true
-		await bankDisplay.set(reveal.price)
-		await delay(200)
+		// BAM — theme
+		await delay(BEAT)
+		bankPhase = 'intro-theme'
+		themeVisible = true
+		await delay(BEAT)
 
+		// BAM — price pops in
+		bankPhase = 'intro-price'
+		priceVisible = true
+		bankDisplay.set(reveal.price, { duration: 0 })
+		await delay(BEAT)
+
+		// BAM — first stat line
+		bankPhase = 'intro-stats'
+		statsVisible = true
+		await delay(BEAT)
+
+		// BAM — second stat line (if mixed), or extra beat for single-line
+		if (!allAnswered && !allPassed) {
+			passedStatsVisible = true
+		}
+		await delay(BEAT)
+
+		// All passed — skip float-up and verdicts entirely
+		if (allPassed) {
+			await delay(300)
+			dispatch('action', { type: 'party-reveal-ready' })
+			return
+		}
+
+		// BAM — everything out, price floats to top
+		themeVisible = false
+		statsVisible = false
+		passedStatsVisible = false
 		bankPhase = 'float-up'
-		await delay(500)
+		await delay(BEAT)
+
+		// BAM — settled, start verdicts if ready
 		bankPhase = 'settled'
 
 		if (verdictsReady && !revealStarted) {
 			revealStarted = true
-			await delay(300)
+			await delay(BEAT)
 			bankPhase = 'verdicts'
 			await revealVerdicts()
 		}
@@ -63,7 +112,7 @@
 
 	$: if (bankPhase === 'settled' && verdictsReady && !revealStarted) {
 		revealStarted = true
-		delay(300).then(() => {
+		delay(BEAT).then(() => {
 			bankPhase = 'verdicts'
 			dispatch('haptic', 'medium')
 			revealVerdicts()
@@ -150,26 +199,69 @@
 </script>
 
 <section class="relative flex h-full flex-col items-center overflow-hidden">
-	<!-- Bank number -->
+	<!-- Intro overlay: theme + price + stats centered -->
+	{#if isIntro}
+		<div class="absolute inset-0 flex flex-col items-center justify-center gap-2 px-6">
+			<div
+				class="intro-element text-center text-sm font-semibold uppercase tracking-widest text-text-neutral"
+				class:visible={themeVisible}
+			>
+				{reveal.theme}
+			</div>
+			<div
+				class="intro-element text-5xl font-bold tabular-nums text-text-normal"
+				class:visible={priceVisible}
+				style="line-height: 1; letter-spacing: -0.02em"
+			>
+				{formatNumber(reveal.price)}
+			</div>
+			{#if allAnswered}
+				<div
+					class="intro-element text-lg font-bold uppercase tracking-wide text-text-neutral"
+					class:visible={statsVisible}
+				>
+					Ответил каждый
+				</div>
+			{:else if allPassed}
+				<div
+					class="intro-element text-lg font-bold uppercase tracking-wide text-text-neutral"
+					class:visible={statsVisible}
+				>
+					Никто не ответил
+				</div>
+			{:else}
+				<div class="flex flex-col items-center gap-1">
+					<div
+						class="intro-element text-lg font-bold uppercase tracking-wide text-text-neutral"
+						class:visible={statsVisible}
+					>
+						{statsLine('Ответил', 'Ответили', reveal.answeredCount)}
+					</div>
+					<div
+						class="intro-element text-lg font-bold uppercase tracking-wide text-text-neutral"
+						class:visible={passedStatsVisible}
+					>
+						{statsLine('Пасанул', 'Пасанули', reveal.passedCount)}
+					</div>
+				</div>
+			{/if}
+		</div>
+	{/if}
+
+	<!-- Bank number (after float-up) -->
 	<div
 		class="bank-container absolute left-0 right-0 flex flex-col items-center justify-center transition-all duration-500 ease-out"
-		class:bank-center={bankPhase === 'price-enter'}
 		class:bank-top={bankPhase === 'float-up' || bankPhase === 'settled' || bankPhase === 'verdicts'}
+		class:opacity-0={isIntro}
 	>
-		{#if priceVisible}
-			<div
-				class="bank-value select-none text-center"
-				class:bank-value-large={bankPhase === 'price-enter'}
-				class:bank-value-settled={bankPhase === 'float-up' || bankPhase === 'settled' || bankPhase === 'verdicts'}
-			>
-				<div class="bank-label text-xs font-semibold uppercase tracking-widest text-text-neutral">
-					Банк
-				</div>
-				<div class="bank-number font-bold tabular-nums text-text-normal">
-					{formatNumber($bankDisplay)}
-				</div>
+		<div class="bank-value bank-value-settled select-none text-center">
+			<div class="bank-label text-xs font-semibold uppercase tracking-widest text-text-neutral">
+				Банк
 			</div>
-		{/if}
+			<div class="bank-number font-bold tabular-nums text-text-normal">
+				{formatNumber($bankDisplay)}
+			</div>
+		</div>
 	</div>
 
 	<!-- Verdicts -->
@@ -268,34 +360,28 @@
 </section>
 
 <style>
-	.bank-container {
-		z-index: 10;
+	.intro-element {
+		opacity: 0;
+		transform: scale(0.85);
+		transition: opacity 0.2s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
 	}
 
-	.bank-center {
+	.intro-element.visible {
+		opacity: 1;
+		transform: scale(1);
+	}
+
+	.bank-container {
+		z-index: 10;
 		top: 50%;
 		transform: translateY(-50%);
+		transition: all 0.45s ease-out, opacity 0.2s ease;
 	}
 
 	.bank-top {
 		top: 0;
 		transform: translateY(0);
 		padding-top: 0.5rem;
-	}
-
-	.bank-value {
-		transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-	}
-
-	.bank-value-large .bank-label {
-		font-size: 0.875rem;
-		margin-bottom: 0.125rem;
-	}
-
-	.bank-value-large .bank-number {
-		font-size: 3rem;
-		line-height: 1;
-		letter-spacing: -0.02em;
 	}
 
 	.bank-value-settled .bank-label {

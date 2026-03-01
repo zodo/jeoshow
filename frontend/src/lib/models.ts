@@ -121,6 +121,9 @@ export namespace ViewState {
 		loading: boolean
 		verdicts: PartyRevealVerdict[]
 		price: number
+		theme: string
+		answeredCount: number
+		passedCount: number
 	}
 
 	export type AnswerStage = {

@@ -165,6 +165,9 @@ export class GameState {
 	})
 
 	private _lastPartyPrice = 0
+	private _lastPartyTheme = ''
+	private _lastPartyAnsweredCount = 0
+	private _lastPartyPassedCount = 0
 
 	viewState: Readable<ViewState.View> = derived(
 		[
@@ -336,26 +339,34 @@ export class GameState {
 						loading: true,
 						verdicts: [],
 						price: this._lastPartyPrice,
+						theme: this._lastPartyTheme,
+						answeredCount: this._lastPartyAnsweredCount,
+						passedCount: this._lastPartyPassedCount,
 					}
 					break
 				}
 				case 'party-reveal': {
+					const mappedVerdicts = serverStage.verdicts.map((v) => {
+						const player = getPlayer(v.playerId)
+						return {
+							playerName: player?.name ?? 'Unknown',
+							avatarUrl: player?.avatarUrl,
+							answer: v.answer,
+							correct: v.correct,
+							scoreDiff: v.scoreDiff,
+							confidenceBet: v.confidenceBet,
+							passed: v.answer === '' && v.scoreDiff === 0 && !v.correct,
+						}
+					})
+					const passedCount = mappedVerdicts.filter((v) => v.passed).length
 					stage = {
 						type: 'party-reveal',
 						loading: false,
-						verdicts: serverStage.verdicts.map((v) => {
-							const player = getPlayer(v.playerId)
-							return {
-								playerName: player?.name ?? 'Unknown',
-								avatarUrl: player?.avatarUrl,
-								answer: v.answer,
-								correct: v.correct,
-								scoreDiff: v.scoreDiff,
-								confidenceBet: v.confidenceBet,
-								passed: v.answer === '' && v.scoreDiff === 0 && !v.correct,
-							}
-						}),
+						verdicts: mappedVerdicts,
 						price: this._lastPartyPrice,
+						theme: this._lastPartyTheme,
+						answeredCount: mappedVerdicts.length - passedCount,
+						passedCount,
 					}
 					break
 				}
@@ -411,6 +422,13 @@ export class GameState {
 
 			if (serverStage.type === 'party-question') {
 				this._lastPartyPrice = serverStage.price
+				this._lastPartyTheme = serverStage.theme
+			}
+			if (serverStage.type === 'party-checking') {
+				this._lastPartyPrice = serverStage.price
+				this._lastPartyTheme = serverStage.theme
+				this._lastPartyAnsweredCount = serverStage.answeredCount
+				this._lastPartyPassedCount = serverStage.passedCount
 			}
 
 			const result: ViewState.View = {

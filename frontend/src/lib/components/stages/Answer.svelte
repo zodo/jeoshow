@@ -21,7 +21,10 @@
 </script>
 
 <section class="grid h-full grid-rows-[min-content_1fr]">
-	<div class="font-xl text-center font-bold">{answer.theme}</div>
+	<div class="text-center">
+		<div class="font-xl font-bold">{answer.theme}</div>
+		<div class="text-xs font-semibold uppercase tracking-widest text-text-neutral">Ответ</div>
+	</div>
 
 	<div class="overflow-scroll">
 		<MediaFragment {fragments} on:action />

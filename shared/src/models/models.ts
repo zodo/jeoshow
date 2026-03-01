@@ -88,6 +88,10 @@ export type StageSnapshot = { gameMode: GameMode } & (
 	  }
 	| {
 			type: 'party-checking'
+			theme: string
+			price: number
+			answeredCount: number
+			passedCount: number
 	  }
 	| {
 			type: 'party-reveal'
