@@ -58,7 +58,7 @@ describe('media-finished', () => {
 // ── answer-skip ──
 
 describe('answer-skip', () => {
-	it('vote adds to votedForSkip and broadcasts stage-updated', () => {
+	it('vote adds to votedForSkip (stage-updated auto-broadcast by DO)', () => {
 		const g = readyForHitGame()
 		g.buttonHit('p1')
 		g.answerGive('p1', 'correct answer')
@@ -69,11 +69,6 @@ describe('answer-skip', () => {
 
 		const stage = g.stage as Extract<Stage, { type: 'answer' }>
 		expect(stage.votedForSkip).toContain('p1')
-		expect(g.broadcasts).toHaveLength(1)
-		expect(g.broadcasts[0]).toMatchObject({
-			type: 'client-broadcast',
-			event: { type: 'stage-updated' },
-		})
 	})
 
 	it('all alive players vote → triggers round-return', () => {
@@ -101,8 +96,6 @@ describe('answer-skip', () => {
 
 		const stage = g.stage as Extract<Stage, { type: 'answer' }>
 		expect(stage.votedForSkip.filter((id) => id === 'p1')).toHaveLength(1)
-		// Only one broadcast for the first vote
-		expect(g.broadcasts).toHaveLength(1)
 	})
 
 	it('only works during answer stage', () => {

@@ -26,6 +26,7 @@ export namespace ViewState {
 	export type ExtendedPlayer = {
 		pressedButton: 'hit' | 'false-start' | null
 		active: boolean
+		partySubmitted: boolean
 	} & Player
 
 	export type Controls =
@@ -36,6 +37,9 @@ export namespace ViewState {
 		| { mode: 'llm-checking' }
 		| { mode: 'answer-attempt'; correct: boolean }
 		| { mode: 'answer-skip'; totalPlayers: number; votes: number; meVoted: boolean }
+		| { mode: 'answer-party' }
+		| { mode: 'answer-party-select'; options: PackModel.SelectAnswerOption[] }
+		| { mode: 'party-waiting'; activePlayerName?: string }
 
 	export type RoundStage = {
 		type: 'round'
@@ -50,6 +54,7 @@ export namespace ViewState {
 			}[]
 		}[]
 		meActive: boolean
+		selectTimeoutSeconds?: number
 		skipRoundVoting?: {
 			timeoutSeconds: number
 			meVoted: boolean
@@ -90,6 +95,38 @@ export namespace ViewState {
 		price: number
 	}
 
+	export type PartyQuestionStage = {
+		type: 'party-question'
+		fragments: PackModel.FragmentGroup[]
+		theme: string
+		themeComment?: string
+		timeoutSeconds: number
+		submittedPlayerIds: string[]
+		jackpot: number
+		totalPot: number
+		price: number
+		showIntroduction: boolean
+	}
+
+	export type PartyRevealVerdict = {
+		playerName: string
+		avatarUrl?: string
+		answer: string
+		correct: boolean
+		scoreDiff: number
+		confidenceBet: boolean
+		passed: boolean
+	}
+
+	export type PartyRevealStage = {
+		type: 'party-reveal'
+		loading: boolean
+		verdicts: PartyRevealVerdict[]
+		totalPot: number
+		price: number
+		jackpot: number
+	}
+
 	export type AnswerStage = {
 		type: 'answer'
 		theme: string
@@ -110,11 +147,15 @@ export namespace ViewState {
 		stageBlink: boolean
 		answerAttempt?: AnswerAttempt
 		messages: ChatMessage[]
+		gameMode: 'classic' | 'party'
+		jackpot: number
 		stage:
 			| { type: 'connecting' }
 			| { type: 'before-start' }
 			| RoundStage
 			| QuestionStage
+			| PartyQuestionStage
+			| PartyRevealStage
 			| AnswerStage
 			| { type: 'after-finish' }
 	}

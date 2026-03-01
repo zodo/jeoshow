@@ -15,7 +15,8 @@
 </script>
 
 <section
-	class="relative grid h-full w-full select-none grid-rows-[min-content_1fr] gap-2"
+	class="relative grid h-full w-full select-none gap-2"
+	style="grid-template-rows: min-content 1fr {round.selectTimeoutSeconds ? '1rem' : ''}"
 	in:scale={{ delay: 300, duration: 300, easing: quintInOut }}
 	out:scale={{ duration: 300, easing: quintInOut }}
 >
@@ -48,6 +49,14 @@
 	</div>
 
 	<Themes {round} on:action />
+
+	{#if round.selectTimeoutSeconds}
+		{#key round.selectTimeoutSeconds}
+			<div class="h-4 w-full">
+				<Progress seconds={round.selectTimeoutSeconds} />
+			</div>
+		{/key}
+	{/if}
 
 	{#if showBackdrop}
 		<div class="absolute -inset-1 backdrop-blur-sm"></div>

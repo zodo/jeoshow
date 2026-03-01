@@ -1,7 +1,6 @@
 import type { GameState, Stage } from '../models/state'
 import type { ClientCommand } from '../models/state-commands'
 import type { CommandContext, UpdateResult } from '../models/state-machine'
-import { toSnapshot } from '../state-utils'
 import { Timeouts } from '../timeouts'
 
 const handleRoundSkip = (
@@ -45,12 +44,7 @@ const handleRoundSkip = (
 			const stage = { ...state.stage, skipRoundVoting: undefined }
 			return {
 				state: { ...state, stage },
-				effects: [
-					{
-						type: 'client-broadcast',
-						event: { type: 'stage-updated', stage: toSnapshot(stage, ctx) },
-					},
-				],
+				effects: [],
 			}
 		}
 	} else {
@@ -69,10 +63,6 @@ const handleRoundSkip = (
 		return {
 			state: { ...state, stage },
 			effects: [
-				{
-					type: 'client-broadcast',
-					event: { type: 'stage-updated', stage: toSnapshot(stage, ctx) },
-				},
 				...(isJustStarted
 					? [
 							{

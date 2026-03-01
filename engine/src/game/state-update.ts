@@ -30,6 +30,13 @@ import handleClientAnswerSkip from './handlers/client-answer-skip'
 import handleClientMessageSend from './handlers/client-message-send'
 import handleServerFireStageUpdate from './handlers/server-fire-stage-update'
 import handleServerLlmVerdict from './handlers/server-llm-verdict'
+import handleClientPartyAnswer from './handlers/client-party-answer'
+import handleClientPartyPass from './handlers/client-party-pass'
+import handleClientPartyRevealReady from './handlers/client-party-reveal-ready'
+import handleServerPartyAnswerTimeout from './handlers/server-party-answer-timeout'
+import handleServerPartyLlmVerdict from './handlers/server-party-llm-verdict'
+import handleServerPartyRevealTimeout from './handlers/server-party-reveal-timeout'
+import handleServerPartyVerdictsReady from './handlers/server-party-verdicts-ready'
 
 export const updateState = (
 	state: GameState,
@@ -63,6 +70,9 @@ const clientCommandHandlers: {
 	'ping-set': handlePingSet,
 	'answer-skip': handleClientAnswerSkip,
 	'message-send': handleClientMessageSend,
+	'party-answer': handleClientPartyAnswer,
+	'party-pass': handleClientPartyPass,
+	'party-reveal-ready': handleClientPartyRevealReady,
 }
 
 const serverCommandHandlers: {
@@ -82,5 +92,9 @@ const serverCommandHandlers: {
 	'answer-timeout': handleServerAnswerTimeout,
 	'fire-stage-update': handleServerFireStageUpdate,
 	'llm-verdict': handleServerLlmVerdict,
+	'party-answer-timeout': handleServerPartyAnswerTimeout,
+	'party-verdicts-ready': handleServerPartyVerdictsReady,
+	'party-reveal-timeout': handleServerPartyRevealTimeout,
+	'party-llm-verdict': handleServerPartyLlmVerdict,
 	'state-cleanup': () => ({}), // handled by caller code
 }

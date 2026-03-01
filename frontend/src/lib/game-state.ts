@@ -24,6 +24,7 @@ export class GameState {
 		correct: boolean
 	} | null>(null)
 	private chatMessages = writable<PlayerMessage[]>([])
+	private gameMode = writable<'classic' | 'party'>('classic')
 
 	private activePlayerId = derived(this.stage, ($stage) => {
 		if ($stage?.type === 'round' && !$stage.appealVoting) {
@@ -37,13 +38,16 @@ export class GameState {
 	})
 
 	private extendedPlayers = derived(
-		[this.players, this.activePlayerId, this.hitButton],
-		([$players, $activePlayerId, $hitButton]) => {
+		[this.players, this.activePlayerId, this.hitButton, this.stage],
+		([$players, $activePlayerId, $hitButton, $stage]) => {
+			const submittedIds =
+				$stage?.type === 'party-question' ? $stage.submittedPlayerIds : []
 			return $players
 				.map((player) => ({
 					...player,
 					pressedButton: $hitButton.find((b) => b.playerId === player.id)?.type ?? null,
 					active: $activePlayerId === player.id,
+					partySubmitted: submittedIds.includes(player.id),
 				}))
 				.sort((a, b) => {
 					if (a.active && !b.active) return -1
@@ -56,7 +60,7 @@ export class GameState {
 	private showQuestionIntroduction = readable(false, (set) => {
 		let inRound = false
 		this.stage.subscribe((stage) => {
-			if (stage?.type === 'question' && inRound) {
+			if ((stage?.type === 'question' || stage?.type === 'party-question') && inRound) {
 				set(true)
 				setTimeout(() => set(false), 1500)
 				inRound = false
@@ -67,8 +71,8 @@ export class GameState {
 	})
 
 	private controls: Readable<ViewState.Controls> = derived(
-		[this.stage, this.playerAnswerAttempt, this.extendedPlayers],
-		([$stage, $playerAnswerAttempt, $players]) => {
+		[this.stage, this.playerAnswerAttempt, this.extendedPlayers, this.gameMode],
+		([$stage, $playerAnswerAttempt, $players, $gameMode]) => {
 			if (
 				$stage?.type === 'question' &&
 				$stage.substate.type === 'llm-checking'
@@ -98,15 +102,34 @@ export class GameState {
 					votes: $stage.votedForSkip.length,
 					meVoted: $stage.votedForSkip.includes(this.userId),
 				} as const
-			} else {
-				return {
-					mode: 'hit',
-					ready: $stage?.type === 'question' && $stage.substate.type === 'ready-for-hit',
-					falselyStart:
-						$stage?.type === 'question' &&
-						$stage.falselyStartedPlayerIds.includes(this.userId),
-				} as const
 			}
+
+			// Party question — player hasn't submitted yet
+			if ($stage?.type === 'party-question' && !$stage.submittedPlayerIds.includes(this.userId)) {
+				if ($stage.selectAnswerOptions) {
+					return { mode: 'answer-party-select', options: $stage.selectAnswerOptions } as const
+				}
+				return { mode: 'answer-party' } as const
+			}
+
+			// Party stages where player just watches (already submitted, checking, reveal)
+			if ($stage?.type === 'party-question' || $stage?.type === 'party-checking' || $stage?.type === 'party-reveal') {
+				return { mode: 'party-waiting' } as const
+			}
+
+			// Party mode round stage — no hit button, just reactions
+			if ($gameMode === 'party') {
+				const activePlayer = $stage?.type === 'round' ? $players.find((p) => p.id === $stage.activePlayerId) : undefined
+				return { mode: 'party-waiting', activePlayerName: activePlayer?.name } as const
+			}
+
+			return {
+				mode: 'hit',
+				ready: $stage?.type === 'question' && $stage.substate.type === 'ready-for-hit',
+				falselyStart:
+					$stage?.type === 'question' &&
+					$stage.falselyStartedPlayerIds.includes(this.userId),
+			} as const
 		}
 	)
 
@@ -141,6 +164,9 @@ export class GameState {
 		})
 	})
 
+	private _lastJackpot = 0
+	private _lastPartyPrice = 0
+
 	viewState: Readable<ViewState.View> = derived(
 		[
 			this.extendedPlayers,
@@ -154,6 +180,7 @@ export class GameState {
 			this.playerAnswerAttempt,
 			this.showQuestionIntroduction,
 			this.chatMessages,
+			this.gameMode,
 		],
 		([
 			$extendedPlayers,
@@ -167,6 +194,7 @@ export class GameState {
 			$playerAnswerAttempt,
 			$showQuestionIntroduction,
 			$chatMessages,
+			$gameMode,
 		]) => {
 			const getPlayer = (playerId: string) => $extendedPlayers.find((p) => p.id === playerId)
 
@@ -195,6 +223,7 @@ export class GameState {
 							})),
 						})),
 						meActive: $activePlayerId === this.userId,
+						selectTimeoutSeconds: $gameMode === 'party' && serverStage.timeoutSeconds > 0 ? serverStage.timeoutSeconds : undefined,
 						skipRoundVoting: serverStage.skipRoundVoting
 							? {
 									yes: serverStage.skipRoundVoting.yes.map(
@@ -278,6 +307,65 @@ export class GameState {
 					}
 					break
 				}
+				case 'party-question': {
+					let fragments: PackModel.FragmentGroup[] = serverStage.fragments
+					if (serverStage.selectAnswerOptions) {
+						fragments = [
+							...fragments,
+							serverStage.selectAnswerOptions.map((option) => ({
+								type: 'text' as const,
+								value: `${option.name}. ${option.text}`,
+							})),
+						]
+					}
+
+					stage = {
+						type: 'party-question',
+						fragments,
+						theme: serverStage.theme,
+						themeComment: serverStage.themeComment,
+						timeoutSeconds: serverStage.timeoutSeconds,
+						submittedPlayerIds: serverStage.submittedPlayerIds,
+						jackpot: serverStage.jackpot,
+						totalPot: serverStage.totalPot,
+						price: serverStage.price,
+						showIntroduction: $showQuestionIntroduction,
+					}
+					break
+				}
+				case 'party-checking': {
+					stage = {
+						type: 'party-reveal',
+						loading: true,
+						verdicts: [],
+						totalPot: serverStage.totalPot,
+						price: this._lastPartyPrice,
+						jackpot: this._lastJackpot,
+					}
+					break
+				}
+				case 'party-reveal': {
+					stage = {
+						type: 'party-reveal',
+						loading: false,
+						verdicts: serverStage.verdicts.map((v) => {
+							const player = getPlayer(v.playerId)
+							return {
+								playerName: player?.name ?? 'Unknown',
+								avatarUrl: player?.avatarUrl,
+								answer: v.answer,
+								correct: v.correct,
+								scoreDiff: v.scoreDiff,
+								confidenceBet: v.confidenceBet,
+								passed: v.answer === '' && v.scoreDiff === 0 && !v.correct,
+							}
+						}),
+						totalPot: serverStage.totalPot,
+						price: this._lastPartyPrice,
+						jackpot: this._lastJackpot,
+					}
+					break
+				}
 				case 'after-finish': {
 					stage = { type: 'after-finish' }
 					break
@@ -328,6 +416,15 @@ export class GameState {
 				text: message.text,
 			}))
 
+			if (serverStage.type === 'party-question') {
+				this._lastJackpot = serverStage.jackpot
+				this._lastPartyPrice = serverStage.price
+			} else if (serverStage.type === 'party-reveal') {
+				this._lastJackpot = serverStage.jackpot
+			} else if (serverStage.type === 'round' && serverStage.jackpot) {
+				this._lastJackpot = serverStage.jackpot
+			}
+
 			const result: ViewState.View = {
 				disconnected: !$connected,
 				showPlayers: $showPlayers,
@@ -337,6 +434,8 @@ export class GameState {
 				stage: stage,
 				answerAttempt,
 				messages,
+				gameMode: $gameMode,
+				jackpot: this._lastJackpot,
 			}
 			return result
 		}
@@ -355,6 +454,9 @@ export class GameState {
 				) {
 					this.playerAnswerTyping.set(null)
 				}
+				this.gameMode.set(event.stage.gameMode)
+				break
+			case 'party-submission':
 				break
 			case 'player-hit-the-button': {
 				const type = event.falseStart ? 'false-start' : 'hit'
@@ -432,4 +534,5 @@ const unknownPlayer: ViewState.ExtendedPlayer = {
 	avatarUrl: undefined,
 	active: false,
 	pressedButton: null,
+	partySubmitted: false,
 }

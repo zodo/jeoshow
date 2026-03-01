@@ -37,6 +37,8 @@
 		stageBlink: false,
 		showPlayers: true,
 		messages: [],
+		gameMode: 'classic',
+		jackpot: 0,
 	}
 
 	onMount(() => {
@@ -94,6 +96,8 @@
 			'game-start': 'light',
 			'question-select': 'light',
 			'round-skip': 'medium',
+			'party-answer': 'light',
+			'party-pass': 'medium',
 		}
 		if (hapticActions[event.detail.type]) {
 			dispatch('haptic', hapticActions[event.detail.type]!!)

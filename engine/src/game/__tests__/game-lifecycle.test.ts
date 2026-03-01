@@ -16,10 +16,7 @@ describe('introduce', () => {
 		expect(p1.name).toBe('Alice')
 		expect(p1.disconnected).toBe(false)
 
-		const broadcast = g.broadcasts.find(
-			(e) => e.type === 'client-broadcast' && e.event.type === 'players-updated'
-		)
-		expect(broadcast).toBeDefined()
+		// players-updated is auto-broadcast by the DO (not a handler effect)
 
 		const reply = g.replies.find(
 			(e) => e.type === 'client-reply' && e.event.type === 'stage-updated'

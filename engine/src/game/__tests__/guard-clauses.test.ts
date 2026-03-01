@@ -167,7 +167,7 @@ describe('stale callbackId dedup', () => {
 // ── fire-stage-update ──
 
 describe('fire-stage-update', () => {
-	it('broadcasts stage-updated with current stage snapshot', () => {
+	it('is a no-op (stage-updated is auto-broadcast by DO)', () => {
 		const g = startedGame()
 		expect(g.stageType).toBe('round')
 		g.clearEffects()
@@ -177,14 +177,7 @@ describe('fire-stage-update', () => {
 			action: { type: 'fire-stage-update' },
 		})
 
-		const stageUpdated = result.effects?.find(
-			(e) => e.type === 'client-broadcast' && e.event.type === 'stage-updated'
-		)
-		expect(stageUpdated).toBeDefined()
-		expect(
-			stageUpdated!.type === 'client-broadcast' &&
-				stageUpdated!.event.type === 'stage-updated' &&
-				stageUpdated!.event.stage.type === 'round'
-		).toBe(true)
+		// fire-stage-update is now a no-op; the DO auto-broadcasts stage changes
+		expect(result.effects).toHaveLength(0)
 	})
 })

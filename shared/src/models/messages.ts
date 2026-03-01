@@ -2,7 +2,7 @@ import type { Player, StageSnapshot } from './models'
 
 export type ClientAction =
 	| { type: 'introduce'; name: string; avatarUrl?: string }
-	| { type: 'game-start' }
+	| { type: 'game-start'; gameMode: 'classic' | 'party' }
 	| { type: 'question-select'; questionId: string }
 	| { type: 'button-hit' }
 	| { type: 'answer-give'; value: string }
@@ -13,6 +13,9 @@ export type ClientAction =
 	| { type: 'ping-set'; ping: number }
 	| { type: 'answer-skip' }
 	| { type: 'message-send'; text: string }
+	| { type: 'party-answer'; value: string; confidenceBet: boolean }
+	| { type: 'party-pass' }
+	| { type: 'party-reveal-ready' }
 
 export type GameEvent =
 	| { type: 'player-hit-the-button'; playerId: string; falseStart: boolean }
@@ -26,3 +29,4 @@ export type GameEvent =
 			correct: boolean
 	  }
 	| { type: 'player-sent-message'; playerId: string; text: string }
+	| { type: 'party-submission'; playerId: string }

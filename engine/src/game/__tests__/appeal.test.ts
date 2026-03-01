@@ -250,7 +250,7 @@ describe('edge cases', () => {
 		expect(g.stageType).toBe('round')
 
 		// Snapshot should report empty playerIdsCanAppeal for select questions
-		const snapshot = toSnapshot(g.stage, g.ctx)
+		const snapshot = toSnapshot(g.state, g.ctx)
 		expect(snapshot.type).toBe('round')
 		if (snapshot.type === 'round') {
 			expect(snapshot.playerIdsCanAppeal).toEqual([])

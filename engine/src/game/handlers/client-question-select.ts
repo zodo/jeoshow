@@ -1,8 +1,8 @@
 import type { GameState, Stage } from '../models/state'
 import type { ClientCommand } from '../models/state-commands'
 import type { CommandContext, UpdateResult } from '../models/state-machine'
-import { getRound, toSnapshot } from '../state-utils'
-import { getFragmentsTime } from '../timeouts'
+import { getRound } from '../state-utils'
+import { getFragmentsTime, Timeouts } from '../timeouts'
 
 const handleClientQuestionSelect = (
 	state: GameState,
@@ -30,6 +30,21 @@ const handleClientQuestionSelect = (
 		return {}
 	}
 
+	if (state.gameMode === 'party') {
+		return selectPartyQuestion(state, stage, roundModel, question, command.playerId, ctx)
+	}
+
+	return selectClassicQuestion(state, stage, roundModel, question, command.playerId, ctx)
+}
+
+const selectClassicQuestion = (
+	state: GameState,
+	stage: Extract<Stage, { type: 'round' }>,
+	roundModel: { id: string },
+	question: { id: string; fragments: any },
+	playerId: string,
+	ctx: CommandContext
+): UpdateResult => {
 	const callbackId: string = ctx.random().toString(36).substring(7)
 	const { seconds } = getFragmentsTime(question.fragments)
 	const questionReadTime = Math.floor(seconds + ctx.random() * 3) + 1
@@ -37,10 +52,10 @@ const handleClientQuestionSelect = (
 	const newStage: Extract<Stage, { type: 'question' }> = {
 		type: 'question',
 		roundId: roundModel.id,
-		activePlayer: command.playerId,
+		activePlayer: playerId,
 		questionId: question.id,
 		previousAnswers: { questionId: question.id, answers: [], triedToAppeal: [] },
-		takenQuestions: [...stage.takenQuestions, command.action.questionId],
+		takenQuestions: [...stage.takenQuestions, question.id],
 		falseStartPlayers: [],
 		finishedMediaPlayers: [],
 		questionReadTime,
@@ -51,16 +66,53 @@ const handleClientQuestionSelect = (
 		state: { ...state, stage: newStage },
 		effects: [
 			{
-				type: 'client-broadcast',
-				event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
-			},
-			{
 				type: 'schedule',
 				command: {
 					type: 'server',
 					action: { type: 'button-ready', callbackId },
 				},
 				delaySeconds: Math.floor(questionReadTime / 1.5) + 1.5,
+			},
+		],
+	}
+}
+
+const selectPartyQuestion = (
+	state: GameState,
+	stage: Extract<Stage, { type: 'round' }>,
+	roundModel: { id: string },
+	question: { id: string; fragments: any },
+	playerId: string,
+	ctx: CommandContext
+): UpdateResult => {
+	const callbackId: string = ctx.random().toString(36).substring(7)
+	const { seconds } = getFragmentsTime(question.fragments)
+	const answerTimeSeconds = Math.floor(seconds) + Timeouts.partyAnswerBuffer
+
+	const newStage: Extract<Stage, { type: 'party-question' }> = {
+		type: 'party-question',
+		roundId: roundModel.id,
+		activePlayer: playerId,
+		questionId: question.id,
+		previousAnswers: { questionId: question.id, answers: [], triedToAppeal: [] },
+		takenQuestions: [...stage.takenQuestions, question.id],
+		answerTimeSeconds,
+		submissions: [],
+		finishedMediaPlayers: [],
+		callbackId,
+		callbackTimeout: answerTimeSeconds,
+	}
+
+	return {
+		state: { ...state, stage: newStage },
+		effects: [
+			{
+				type: 'schedule',
+				command: {
+					type: 'server',
+					action: { type: 'party-answer-timeout', callbackId },
+				},
+				delaySeconds: answerTimeSeconds,
 			},
 		],
 	}

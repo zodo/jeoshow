@@ -11,6 +11,10 @@ export type ServerAction =
 	| { type: 'question-random'; callbackId: string }
 	| { type: 'fire-stage-update' }
 	| { type: 'llm-verdict'; correct: boolean; callbackId: string }
+	| { type: 'party-answer-timeout'; callbackId: string }
+	| { type: 'party-verdicts-ready'; callbackId: string }
+	| { type: 'party-llm-verdict'; playerId: string; correct: boolean; callbackId: string }
+	| { type: 'party-reveal-timeout'; callbackId: string }
 	| { type: 'state-cleanup' }
 
 export type ServerCommand<A extends ServerAction> = {

@@ -2,7 +2,7 @@ import { assertNever } from 'shared/utils/assert-never'
 import type { GameState, Stage } from '../models/state'
 import type { ServerCommand } from '../models/state-commands'
 import type { CommandContext, UpdateResult } from '../models/state-machine'
-import { getQuestion, toSnapshot } from '../state-utils'
+import { getQuestion } from '../state-utils'
 import { Timeouts, getFragmentsTime } from '../timeouts'
 
 const handleServerAnswerShow = (
@@ -14,7 +14,8 @@ const handleServerAnswerShow = (
 		state.stage.type !== 'ready-for-hit' &&
 		state.stage.type !== 'question' &&
 		state.stage.type !== 'awaiting-answer' &&
-		state.stage.type !== 'answer-attempt'
+		state.stage.type !== 'answer-attempt' &&
+		state.stage.type !== 'party-reveal'
 	) {
 		return { state, effects: [] }
 	}
@@ -50,10 +51,6 @@ const handleServerAnswerShow = (
 	return {
 		state: { ...state, stage },
 		effects: [
-			{
-				type: 'client-broadcast',
-				event: { type: 'stage-updated', stage: toSnapshot(stage, ctx) },
-			},
 			{
 				type: 'schedule',
 				command: {

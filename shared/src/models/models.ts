@@ -10,6 +10,14 @@ export interface Player {
 	ping: number
 }
 
+export interface PartyVerdict {
+	playerId: string
+	answer: string
+	correct: boolean
+	scoreDiff: number
+	confidenceBet: boolean
+}
+
 export type QuestionState =
 	| { type: 'idle' }
 	| { type: 'ready-for-hit'; timeoutSeconds: number }
@@ -17,7 +25,9 @@ export type QuestionState =
 	| { type: 'llm-checking'; activePlayerId: string }
 	| { type: 'answer-attempt' }
 
-export type StageSnapshot =
+export type GameMode = 'classic' | 'party'
+
+export type StageSnapshot = { gameMode: GameMode } & (
 	| { type: 'before-start' }
 	| {
 			type: 'round'
@@ -48,6 +58,7 @@ export type StageSnapshot =
 				timeoutSeconds: number
 			}
 			appealResolution?: 'approved' | 'rejected'
+			jackpot?: number
 	  }
 	| {
 			type: 'question'
@@ -66,4 +77,27 @@ export type StageSnapshot =
 			canSkip: boolean
 			votedForSkip: string[]
 	  }
+	| {
+			type: 'party-question'
+			fragments: PackModel.FragmentGroup[]
+			price: number
+			theme: string
+			themeComment?: string
+			timeoutSeconds: number
+			submittedPlayerIds: string[]
+			jackpot: number
+			totalPot: number
+			selectAnswerOptions?: PackModel.SelectAnswerOption[]
+	  }
+	| {
+			type: 'party-checking'
+			totalPot: number
+	  }
+	| {
+			type: 'party-reveal'
+			verdicts: PartyVerdict[]
+			totalPot: number
+			jackpot: number
+	  }
 	| { type: 'after-finish' }
+)

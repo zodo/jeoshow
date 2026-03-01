@@ -1,10 +1,14 @@
-import type { Player } from 'shared/models/models'
+import type { PartyVerdict, Player } from 'shared/models/models'
 
 type PlayerId = string
+
+export type GameMode = 'classic' | 'party'
 
 export interface GameState {
 	players: Player[]
 	stage: Stage
+	gameMode: GameMode
+	jackpot: number
 }
 
 export type Stage =
@@ -76,6 +80,27 @@ type RoundStageType =
 			finishedMediaPlayers: PlayerId[]
 			votedForSkip: PlayerId[]
 	  }
+	| {
+			type: 'party-question'
+			questionId: string
+			answerTimeSeconds: number
+			submissions: PartySubmission[]
+			finishedMediaPlayers: PlayerId[]
+	  }
+	| {
+			type: 'party-checking'
+			questionId: string
+			submissions: PartySubmission[]
+			pendingVerdicts: number
+			verdicts: PartyVerdict[]
+	  }
+	| {
+			type: 'party-reveal'
+			questionId: string
+			verdicts: PartyVerdict[]
+			potAmount: number
+			finishedRevealPlayers: PlayerId[]
+	  }
 
 export interface FalseStartRecord {
 	playerId: PlayerId
@@ -94,3 +119,14 @@ export interface PlayerAnswer {
 	isCorrect: boolean
 	scoreDiff: number
 }
+
+export interface PartySubmission {
+	playerId: PlayerId
+	answer: string
+	answerText: string
+	submittedAt: number
+	passed: boolean
+	confidenceBet: boolean
+}
+
+export type { PartyVerdict } from 'shared/models/models'

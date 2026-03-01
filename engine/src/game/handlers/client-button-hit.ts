@@ -49,7 +49,7 @@ const handleClientButtonHit = (
 					type: 'client-reply',
 					event: {
 						type: 'stage-updated',
-						stage: toSnapshot(newStage, ctx),
+						stage: toSnapshot({ ...state, stage: newStage }, ctx),
 					},
 				},
 				{
@@ -77,10 +77,6 @@ const handleClientButtonHit = (
 				stage: newStage,
 			},
 			effects: [
-				{
-					type: 'client-broadcast',
-					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
-				},
 				{
 					type: 'client-broadcast',
 					event: {
@@ -136,10 +132,6 @@ export const goToAwaitingAnswer = (
 			stage: newStage,
 		},
 		effects: [
-			{
-				type: 'client-broadcast',
-				event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
-			},
 			{
 				type: 'client-broadcast',
 				event: { type: 'player-hit-the-button', playerId, falseStart: false },

@@ -1,104 +1,149 @@
 <script lang="ts">
 	import Game from '$lib/components/Game.svelte'
-	import AfterFinish from '$lib/components/stages/AfterFinish.svelte'
-	import { readable } from 'svelte/store'
 
-	const changingBoolean = readable(true, (set, update) => {
-		const interval = setInterval(() => {
-			update((value) => !value)
-		}, 2500)
-
-		return () => {
-			clearInterval(interval)
-		}
-	})
-
-	let answer = ''
+	const players = [
+		{
+			id: '1',
+			name: 'Алексей',
+			score: 1200,
+			active: false,
+			disconnected: false,
+			pressedButton: null,
+			answerAttemts: 5,
+			ping: 45,
+			partySubmitted: true,
+			avatarUrl: undefined,
+		},
+		{
+			id: '2',
+			name: 'Мария',
+			score: 800,
+			active: false,
+			disconnected: false,
+			pressedButton: null,
+			answerAttemts: 3,
+			ping: 62,
+			partySubmitted: true,
+			avatarUrl: undefined,
+		},
+		{
+			id: '3',
+			name: 'Дмитрий',
+			score: -200,
+			active: false,
+			disconnected: false,
+			pressedButton: null,
+			answerAttemts: 4,
+			ping: 38,
+			partySubmitted: true,
+			avatarUrl: undefined,
+		},
+		{
+			id: '4',
+			name: 'Екатерина',
+			score: 500,
+			active: false,
+			disconnected: false,
+			pressedButton: null,
+			answerAttemts: 2,
+			ping: 55,
+			partySubmitted: true,
+			avatarUrl: undefined,
+		},
+		{
+			id: '5',
+			name: 'Игорь',
+			score: 300,
+			active: false,
+			disconnected: false,
+			pressedButton: null,
+			answerAttemts: 1,
+			ping: 70,
+			partySubmitted: true,
+			avatarUrl: undefined,
+		},
+		{
+			id: '6',
+			name: 'Ольга',
+			score: 950,
+			active: false,
+			disconnected: false,
+			pressedButton: null,
+			answerAttemts: 6,
+			ping: 41,
+			partySubmitted: true,
+			avatarUrl: undefined,
+		},
+	]
 </script>
 
 <Game
 	state={{
 		stage: {
-			type: 'round',
-			name: 'Round 1',
-			meActive: true,
-			themes: [
-				...Array.from({ length: 26 }).map((_, i) => ({
-					name: `Theme ${i + 1}`,
-					questions: [
-						...Array.from({ length: 15 }).map((_, j) => ({
-							id: `${i}-${j}`,
-							price: 100 * (j + 1),
-							available: true,
-						})),
-					],
-				})),
+			type: 'party-reveal',
+			loading: false,
+			totalPot: 1800,
+			price: 600,
+			jackpot: 1200,
+			verdicts: [
+				{
+					playerName: 'Алексей',
+					answer: 'Байкал',
+					correct: true,
+					scoreDiff: 300,
+					confidenceBet: false,
+					passed: false,
+				},
+				{
+					playerName: 'Мария',
+					answer: 'Каспийское море. На самом деле, оно очень большое и красивое',
+					correct: false,
+					scoreDiff: 0,
+					confidenceBet: false,
+					passed: false,
+				},
+				{
+					playerName: 'Дмитрий',
+					answer: '',
+					correct: false,
+					scoreDiff: 0,
+					confidenceBet: false,
+					passed: true,
+				},
+				{
+					playerName: 'Екатерина',
+					answer: 'Байкал',
+					correct: true,
+					scoreDiff: 600,
+					confidenceBet: true,
+					passed: false,
+				},
+				{
+					playerName: 'Игорь',
+					answer: 'Ладожское озеро',
+					correct: false,
+					scoreDiff: -600,
+					confidenceBet: true,
+					passed: false,
+				},
+				{
+					playerName: 'Ольга',
+					answer: '',
+					correct: false,
+					scoreDiff: 0,
+					confidenceBet: false,
+					passed: true,
+				},
 			],
 		},
-		players: [
-			{
-				id: '1',
-				name: 'Player 1',
-				score: $changingBoolean ? 100 : 500,
-				active: true,
-				disconnected: false,
-				pressedButton: null,
-				answerAttemts: 123,
-				ping: 123,
-			},
-		],
+		players,
 		disconnected: false,
-		controls: {
-			mode: 'hit',
-			ready: true,
-			falselyStart: false,
-		},
-		answerAttempt: {
-			isMe: false,
-			playerName: 'Join',
-			type: 'in-progress',
-			answer: 'Answer',
-			avatarUrl: '/telegram/user-photo/5000362861',
-		},
+		gameMode: 'party',
+		controls: { mode: 'party-waiting' },
 		stageBlink: false,
 		showPlayers: true,
-
-		messages: [
-			...(true
-				? [
-						{
-							player: {
-								id: '2',
-								name: 'Player 1',
-								score: 100,
-								disconnected: false,
-								answerAttemts: 123,
-								ping: 123,
-								avatarUrl: undefined,
-							},
-							text: '🤔',
-							id: '123',
-						},
-					]
-				: []),
-			{
-				player: {
-					id: '1',
-					name: 'Player 1',
-					score: 100,
-					disconnected: false,
-					answerAttemts: 123,
-					ping: 123,
-					avatarUrl: '/telegram/user-photo/5000362861',
-				},
-				text: 'Текст подольше',
-				id: '22',
-			},
-		],
+		jackpot: 0,
+		messages: [],
 	}}
-	on:action={(e) => {
-		if (e.detail.type === 'answer-typing') {
-			answer = e.detail.value
-		}
-	}}
+	on:action={(e) => console.log('action', e.detail)}
 />

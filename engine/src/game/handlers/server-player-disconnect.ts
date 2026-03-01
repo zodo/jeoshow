@@ -21,21 +21,18 @@ const handlePlayerDisconnect = (
 
 	return {
 		state: { ...state, players: newPlayers },
-		effects: [
-			noPlayersLeft
-				? {
+		effects: noPlayersLeft
+			? [
+					{
 						type: 'schedule',
 						command: {
 							type: 'server',
 							action: { type: 'state-cleanup' },
 						},
 						delaySeconds: 60 * 60,
-					}
-				: {
-						type: 'client-broadcast',
-						event: { type: 'players-updated', players: newPlayers },
 					},
-		],
+				]
+			: [],
 	}
 }
 

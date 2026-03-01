@@ -1,7 +1,6 @@
 import type { GameState, Stage } from '../models/state'
 import type { ClientCommand } from '../models/state-commands'
 import type { CommandContext, UpdateResult } from '../models/state-machine'
-import { toSnapshot } from '../state-utils'
 import { Timeouts } from '../timeouts'
 
 const handleClientGameStart = (
@@ -9,10 +8,12 @@ const handleClientGameStart = (
 	command: ClientCommand.OfType<'game-start'>,
 	ctx: CommandContext
 ): UpdateResult => {
+	const gameMode = command.action.gameMode
 	const alivePlayers = state.players.filter((p) => !p.disconnected)
 	const randomActivePlayer = alivePlayers[Math.floor(ctx.random() * alivePlayers.length)]
 	const callbackId: string = ctx.random().toString(36).substring(7)
 	const firstRoundId = ctx.pack.rounds[0].id
+	const selectTimeout = gameMode === 'party' ? Timeouts.partySelectQuestion : Timeouts.selectQuestion
 	const newStage: Stage = {
 		type: 'round',
 		paused: false,
@@ -21,23 +22,19 @@ const handleClientGameStart = (
 		activePlayer: randomActivePlayer.id,
 		previousAnswers: { answers: [], triedToAppeal: [] },
 		callbackId,
-		callbackTimeout: Timeouts.selectQuestion,
+		callbackTimeout: selectTimeout,
 	}
 
 	return {
-		state: { ...state, stage: newStage },
+		state: { ...state, gameMode, jackpot: 0, stage: newStage },
 		effects: [
-			{
-				type: 'client-broadcast',
-				event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
-			},
 			{
 				type: 'schedule',
 				command: {
 					type: 'server',
 					action: { type: 'question-random', callbackId },
 				},
-				delaySeconds: Timeouts.selectQuestion,
+				delaySeconds: selectTimeout,
 			},
 		],
 	}

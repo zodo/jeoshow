@@ -31,15 +31,12 @@ describe('disconnect', () => {
 		expect(g.player('p2').disconnected).toBe(false)
 	})
 
-	it('broadcasts players-updated when some players remain connected', () => {
+	it('marks player as disconnected (players-updated auto-broadcast by DO)', () => {
 		const g = startedGame()
 
 		g.disconnect('p1')
 
-		const broadcast = g.broadcasts.find(
-			(b) => b.type === 'client-broadcast' && b.event.type === 'players-updated'
-		)
-		expect(broadcast).toBeDefined()
+		expect(g.player('p1').disconnected).toBe(true)
 	})
 
 	it('schedules state-cleanup when ALL players disconnect', () => {

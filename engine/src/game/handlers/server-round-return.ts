@@ -1,7 +1,7 @@
 import type { GameState, Stage } from '../models/state'
 import type { ServerCommand } from '../models/state-commands'
 import type { CommandContext, UpdateResult } from '../models/state-machine'
-import { getRound, toSnapshot } from '../state-utils'
+import { getRound } from '../state-utils'
 import { Timeouts } from '../timeouts'
 
 const handleServerRoundReturn = (
@@ -23,6 +23,7 @@ const handleServerRoundReturn = (
 
 	const hasMoreRounds = ctx.pack.rounds[ctx.pack.rounds.length - 1].id !== state.stage.roundId
 	const callbackId: string = ctx.random().toString(36).substring(7)
+	const selectTimeout = state.gameMode === 'party' ? Timeouts.partySelectQuestion : Timeouts.selectQuestion
 
 	let activePlayer = state.stage.activePlayer
 	if (state.players.find((p) => p.id === activePlayer)?.disconnected) {
@@ -49,7 +50,7 @@ const handleServerRoundReturn = (
 				appealResolution: undefined,
 				appealVoting: undefined,
 				callbackId,
-				callbackTimeout: Timeouts.selectQuestion,
+				callbackTimeout: selectTimeout,
 			}
 		} else {
 			const stageRoundId = state.stage.roundId
@@ -69,17 +70,13 @@ const handleServerRoundReturn = (
 				appealResolution: undefined,
 				appealVoting: undefined,
 				callbackId,
-				callbackTimeout: Timeouts.selectQuestion,
+				callbackTimeout: selectTimeout,
 			}
 		}
 
 		return {
 			state: { ...state, stage: newStage },
 			effects: [
-				{
-					type: 'client-broadcast',
-					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
-				},
 				...(noPlayersLeft
 					? []
 					: [
@@ -89,7 +86,7 @@ const handleServerRoundReturn = (
 									type: 'server',
 									action: { type: 'question-random', callbackId },
 								},
-								delaySeconds: Timeouts.selectQuestion,
+								delaySeconds: selectTimeout,
 							} as const,
 						]),
 			],
@@ -101,12 +98,7 @@ const handleServerRoundReturn = (
 
 		return {
 			state: { ...state, stage: newStage },
-			effects: [
-				{
-					type: 'client-broadcast',
-					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
-				},
-			],
+			effects: [],
 		}
 	}
 }

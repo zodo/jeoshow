@@ -1,7 +1,6 @@
 import type { AnswersSummary, GameState, Stage } from '../models/state'
 import type { ClientCommand } from '../models/state-commands'
 import type { CommandContext, UpdateResult } from '../models/state-machine'
-import { toSnapshot } from '../state-utils'
 import { Timeouts } from '../timeouts'
 
 const handleClientAppealVote = (
@@ -88,14 +87,6 @@ const handleVote = (
 			state: { ...state, players: newPlayers, stage: newStage },
 			effects: [
 				{
-					type: 'client-broadcast',
-					event: { type: 'players-updated', players: newPlayers },
-				},
-				{
-					type: 'client-broadcast',
-					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
-				},
-				{
 					type: 'schedule',
 					command: {
 						type: 'server',
@@ -116,10 +107,6 @@ const handleVote = (
 		return {
 			state: { ...state, stage: newStage },
 			effects: [
-				{
-					type: 'client-broadcast',
-					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
-				},
 				{
 					type: 'schedule',
 					command: {
@@ -142,12 +129,7 @@ const handleVote = (
 
 		return {
 			state: { ...state, stage: newStage },
-			effects: [
-				{
-					type: 'client-broadcast',
-					event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
-				},
-			],
+			effects: [],
 		}
 	}
 }
@@ -198,10 +180,6 @@ const handleStartAppeal = (
 	return {
 		state: { ...state, stage: newStage },
 		effects: [
-			{
-				type: 'client-broadcast',
-				event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
-			},
 			{
 				type: 'schedule',
 				command: {

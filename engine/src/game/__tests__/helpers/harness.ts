@@ -32,6 +32,7 @@ export class GameHarness {
 	broadcasts: UpdateEffect[] = []
 	replies: UpdateEffect[] = []
 	llmRequests: Extract<UpdateEffect, { type: 'llm-judge' }>[] = []
+	llmBatchRequests: Extract<UpdateEffect, { type: 'llm-judge-batch' }>[] = []
 
 	constructor(
 		players: Player[] = [PLAYER1, PLAYER2],
@@ -48,6 +49,7 @@ export class GameHarness {
 		this.broadcasts = []
 		this.replies = []
 		this.llmRequests = []
+		this.llmBatchRequests = []
 	}
 
 	// ── Core ──
@@ -87,6 +89,9 @@ export class GameHarness {
 				allEffects.push(effect)
 			} else if (effect.type === 'llm-judge') {
 				this.llmRequests.push(effect)
+				allEffects.push(effect)
+			} else if (effect.type === 'llm-judge-batch') {
+				this.llmBatchRequests.push(effect)
 				allEffects.push(effect)
 			}
 		}
@@ -128,11 +133,11 @@ export class GameHarness {
 		})
 	}
 
-	gameStart(playerId: string = 'p1') {
+	gameStart(playerId: string = 'p1', gameMode: 'classic' | 'party' = 'classic') {
 		return this.apply({
 			type: 'client',
 			playerId,
-			action: { type: 'game-start' },
+			action: { type: 'game-start', gameMode },
 		})
 	}
 
@@ -216,6 +221,46 @@ export class GameHarness {
 		})
 	}
 
+	partyAnswer(playerId: string, value: string, confidenceBet = false) {
+		return this.apply({
+			type: 'client',
+			playerId,
+			action: { type: 'party-answer', value, confidenceBet },
+		})
+	}
+
+	partyPass(playerId: string) {
+		return this.apply({
+			type: 'client',
+			playerId,
+			action: { type: 'party-pass' },
+		})
+	}
+
+	partyRevealReady(playerId: string) {
+		return this.apply({
+			type: 'client',
+			playerId,
+			action: { type: 'party-reveal-ready' },
+		})
+	}
+
+	partyLlmVerdict(playerId: string, correct: boolean) {
+		const lastBatch = this.llmBatchRequests[this.llmBatchRequests.length - 1]
+		if (!lastBatch) {
+			throw new Error('No pending LLM batch request')
+		}
+		return this.apply({
+			type: 'server',
+			action: {
+				type: 'party-llm-verdict',
+				playerId,
+				correct,
+				callbackId: lastBatch.callbackId,
+			},
+		})
+	}
+
 	disconnect(playerId: string) {
 		return this.apply({
 			type: 'server',
@@ -287,6 +332,42 @@ export const startedGame = (
  * Create a harness at the 'ready-for-hit' stage.
  * question q1 (price 100, answer "correct answer") is active.
  */
+/**
+ * Create a harness with players introduced and party game started.
+ * Returns in 'round' stage ready to select a question.
+ */
+export const startedPartyGame = (
+	players: Player[] = [PLAYER1, PLAYER2],
+	ctxOverrides?: Partial<CommandContext>
+): GameHarness => {
+	const g = new GameHarness(players, ctxOverrides)
+	for (const p of players) {
+		g.introduce(p.id, p.name)
+	}
+	g.gameStart(players[0].id, 'party')
+	g.clearEffects()
+	return g
+}
+
+/**
+ * Create a party harness at the 'party-question' stage.
+ * question q1 (price 100, answer "correct answer") is active.
+ */
+export const partyQuestionGame = (
+	players: Player[] = [PLAYER1, PLAYER2],
+	questionId: string = 'q1',
+	ctxOverrides?: Partial<CommandContext>
+): GameHarness => {
+	const g = startedPartyGame(players, ctxOverrides)
+	g.selectQuestion(g.activePlayer, questionId)
+	// Keep scheduled (party-answer-timeout) but clear other effects
+	g.broadcasts = []
+	g.replies = []
+	g.llmRequests = []
+	g.llmBatchRequests = []
+	return g
+}
+
 export const readyForHitGame = (
 	players: Player[] = [PLAYER1, PLAYER2],
 	questionId: string = 'q1',

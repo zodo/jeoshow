@@ -2,9 +2,11 @@ import type { PackModel } from 'shared/models/siq'
 import type { AnswersSummary, GameState, Stage } from '../models/state'
 import type { ClientCommand } from '../models/state-commands'
 import type { CommandContext, UpdateEffect, UpdateResult } from '../models/state-machine'
-import { getQuestion, getRound, toSnapshot } from '../state-utils'
+import { getQuestion, getRound } from '../state-utils'
 import { Timeouts } from '../timeouts'
 import { assertNever } from 'shared/utils/assert-never'
+import { isCorrect } from '../answer-check'
+import { extractQuestionText } from '../llm-judge'
 
 const handleClientAnswerGive = (
 	state: GameState,
@@ -60,17 +62,9 @@ const handleClientAnswerGive = (
 		t.questions.some((q) => q.id === questionModel.id)
 	)
 
-	const questionText = questionModel.fragments
-		.flatMap((fg) => fg)
-		.filter((f) => f.type === 'text')
-		.map((f) => f.value)
-		.join(' ')
+	const questionText = extractQuestionText(questionModel.fragments)
 
 	const effects: UpdateEffect[] = [
-		{
-			type: 'client-broadcast',
-			event: { type: 'stage-updated', stage: toSnapshot(stage, ctx) },
-		},
 		{
 			type: 'llm-judge',
 			questionText,
@@ -169,17 +163,6 @@ export const resolveAnswer = (opts: {
 			{
 				type: 'client-broadcast',
 				event: {
-					type: 'players-updated',
-					players,
-				},
-			},
-			{
-				type: 'client-broadcast',
-				event: { type: 'stage-updated', stage: toSnapshot(stage, ctx) },
-			},
-			{
-				type: 'client-broadcast',
-				event: {
 					type: 'answer-attempt',
 					playerId: command.playerId,
 					answer: playerAnswerText,
@@ -211,23 +194,6 @@ export const resolveAnswer = (opts: {
 						},
 					},
 		],
-	}
-}
-
-const isCorrect = (correctAnswer: PackModel.Answers, actualAnswer: string) => {
-	if (correctAnswer.type === 'regular') {
-		const sanitize = (s: string) =>
-			s
-				.replace(/[^\p{L}\p{N}]+/gu, '')
-				.replace('ё', 'е')
-				.replace('й', 'и')
-				.toLowerCase()
-
-		return correctAnswer.correct.map(sanitize).includes(sanitize(actualAnswer))
-	} else if (correctAnswer.type === 'select') {
-		return actualAnswer === correctAnswer.correctName
-	} else {
-		assertNever(correctAnswer)
 	}
 }
 

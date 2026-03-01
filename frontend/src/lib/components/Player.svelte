@@ -50,6 +50,10 @@
 		{$score.toFixed(0)}
 	</div>
 
+	{#if player.partySubmitted}
+		<div class="flex-none text-sm text-text-neutral">✓</div>
+	{/if}
+
 	{#if player.disconnected}
 		<svg
 			class="h-5 w-5 flex-none"

@@ -31,12 +31,8 @@ const handleClientIntroduce = (
 		state: { ...state, stage: newStage, players: newPlayers },
 		effects: [
 			{
-				type: 'client-broadcast',
-				event: { type: 'players-updated', players: newPlayers },
-			},
-			{
 				type: 'client-reply',
-				event: { type: 'stage-updated', stage: toSnapshot(newStage, ctx) },
+				event: { type: 'stage-updated', stage: toSnapshot({ ...state, stage: newStage, players: newPlayers }, ctx) },
 			},
 		],
 	}

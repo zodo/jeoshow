@@ -28,6 +28,8 @@ export const createState = async (
 		state: {
 			players: [],
 			stage: { type: 'before-start' },
+			gameMode: 'classic',
+			jackpot: 0,
 		},
 		model: packModel,
 	}

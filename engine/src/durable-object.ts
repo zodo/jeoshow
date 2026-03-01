@@ -1,7 +1,8 @@
 import { updateState } from './game/state-update'
-import { loadMetadata, type PackMetadata } from './game/metadata'
+import { loadMetadata } from './game/metadata'
 import { createState } from './game/state-create'
-import { judgeLlm } from './game/llm-judge'
+import { judgeLlm, judgeLlmBatch } from './game/llm-judge'
+import { toSnapshot } from './game/state-utils'
 import type {
 	ClientCommand,
 	GameCommand,
@@ -10,7 +11,7 @@ import type {
 } from './game/models/state-commands'
 import type { ClientAction } from 'shared/models/messages'
 import type { GameState } from './game/models/state'
-import type { UpdateEffect, UpdateResult } from './game/models/state-machine'
+import type { CommandContext, UpdateEffect, UpdateResult } from './game/models/state-machine'
 
 class GameDurableObjectSqlite {
 	state: DurableObjectState
@@ -184,21 +185,23 @@ class GameDurableObjectSqlite {
 			console.error('Metadata not found')
 			return
 		}
-		const events = await this.storage.transaction(async (txn) => {
+		const ctx: CommandContext = {
+			pack: packMetadata.model,
+			mediaMapping: packMetadata.mediaMapping,
+			now,
+			random: Math.random,
+		}
+		const txResult = await this.storage.transaction(async (txn) => {
 			const before: GameState | undefined = await txn.get('state')
 			if (!before) {
 				console.error('State not found')
 				return
 			}
 
-			const { state: after, effects } = this.recursivelyUpdateState({
-				state: before,
-				command,
-				packMetadata,
-				now,
-			})
+			const { state: after, effects } = this.recursivelyUpdateState(before, command, ctx)
 
-			await txn.put('state', after ?? before)
+			const finalState = after ?? before
+			await txn.put('state', finalState)
 
 			console.log(
 				`<- ${origin}.${command.type}.${command.action.type}`,
@@ -208,16 +211,19 @@ class GameDurableObjectSqlite {
 					effects,
 					state: {
 						before,
-						after,
+						after: finalState,
 					},
 				})
 			)
 
-			return effects
+			return { effects, before, after: finalState }
 		})
 
+		if (!txResult) return
+		const { effects, before, after } = txResult
+
 		const replyEvents =
-			events
+			effects
 				?.filter(
 					(e): e is Extract<UpdateEffect, { type: 'client-reply' }> =>
 						e.type === 'client-reply'
@@ -228,18 +234,33 @@ class GameDurableObjectSqlite {
 		}
 
 		const broadcastEvents =
-			events
+			effects
 				?.filter(
 					(e): e is Extract<UpdateEffect, { type: 'client-broadcast' }> =>
 						e.type === 'client-broadcast'
 				)
 				.map((e) => e.event) ?? []
+
+		// Auto-broadcast stage-updated and players-updated by diffing before/after
+		if (before.stage !== after.stage) {
+			broadcastEvents.push({
+				type: 'stage-updated',
+				stage: toSnapshot(after, ctx),
+			})
+		}
+		if (before.players !== after.players) {
+			broadcastEvents.push({
+				type: 'players-updated',
+				players: after.players,
+			})
+		}
+
 		if (broadcastEvents.length > 0) {
 			await this.broadcast(JSON.stringify(broadcastEvents))
 		}
 
 		const scheduledCommands =
-			events?.filter(
+			effects?.filter(
 				(e): e is Extract<UpdateEffect, { type: 'schedule' }> => e.type === 'schedule'
 			) ?? []
 		if (scheduledCommands.length > 0 || origin === 'alarm') {
@@ -255,7 +276,7 @@ class GameDurableObjectSqlite {
 		}
 
 		const llmJudgeEffects =
-			events?.filter(
+			effects?.filter(
 				(e): e is Extract<UpdateEffect, { type: 'llm-judge' }> => e.type === 'llm-judge'
 			) ?? []
 		for (const effect of llmJudgeEffects) {
@@ -281,26 +302,59 @@ class GameDurableObjectSqlite {
 				)
 			})
 		}
+
+		const llmBatchEffects =
+			effects?.filter(
+				(e): e is Extract<UpdateEffect, { type: 'llm-judge-batch' }> =>
+					e.type === 'llm-judge-batch'
+			) ?? []
+		for (const effect of llmBatchEffects) {
+			const apiKey = this.env.OPENROUTER_API_KEY
+			if (!apiKey) {
+				console.error('OPENROUTER_API_KEY not configured, falling back to incorrect')
+				continue
+			}
+			judgeLlmBatch(
+				apiKey,
+				effect.entries.map((entry) => ({
+					playerId: entry.playerId,
+					questionText: entry.questionText,
+					theme: entry.theme,
+					correctAnswers: entry.correctAnswers,
+					incorrectAnswers: entry.incorrectAnswers,
+					playerAnswer: entry.playerAnswer,
+				}))
+			).then((results) => {
+				for (const [playerId, correct] of Object.entries(results)) {
+					this.modifyState(
+						{
+							type: 'server',
+							action: {
+								type: 'party-llm-verdict',
+								playerId,
+								correct,
+								callbackId: effect.callbackId,
+							},
+						},
+						Date.now(),
+						'llm'
+					)
+				}
+			})
+		}
 	}
 
-	private recursivelyUpdateState(opts: {
-		state: GameState
-		command: GameCommand
-		packMetadata: PackMetadata
-		now: number
-		depth?: number
-	}): UpdateResult {
-		const { state, command, packMetadata, now, depth = 0 } = opts
+	private recursivelyUpdateState(
+		state: GameState,
+		command: GameCommand,
+		ctx: CommandContext,
+		depth = 0
+	): UpdateResult {
 		if (depth > 10) {
 			throw new Error(`Likely infinite loop: ${depth}, command: ${JSON.stringify(command)}`)
 		}
 
-		const { state: updatedState, effects: events } = updateState(state, command, {
-			pack: packMetadata.model,
-			mediaMapping: packMetadata.mediaMapping,
-			now,
-			random: Math.random,
-		})
+		const { state: updatedState, effects: events } = updateState(state, command, ctx)
 
 		const triggerEvents =
 			events?.filter(
@@ -311,13 +365,7 @@ class GameDurableObjectSqlite {
 
 		const finalState = triggerEvents.reduce<GameState>((currentState, event) => {
 			console.log('-> trigger:', event.command.type, event.command.action.type)
-			const result = this.recursivelyUpdateState({
-				state: currentState,
-				command: event.command,
-				packMetadata,
-				now,
-				depth: depth + 1,
-			})
+			const result = this.recursivelyUpdateState(currentState, event.command, ctx, depth + 1)
 			nonTriggerEvents.push(...(result.effects ?? []))
 			return result.state ?? currentState
 		}, updatedState ?? state)

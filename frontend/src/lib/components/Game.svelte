@@ -4,6 +4,7 @@
 	import DisconnectedOverlay from './DisconnectedOverlay.svelte'
 	import type { ViewState } from '$lib/models'
 	import Controls from './Controls.svelte'
+	import JackpotStrip from './JackpotStrip.svelte'
 	import { scale } from 'svelte/transition'
 	import { quintInOut } from 'svelte/easing'
 	import { cn } from '$lib/style-utils'
@@ -12,16 +13,21 @@
 </script>
 
 <section
-	class="grid h-[var(--height)] w-full max-w-[1200px] select-none grid-cols-[1fr] grid-rows-[fit-content(30%)_1fr_2.5rem] gap-2 px-1 py-2"
+	class="grid h-[var(--height)] w-full max-w-[1200px] select-none grid-cols-[1fr] grid-rows-[fit-content(30%)_1fr_auto] gap-2 px-1 py-2"
 	in:scale={{ duration: 700, easing: quintInOut }}
 >
-	<div class="relative overflow-scroll">
-		{#if state.showPlayers}
-			{#if state.stage.type === 'connecting'}
-				<div class="h-7"></div>
-			{:else}
-				<PlayerList players={state.players} />
+	<div class="flex flex-col">
+		<div class="relative min-h-0 flex-1 overflow-scroll">
+			{#if state.showPlayers}
+				{#if state.stage.type === 'connecting'}
+					<div class="h-7"></div>
+				{:else}
+					<PlayerList players={state.players} />
+				{/if}
 			{/if}
+		</div>
+		{#if state.jackpot > 0}
+			<JackpotStrip amount={state.jackpot} />
 		{/if}
 	</div>
 	<div
@@ -36,7 +42,7 @@
 		{#if state.stage.type === 'connecting'}
 			<div class="h-10"></div>
 		{:else}
-			<Controls controls={state.controls} on:action on:haptic />
+			<Controls controls={state.controls} gameMode={state.gameMode} on:action on:haptic />
 		{/if}
 	</div>
 

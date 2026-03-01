@@ -130,4 +130,6 @@ export const makeContext = (overrides?: Partial<CommandContext>): CommandContext
 export const makeInitialState = (players: Player[] = [PLAYER1, PLAYER2]): GameState => ({
 	players,
 	stage: { type: 'before-start' },
+	gameMode: 'classic',
+	jackpot: 0,
 })

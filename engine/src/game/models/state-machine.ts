@@ -23,6 +23,18 @@ export type UpdateEffect =
 			playerAnswer: string
 			callbackId: string
 	  }
+	| {
+			type: 'llm-judge-batch'
+			entries: {
+				playerId: string
+				questionText: string
+				theme: string
+				correctAnswers: string[]
+				incorrectAnswers: string[]
+				playerAnswer: string
+			}[]
+			callbackId: string
+	  }
 
 export interface UpdateResult {
 	state?: GameState

@@ -2,6 +2,8 @@
 	import BeforeStart from './stages/BeforeStart.svelte'
 	import Round from './stages/round/Round.svelte'
 	import Question from './stages/Question.svelte'
+	import PartyQuestion from './stages/PartyQuestion.svelte'
+	import PartyReveal from './stages/PartyReveal.svelte'
 	import AfterFinish from './stages/AfterFinish.svelte'
 	import Answer from './stages/Answer.svelte'
 	import type { ViewState } from '$lib/models'
@@ -25,6 +27,10 @@
 		<Round round={stage} on:action />
 	{:else if stage.type === 'question'}
 		<Question question={stage} on:action />
+	{:else if stage.type === 'party-question'}
+		<PartyQuestion question={stage} on:action />
+	{:else if stage.type === 'party-reveal'}
+		<PartyReveal reveal={stage} on:action on:haptic />
 	{:else if stage.type === 'answer'}
 		<Answer answer={stage} on:action />
 	{:else if stage.type === 'after-finish'}

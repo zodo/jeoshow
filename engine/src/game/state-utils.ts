@@ -1,6 +1,23 @@
-import type { QuestionState, StageSnapshot } from 'shared/models/models'
-import type { Stage } from './models/state'
+import type { GameMode, PartyVerdict, QuestionState, StageSnapshot } from 'shared/models/models'
+import type { Player } from 'shared/models/models'
+import type { GameState, Stage } from './models/state'
 import type { CommandContext } from './models/state-machine'
+
+/** Apply verdict scoreDiffs to players and compute new jackpot. */
+export function applyRevealScores(
+	state: GameState & { stage: Extract<Stage, { type: 'party-reveal' }> },
+	questionPrice: number
+): { players: Player[]; jackpot: number } {
+	const verdicts = state.stage.verdicts
+	const players = state.players.map((p) => {
+		const verdict = verdicts.find((v) => v.playerId === p.id)
+		if (!verdict || verdict.scoreDiff === 0) return p
+		return { ...p, score: p.score + verdict.scoreDiff }
+	})
+	const anyCorrect = verdicts.some((v) => v.correct)
+	const jackpot = anyCorrect ? 0 : state.jackpot + questionPrice
+	return { players, jackpot }
+}
 
 export const getRound = (ctx: CommandContext, roundId: string) => {
 	const round = ctx.pack.rounds.find((r) => r.id === roundId)
@@ -20,10 +37,16 @@ export const getQuestion = (ctx: CommandContext, questionId: string) => {
 	return question
 }
 
-export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => {
+export const toSnapshot = (
+	state: Pick<GameState, 'gameMode' | 'players' | 'jackpot' | 'stage'>,
+	ctx: CommandContext
+): StageSnapshot => {
+	const { stage } = state
+	const gameMode: GameMode = state.gameMode
+
 	switch (stage.type) {
 		case 'before-start': {
-			return { type: 'before-start' }
+			return { type: 'before-start', gameMode }
 		}
 		case 'round': {
 			const round = getRound(ctx, stage.roundId)
@@ -40,6 +63,7 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 
 			return {
 				type: 'round',
+				gameMode,
 				name: round.name,
 				comments: round.comments,
 				themes: [
@@ -55,6 +79,7 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 				activePlayerId: stage.activePlayer,
 				timeoutSeconds: stage.callbackTimeout ?? 0,
 				playerIdsCanAppeal,
+				jackpot: state.jackpot || undefined,
 				skipRoundVoting: stage.skipRoundVoting,
 				appealVoting: stage.appealVoting
 					? {
@@ -113,6 +138,7 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 
 			return {
 				type: 'question',
+				gameMode,
 				fragments: question.fragments,
 				price: question.price,
 				theme: theme?.name ?? '',
@@ -133,6 +159,7 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 				)
 			return {
 				type: 'answer',
+				gameMode,
 				theme: round.themes.find((t) => t.questions.some((q) => q.id === stage.questionId))!
 					.name,
 				model: question.answers,
@@ -140,7 +167,46 @@ export const toSnapshot = (stage: Stage, ctx: CommandContext): StageSnapshot => 
 				votedForSkip: stage.votedForSkip,
 			}
 		}
+		case 'party-question': {
+			const round = getRound(ctx, stage.roundId)
+			const question = getQuestion(ctx, stage.questionId)
+			const theme = round.themes.find((t) => t.questions.some((q) => q.id === question.id))
+			const jackpot = state.jackpot ?? 0
+			const totalPot = question.price + jackpot
+			return {
+				type: 'party-question',
+				gameMode,
+				fragments: question.fragments,
+				price: question.price,
+				theme: theme?.name ?? '',
+				themeComment: theme?.comments,
+				timeoutSeconds: stage.callbackTimeout ?? stage.answerTimeSeconds,
+				submittedPlayerIds: stage.submissions.map((s) => s.playerId),
+				jackpot,
+				totalPot,
+				selectAnswerOptions:
+					question.answers.type === 'select' ? question.answers.options : undefined,
+			}
+		}
+		case 'party-checking': {
+			const question = getQuestion(ctx, stage.questionId)
+			const jackpot = state.jackpot ?? 0
+			return {
+				type: 'party-checking',
+				gameMode,
+				totalPot: question.price + jackpot,
+			}
+		}
+		case 'party-reveal': {
+			return {
+				type: 'party-reveal',
+				gameMode,
+				verdicts: stage.verdicts,
+				totalPot: stage.potAmount,
+				jackpot: state.jackpot,
+			}
+		}
 		case 'after-finish':
-			return { type: 'after-finish' }
+			return { type: 'after-finish', gameMode }
 	}
 }

@@ -1,7 +1,6 @@
 import type { GameState } from '../models/state'
 import type { ClientCommand } from '../models/state-commands'
 import type { CommandContext, UpdateResult } from '../models/state-machine'
-import { toSnapshot } from '../state-utils'
 
 const handleClientAnswerSkip = (
 	state: GameState,
@@ -37,12 +36,7 @@ const handleClientAnswerSkip = (
 		const stage = { ...state.stage, votedForSkip: newVotedForSkip }
 		return {
 			state: { ...state, stage },
-			effects: [
-				{
-					type: 'client-broadcast',
-					event: { type: 'stage-updated', stage: toSnapshot(stage, ctx) },
-				},
-			],
+			effects: [],
 		}
 	}
 }
