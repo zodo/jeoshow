@@ -18,7 +18,7 @@
 
 <section class="relative h-full w-full p-2">
 	{#if stage.type === 'before-start'}
-		<BeforeStart on:action />
+		<BeforeStart playerCount={state.players.length} on:action />
 	{:else if stage.type === 'connecting'}
 		<section class="flex h-full items-center justify-center">
 			<div class="animate-bounce text-xl">Connecting...</div>
