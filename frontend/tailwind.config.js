@@ -20,6 +20,7 @@ export default {
 				'sans-serif',
 			],
 			serif: [
+				'"Source Serif 4"',
 				'Iowan Old Style',
 				'Apple Garamond',
 				'Baskerville',

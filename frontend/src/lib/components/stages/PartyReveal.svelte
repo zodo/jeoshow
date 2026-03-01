@@ -111,15 +111,7 @@
 				await delay(250)
 				setStep(i, 4)
 			} else {
-				// Step 0: card shell
-				setStep(i, 0)
-				await delay(150)
-
-				// Step 1: avatar
-				setStep(i, 1)
-				await delay(200)
-
-				// Step 2: name + answer
+				// Step 2: card with avatar + name + answer
 				setStep(i, 2)
 				await delay(400)
 
@@ -208,9 +200,9 @@
 
 	<!-- Verdicts -->
 	{#if bankPhase === 'verdicts'}
-		<div class="mt-12 flex w-full min-h-0 flex-1 flex-col px-4">
+		<div class="mt-12 flex w-full max-w-[650px] mx-auto min-h-0 flex-1 flex-col px-1">
 			<!-- Card list -->
-			<div class="min-h-0 flex-1 space-y-2 overflow-auto py-1">
+			<div class="min-h-0 flex-1 space-y-2 overflow-auto px-5 py-3 -mx-5">
 				{#each [...sortedVerdicts].reverse() as v, ri}
 					{@const i = sortedVerdicts.length - 1 - ri}
 					{@const step = cardSteps[i] ?? -1}
@@ -348,23 +340,35 @@
 
 	.verdict-card {
 		animation: card-enter 0.5s cubic-bezier(0.18, 1.8, 0.58, 1) both;
-		margin-left: 6px;
-		margin-right: 6px;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+		border: 1px solid rgba(128, 128, 128, 0.15);
+		transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+			box-shadow 0.35s ease,
+			border-color 0.35s ease,
+			background-color 0.8s ease;
 	}
 
 	.verdict-correct {
 		background: #059669;
 		color: #fff;
+		transform: scale(1.03);
+		box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
+		border-color: rgba(255, 255, 255, 0.2);
 	}
 
 	.verdict-wrong {
 		background: #e11d48;
 		color: #fff;
+		transform: scale(1.03);
+		box-shadow: 0 4px 12px rgba(225, 29, 72, 0.4);
+		border-color: rgba(255, 255, 255, 0.2);
 	}
 
 	.verdict-pass {
 		background: var(--color-bg-main);
 		opacity: 0.5;
+		box-shadow: none;
+		border-color: rgba(128, 128, 128, 0.1);
 	}
 
 	.bet-badge {
