@@ -86,10 +86,12 @@ async function callLlm(
 		return null
 	}
 
-	const data = (await response.json()) as {
+	const data = await response.json()
+	console.log('LLM judge raw response:', JSON.stringify(data))
+	const typed = data as {
 		choices?: { message?: { content?: string } }[]
 	}
-	return data.choices?.[0]?.message?.content ?? null
+	return typed.choices?.[0]?.message?.content ?? null
 }
 
 const singleSchema = {
