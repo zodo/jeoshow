@@ -201,7 +201,7 @@ export async function judgeLlmBatch(
 			},
 		}
 
-		const content = await callLlm(apiKey, messages, batchSchema, 150 * entries.length)
+		const content = await callLlm(apiKey, messages, batchSchema, 300 * entries.length)
 		if (content !== null) {
 			console.log('LLM judge batch response:', content)
 			const parsed = JSON.parse(content) as {

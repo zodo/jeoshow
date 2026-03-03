@@ -81,20 +81,25 @@ class GameDurableObjectSqlite {
 	}
 
 	async alarm() {
-		const now = Date.now()
-		const commands: ScheduledCommand[] = (await this.storage.get('scheduledCommands')) ?? []
-		const commandsToExecute = commands.filter((c) => c.time <= now)
-		for (const { command } of commandsToExecute) {
-			await this.modifyState(command, now, 'alarm')
-		}
-		if (commandsToExecute.length === 0) {
-			console.warn(
-				'Alarm triggered but no commands to execute',
-				JSON.stringify({
-					commands,
-					now,
-				})
-			)
+		try {
+			const now = Date.now()
+			const commands: ScheduledCommand[] =
+				(await this.storage.get('scheduledCommands')) ?? []
+			const commandsToExecute = commands.filter((c) => c.time <= now)
+			for (const { command } of commandsToExecute) {
+				await this.modifyState(command, now, 'alarm')
+			}
+			if (commandsToExecute.length === 0) {
+				console.warn(
+					'Alarm triggered but no commands to execute',
+					JSON.stringify({
+						commands,
+						now,
+					})
+				)
+			}
+		} catch (err) {
+			console.error('Alarm handler exception:', err instanceof Error ? err.stack : err)
 		}
 	}
 
